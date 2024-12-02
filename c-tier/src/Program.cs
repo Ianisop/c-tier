@@ -22,7 +22,7 @@ namespace c_tier.src.program
                 Console.WriteLine("Starting in client mode...");
                 Client client = new Client();
                 client.Connect(); // Connect to the server
-                client.Speak("Yooooooooo");
+                client.Speak("/asfhafh");
             }
             else
             {
