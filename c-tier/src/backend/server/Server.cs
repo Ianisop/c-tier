@@ -24,7 +24,6 @@ namespace c_tier.src.backend.server
 
         private static Dictionary<int, Socket> connectedClients = new Dictionary<int, Socket>();
         private static int nextClientId = 1;  // Client ID counter
-
         private static char commandPrefix = '/'; // Slash by default
 
         public Server(int targetPort, bool debug)
@@ -102,6 +101,8 @@ namespace c_tier.src.backend.server
                     CheckAndParseCommand(receivedText, clientSocket, clientId); // process a possible command
 
                     Console.WriteLine($"{Utils.GREEN}SERVER: Received from client {clientId}: {Utils.NORMAL} {receivedText}");
+
+                    UpdateClients($"client {clientId}: {Utils.NORMAL} {receivedText}\"",clientId);
                 }
             }
             catch (Exception ex)
@@ -117,25 +118,20 @@ namespace c_tier.src.backend.server
             }
         }
 
-        private static void DisconnectClient(int clientId)
+        /// <summary>
+        /// Updates all clients besides the message provider
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="clientToIgnore"></param>
+        private static void UpdateClients(string message, int clientToIgnore)
         {
-            if (connectedClients.ContainsKey(clientId))
-            {
-                Socket clientSocket = connectedClients[clientId];
-                byte[] responseBytes = Encoding.UTF8.GetBytes("You have been disconnected.");
-                clientSocket.Send(responseBytes); // Notify client
-                clientSocket.Close(); // Close the connection
-                connectedClients.Remove(clientId); // Remove from connected clients
-                Console.WriteLine($"Client {clientId} has been disconnected.");
-            }
-        }
-
-        private static void UpdateClients(string message)
-        {
+            connectedClients.TryGetValue(clientToIgnore, out var socketToIgnore);
             byte[] msgBytes = Encoding.UTF8.GetBytes(message);
+
             foreach (Socket socket in connectedClients.Values)
             {
-                socket.Send(msgBytes);
+                if (socket == socketToIgnore) continue; // ignore the og client when spreading the word
+                socket.Send(msgBytes); // bye bye
             }
         }
 
@@ -153,15 +149,20 @@ namespace c_tier.src.backend.server
                 }
                 else
                 {
-                    SendResponse(clientSocket, Utils.RED + "Invalid command.");
+                    SendResponse(clientSocket, Utils.RED + "Invalid command."); // Misspellings, invalid perms
                 }
             }
             catch (Exception ex)
             {
-                SendResponse(clientSocket, Utils.RED + "Error executing command.");
+                SendResponse(clientSocket, Utils.RED + "Error executing command."); // Anything else lol
             }
         }
 
+        /// <summary>
+        /// method to talk to a client at a time
+        /// </summary>
+        /// <param name="clientSocket"></param>
+        /// <param name="responseText"></param>
         private static void SendResponse(Socket clientSocket, string responseText)
         {
             byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
