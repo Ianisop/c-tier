@@ -5,6 +5,7 @@
 *.suo
 *.user
 *.sln.docstates
+*.vsidx
 
 # Build results
 
@@ -17,6 +18,7 @@ x64/
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
+
 
 *_i.c
 *_p.c
