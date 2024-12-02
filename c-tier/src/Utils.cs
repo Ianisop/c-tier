@@ -24,10 +24,26 @@ namespace c_tier.src
         public static string NOUNDERLINE = Console.IsOutputRedirected ? "" : "\x1b[24m";
         public static string REVERSE = Console.IsOutputRedirected ? "" : "\x1b[7m";
         public static string NOREVERSE = Console.IsOutputRedirected ? "" : "\x1b[27m";
-        public static async Task<T> ReadAsync<T>(string filePath)
+
+
+        /// <summary>
+        /// Serializes json into object
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="filePath"></param>
+        /// <returns> :shrug: </returns>
+        public static T ReadFromFile<T>(string filePath)
         {
-            using FileStream stream = File.OpenRead(filePath);
-            return await JsonSerializer.DeserializeAsync<T>(stream);
+            try
+            {
+                string jsonContent = File.ReadAllText(filePath);
+                return JsonSerializer.Deserialize<T>(jsonContent);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error reading or deserializing file: {ex.Message}");
+                return default;
+            }
         }
 
     }

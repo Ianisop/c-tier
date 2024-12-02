@@ -44,7 +44,7 @@ namespace c_tier.src.backend.server
             } catch(Exception e) {
                 Console.WriteLine($"{Utils.RED}Something went wrong! Stopping!"  + e.Message);
             }
-
+            Console.WriteLine(Utils.GREEN + "SERVER: Running on " + ipAddress.ToString());
             Work();
         }
 
@@ -60,7 +60,7 @@ namespace c_tier.src.backend.server
         {
             try
             {
-                Console.WriteLine($"{Utils.GREEN}SERVER:Listening on port {port}...");
+                Console.WriteLine($"{Utils.GREEN}SERVER: Listening on port {port}...");
 
                 // Start listening for incoming connections
                 serverSocket.Listen(10); // Backlog of 10 connections
@@ -75,6 +75,7 @@ namespace c_tier.src.backend.server
                     byte[] buffer = new byte[1024];
                     int receivedBytes = clientSocket.Receive(buffer);
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+
                     Console.WriteLine($"{Utils.GREEN}SERVER: Received from client: {Utils.NORMAL} {receivedText}");
 
                     // Send a response back to the client
