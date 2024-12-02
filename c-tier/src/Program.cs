@@ -9,7 +9,8 @@ namespace c_tier.src.program
         static void Main(string[] args)
         {
             Console.WriteLine("Select mode: Type 'server' to run as server, or 'client' to run as client.");
-            string mode = Console.ReadLine()?.ToLower();
+            //  string mode = Console.ReadLine()?.ToLower();
+            string mode = "client";
 
             if (mode == "server")
             {
@@ -19,15 +20,14 @@ namespace c_tier.src.program
             }
             else if (mode == "client")
             {
-                Console.WriteLine("Starting in client mode...");
-                Client client = new Client();
-                client.Connect(); // Connect to the server
-                client.Speak("/asfhafh");
+                Frontend.Init();
+
             }
             else
             {
                 Console.WriteLine("Invalid input. Please type 'server' or 'client'.");
             }
         }
+
     }
 }
