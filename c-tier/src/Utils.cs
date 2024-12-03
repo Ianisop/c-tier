@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
+using System.Security.Policy;
+using System.Security.Cryptography;
 
 namespace c_tier.src
 {
@@ -43,6 +45,25 @@ namespace c_tier.src
             {
                 Console.WriteLine($"Error reading or deserializing file: {ex.Message}");
                 return default;
+            }
+        }
+
+        public static UInt64 GenerateID(int length)
+        {
+            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            byte[] randomBytes = new byte[8];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomBytes);
+            }
+            UInt64 randomPort = BitConverter.ToUInt64(randomBytes, 0);
+            string combined = timestamp.ToString() + randomPort.ToString();
+            using (var sha256 =  SHA256.Create())
+            {
+                byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(combined));
+                UInt64 id = BitConverter.ToUInt64(hash, 0);
+                string idString = id.ToString().Substring(0, Math.Min(length,id.ToString().Length));
+                return UInt64.Parse(idString);
             }
         }
 
