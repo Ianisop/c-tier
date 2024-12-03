@@ -34,16 +34,17 @@ namespace c_tier.src
         /// <typeparam name="T"></typeparam>
         /// <param name="filePath"></param>
         /// <returns> :shrug: </returns>
-        public static T ReadFromFile<T>(string filePath)
+        public static T ReadFromFile<T>(string filePath, JsonSerializerOptions options)
         {
             try
             {
                 string jsonContent = File.ReadAllText(filePath);
-                return JsonSerializer.Deserialize<T>(jsonContent);
+                return JsonSerializer.Deserialize<T>(jsonContent, options);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error reading or deserializing file: {ex.Message}");
+                // Console.WriteLine($"Error reading or deserializing file: {ex.Message}");
+                Frontend.Log(ex.Message);
                 return default;
             }
         }

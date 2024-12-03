@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using c_tier.src.backend.client;
 
 namespace c_tier.src.backend.server
 {
@@ -17,9 +18,14 @@ namespace c_tier.src.backend.server
         private static readonly IPAddress ipAddress = IPAddress.Any; // Listen on all network interfaces;
         private static readonly Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); // Create a socket
         private static readonly IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
+        public static List<Channel> channels = new List<Channel>()
+        { new Channel("General", "The Place to be!", new List<Role>(){ new Role(1, "Creator")})};
+
+        public static List<User> users = new List<User>();
+
         public static readonly Dictionary<string, Action> commands = new Dictionary<string, Action>()    // Dict to hold all commands
         {
-
+            
         };
 
         private static Dictionary<int, Socket> connectedClients = new Dictionary<int, Socket>();
@@ -94,15 +100,24 @@ namespace c_tier.src.backend.server
                 byte[] buffer = new byte[1024];
                 while (true)
                 {
+
                     int receivedBytes = clientSocket.Receive(buffer);
                     if (receivedBytes == 0) break; // Client disconnected
 
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
-                    CheckAndParseCommand(receivedText, clientSocket, clientId); // process a possible command
+                    if(receivedText.StartsWith("LOGIN"))
+                    {
+                        
+                    }
+                    else
+                    {
+                        CheckAndParseCommand(receivedText, clientSocket, clientId); // process a possible command
 
-                    Console.WriteLine($"{Utils.GREEN}SERVER: Received from client {clientId}: {Utils.NORMAL} {receivedText}");
+                        Console.WriteLine($"{Utils.GREEN}SERVER: Received from client {clientId}: {Utils.NORMAL} {receivedText}");
 
-                    UpdateClients($"client {clientId}: {Utils.NORMAL} {receivedText}\"",clientId);
+                        UpdateClientsAndHost($"{clientId}: {receivedText}");
+                    }
+
                 }
             }
             catch (Exception ex)
@@ -123,7 +138,7 @@ namespace c_tier.src.backend.server
         /// </summary>
         /// <param name="message"></param>
         /// <param name="clientToIgnore"></param>
-        private static void UpdateClients(string message, int clientToIgnore)
+        private static void UpdateClientsNoHost(string message, int clientToIgnore)
         {
             connectedClients.TryGetValue(clientToIgnore, out var socketToIgnore);
             byte[] msgBytes = Encoding.UTF8.GetBytes(message);
@@ -134,7 +149,37 @@ namespace c_tier.src.backend.server
                 socket.Send(msgBytes); // bye bye
             }
         }
+        private static void UpdateClientsAndHost(string message)
+        {
 
+            byte[] msgBytes = Encoding.UTF8.GetBytes(message);
+
+            foreach (Socket socket in connectedClients.Values)
+            {
+                socket.Send(msgBytes); // bye bye
+            }
+        }
+        /// <summary>
+        /// Method to create a new channel
+        /// </summary>
+        /// <param name="channelName"></param>
+        /// <param name="rolesWithAccess"></param>
+        public static bool CreateChannel(string newChannelName, string newChannelDesc, List<Role> rolesWithBaseAccess)
+        {
+            Channel aux = channels.Find(x => x.channelName == newChannelName); // Check if theres a channel with the same name already
+            if (aux != null) return false; // channel already exists
+            Channel newChannel = new Channel(newChannelName, newChannelDesc, rolesWithBaseAccess);
+            channels.Add(newChannel);
+            Console.WriteLine("SYSTEM: CREATED NEW CHANNEL " + newChannelName);
+            return true;
+        }
+
+        /// <summary>
+        /// Checks for a potential command 
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="clientSocket"></param>
+        /// <param name="clientId"></param>
         private static void CheckAndParseCommand(string command, Socket clientSocket, int clientId)
         {
             char prefix = command[0]; // fetch the prefix

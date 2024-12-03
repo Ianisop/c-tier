@@ -15,30 +15,26 @@ namespace c_tier.src.backend.client
         // Create a TCP socket
         private readonly Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         private IPEndPoint remoteEndPoint;
+        private bool isSpeaking = false;
+        public User localUser;
+
 
         public Client()
         {
             //ServerInfo serverData = Utils.ReadFromFile<ServerInfo>("C:/Users/bocia/Documents/GitHub/c-tier/c-tier/src/secret.json"); // TODO: FIX THIS GARBAGE
             remoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 25366);
-
+            
         }
 
 
         public void Connect()
         {
-            Console.WriteLine($"{Utils.YELLOW}CLIENT: TRYING CONNECTION TO SERVER.");
+            // Console.WriteLine($"{Utils.YELLOW}CLIENT: TRYING CONNECTION TO SERVER.");
             clientSocket.Connect(remoteEndPoint);
-            Console.WriteLine($"{Utils.GREEN}CLIENT: Connected to server");
+            //Console.WriteLine($"{Utils.GREEN}CLIENT: Connected to server");
 
             // Start a background task to listen for incoming messages from the server
             Task.Run(() => ReceiveMessagesFromServer());
-
-            // Receive user input and send to server
-            while (true)
-            {
-                string action = Console.ReadLine(); // get input
-                Speak(action); // send input
-            }
         }
 
         /// <summary>
@@ -56,13 +52,17 @@ namespace c_tier.src.backend.client
                     if (receivedBytes == 0) break; // Server closed the connection
 
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
-                    Console.WriteLine($"Received from server: {receivedText}");
+                    Frontend.Log($"Received from server: {receivedText}");
+                    Frontend.PushMessage(receivedText);
+                    isSpeaking = false;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error receiving data: {ex.Message}");
+                    Frontend.Log($"Error receiving data: {ex.Message}");
+                    isSpeaking = false;
                     break;
                 }
+        
             }
         }
 
@@ -73,10 +73,16 @@ namespace c_tier.src.backend.client
         /// <param name="message"></param>
         public void Speak(string message)
         {
-            byte[] rawData = Encoding.UTF8.GetBytes(message); 
+            if (isSpeaking) return; // this ensures it only sends one message (not really)
+
+            isSpeaking = true;
+            byte[] rawData = Encoding.UTF8.GetBytes(message);
             clientSocket.Send(rawData);
+            Frontend.Log($"Sending message: {message}");
+
+
         }
-        
+
 
     }
 }
