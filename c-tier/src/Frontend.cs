@@ -44,8 +44,7 @@ namespace c_tier.src
             // Add the chat history to the chat window
             chatWindow.Add(chatHistory);
 
-            // Position the chat input field at the bottom of the chat window
-           // chatInputField.Y = Pos.AnchorEnd(2); // Position it 2 rows up from the bottom of the chatWindow
+
             chatWindow.Add(chatInputField);
 
             profileWindow.Add(userNameLabel);
@@ -119,7 +118,7 @@ namespace c_tier.src
         /// <param name="message"></param>
         public static void PushMessage(string message)
         {
-            app.chatWindow.Text += "\n" + message;
+            app.chatHistory.Text += message + '\n';
         }
 
         /// <summary>

@@ -106,7 +106,7 @@ namespace c_tier.src.backend.server
 
                     Console.WriteLine($"{Utils.GREEN}SERVER: Received from client {clientId}: {Utils.NORMAL} {receivedText}");
 
-                    UpdateClientsAndHost($"{clientId}:{receivedText}\"");
+                    UpdateClientsAndHost($"{clientId}: {receivedText}");
                 }
             }
             catch (Exception ex)

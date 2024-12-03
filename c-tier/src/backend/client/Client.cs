@@ -59,8 +59,10 @@ namespace c_tier.src.backend.client
                 catch (Exception ex)
                 {
                     Frontend.Log($"Error receiving data: {ex.Message}");
+                    isSpeaking = false;
                     break;
                 }
+        
             }
         }
 
@@ -77,7 +79,7 @@ namespace c_tier.src.backend.client
             byte[] rawData = Encoding.UTF8.GetBytes(message);
             clientSocket.Send(rawData);
             Frontend.Log($"Sending message: {message}");
-            Frontend.PushMessage(message);
+
 
         }
 
