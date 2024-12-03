@@ -1,0 +1,8 @@
+{
+    "username": "somethingfishy",
+    "id": 1,
+    "roles": [
+        { "roleName": "Creator" }
+    ]
+
+}

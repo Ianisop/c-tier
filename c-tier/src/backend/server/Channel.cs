@@ -8,6 +8,17 @@ namespace c_tier.src.backend.server
 {
     public class Channel
     {
+        public string channelName;
+        public int channelID;
+        public string channelDescription;
+        public List<Role> rolesWithAccess;
+        public int activeMembers;
 
+        public Channel(string channelName, string channelDescription, List<Role> rolesWithAcess)
+        {
+            this.channelName = channelName;
+            this.channelDescription = channelDescription;
+            this.rolesWithAccess = rolesWithAcess;
+        }
     }
 }
