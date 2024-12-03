@@ -2,7 +2,10 @@
     "username": "somethingfishy",
     "id": 1,
     "roles": [
-        { "roleName": "Creator" }
+        {
+            "roleName": "Creator" ,
+                "roleId": 1
+        }
     ]
 
 }

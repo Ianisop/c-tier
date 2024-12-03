@@ -18,12 +18,14 @@ namespace c_tier.src.backend.server
         private static readonly IPAddress ipAddress = IPAddress.Any; // Listen on all network interfaces;
         private static readonly Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); // Create a socket
         private static readonly IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
-        public static List<Channel> channels = new List<Channel>();
+        public static List<Channel> channels = new List<Channel>()
+        { new Channel("General", "The Place to be!", new List<Role>(){ new Role(1, "Creator")})};
+
         public static List<User> users = new List<User>();
 
         public static readonly Dictionary<string, Action> commands = new Dictionary<string, Action>()    // Dict to hold all commands
         {
-
+            
         };
 
         private static Dictionary<int, Socket> connectedClients = new Dictionary<int, Socket>();
@@ -98,15 +100,24 @@ namespace c_tier.src.backend.server
                 byte[] buffer = new byte[1024];
                 while (true)
                 {
+
                     int receivedBytes = clientSocket.Receive(buffer);
                     if (receivedBytes == 0) break; // Client disconnected
 
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
-                    CheckAndParseCommand(receivedText, clientSocket, clientId); // process a possible command
+                    if(receivedText.StartsWith("LOGIN"))
+                    {
+                        
+                    }
+                    else
+                    {
+                        CheckAndParseCommand(receivedText, clientSocket, clientId); // process a possible command
 
-                    Console.WriteLine($"{Utils.GREEN}SERVER: Received from client {clientId}: {Utils.NORMAL} {receivedText}");
+                        Console.WriteLine($"{Utils.GREEN}SERVER: Received from client {clientId}: {Utils.NORMAL} {receivedText}");
 
-                    UpdateClientsAndHost($"{clientId}: {receivedText}");
+                        UpdateClientsAndHost($"{clientId}: {receivedText}");
+                    }
+
                 }
             }
             catch (Exception ex)
@@ -159,6 +170,7 @@ namespace c_tier.src.backend.server
             if (aux != null) return false; // channel already exists
             Channel newChannel = new Channel(newChannelName, newChannelDesc, rolesWithBaseAccess);
             channels.Add(newChannel);
+            Console.WriteLine("SYSTEM: CREATED NEW CHANNEL " + newChannelName);
             return true;
         }
 

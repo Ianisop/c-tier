@@ -9,8 +9,14 @@ namespace c_tier.src.backend.server
 {
     public class Role
     {
-      //  public int roleID;
+        public int roleID;
         public string roleName;
       //  public Color roleColor;
+      public Role(int roleID, string roleName)
+        {
+            this.roleID = roleID;
+            this.roleName = roleName;
+        }
+
     }
 }

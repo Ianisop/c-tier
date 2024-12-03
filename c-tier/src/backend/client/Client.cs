@@ -73,7 +73,7 @@ namespace c_tier.src.backend.client
         /// <param name="message"></param>
         public void Speak(string message)
         {
-            if (isSpeaking) return;
+            if (isSpeaking) return; // this ensures it only sends one message (not really)
 
             isSpeaking = true;
             byte[] rawData = Encoding.UTF8.GetBytes(message);
