@@ -84,10 +84,10 @@ namespace c_tier.src.backend.client
 
                     if (receivedText.StartsWith(".CHANNELLIST"))
                     {
-                      
                         string[] aux = receivedText.Split("|").Skip(1).ToArray();// Skip the ".CHANNELIST" part
                         Frontend.Log("Updating channels list");
                         Frontend.UpdateChannelList(aux);
+                        isSpeaking = false;
                     }
 
                     //just a chat message

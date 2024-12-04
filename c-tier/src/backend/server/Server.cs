@@ -121,17 +121,17 @@ namespace c_tier.src.backend.server
                     }
                     else if(receivedText.StartsWith(".getchannels") || receivedText.StartsWith(".gc"))
                     {
-                        Console.Write("Client asked for channel list!");
+                        Console.WriteLine(Utils.GREEN + "SERVER: Client asked for channel list!");
 
                         // Send the channel list
                         string channelNameList = "";
                         foreach (Channel channel in channels) channelNameList += "|" + channel.channelName;
                         SendResponse(clientSocket, ".CHANNELLIST" + channelNameList);
-                        Console.WriteLine("SYSTEM: Channel list sent!");
+                        Console.WriteLine(Utils.GREEN + "SYSTEM: Channel list sent!");
                     }
                     else if (receivedText.StartsWith(".mc"))
                     {
-                        Console.WriteLine($"SYSTEM: Attempting channel moving");
+                        Console.WriteLine(Utils.GREEN + $"SYSTEM: Attempting channel moving");
                         // Correctly split the string using the '|' delimiter
                         string[] aux = receivedText.Split(' ');
 
@@ -139,7 +139,7 @@ namespace c_tier.src.backend.server
                         if (aux.Length >= 2)
                         {
                             string channelName = aux[1];
-                            Console.WriteLine($"SYSTEM: Moving client to channel {channelName}");
+                            Console.WriteLine(Utils.GREEN + $"SYSTEM: Moving client to channel {channelName}");
 
                             // Try to get the user associated with the clientSocket
                             if (users.TryGetValue(clientSocket, out var user))

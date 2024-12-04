@@ -133,7 +133,7 @@ namespace c_tier.src
 
             Frontend.Log("Frontend: Updated channels list.");
             // Explicitly refresh the UI
-            Application.Refresh();
+            //Application.Refresh();
         }
 
 
