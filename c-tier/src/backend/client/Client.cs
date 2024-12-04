@@ -59,6 +59,7 @@ namespace c_tier.src.backend.client
         {
             string message = ".LOGIN|" + localUser.username + "|" +localUser.password.ToString();
             Speak(message);
+            Speak(".GETCHANNELS");
             Frontend.Update();
         }
 
@@ -80,12 +81,12 @@ namespace c_tier.src.backend.client
 
                     Frontend.Log($"Received from server: {receivedText}");
 
-                    if (receivedText.StartsWith(".CHANNELIST"))
+                    if (receivedText.StartsWith(".CHANNELLIST"))
                     {
-                        string[] aux = receivedText.Split("|").Skip(1).ToArray(); // Skip the ".CHANNELIST" part
-                        List<string> channelNames = aux.ToList();
-
-                        Frontend.UpdateChannelList(channelNames);
+                      
+                        string[] aux = receivedText.Split("|").Skip(1).ToArray();// Skip the ".CHANNELIST" part
+                        Frontend.Log("Updating channels list");
+                        Frontend.UpdateChannelList(aux);
                     }
 
                     //just a chat message

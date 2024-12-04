@@ -20,15 +20,14 @@ namespace c_tier.src.backend.server
         private static readonly IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
         public static readonly string welcomeMessage = "System: Welcome to the server!";
         public static List<Channel> channels = new List<Channel>()
-        { new Channel("General", "The Place to be!", new List<Role>(){ new Role(1, "Creator")})};
-
+        { new Channel("General", "The Place to be!", new List<Role>(){ new Role(1, "Creator")}),
+          new Channel("Staff", "Staff Only!", new List<Role>(){ new Role(1, "Creator")})
+        };
         public static readonly Dictionary<string, Action> commands = new Dictionary<string, Action>()    // Dict to hold all commands
         {
             
         };
-
         private static Dictionary<Socket, User> users = new Dictionary<Socket, User>();
-        private static int nextClientId = 1;  // Client ID counter
         private static char commandPrefix = '/'; // Slash by default
 
         public Server(int targetPort, bool debug)
@@ -119,15 +118,19 @@ namespace c_tier.src.backend.server
                             password = password
                         };
                         users.Add(clientSocket,newUser);
-                        newUser.MoveToChannel(channels.FirstOrDefault());
-                        SendResponse(clientSocket, welcomeMessage);
-                        SendResponse(clientSocket, "You're in " + newUser.currentChannel.channelName);
+                        if(newUser.MoveToChannel(channels.FirstOrDefault()));
+                            SendResponse(clientSocket, welcomeMessage + "\n"+ "You're in " + newUser.currentChannel.channelName);
+                        
+                    }
+                    else if(receivedText.StartsWith(".GETCHANNELS"))
+                    {
+                        Console.Write("Client asked for channel list!");
 
                         // Send the channel list
                         string channelNameList = "";
                         foreach (Channel channel in channels) channelNameList += "|" + channel.channelName;
-                        SendResponse(clientSocket, ".CHANNELIST"+ channelNameList);
-                        
+                        SendResponse(clientSocket, ".CHANNELLIST" + channelNameList);
+                        Console.WriteLine("SYSTEM: Channel list sent!");
                     }
 
                     else // if its just a message

@@ -26,6 +26,21 @@ namespace c_tier.src
                 Focus = Application.Driver.MakeAttribute(Color.Green, Color.Black), 
             }
         };
+        public TextView debugLogHistory= new TextView
+        {
+            X = 0,
+            Y = 0,
+            Width = 40,
+            Height = 40,
+            ReadOnly = true,
+            Multiline = true,
+            WordWrap = true,
+            ColorScheme = new ColorScheme
+            {
+                Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black),
+                Focus = Application.Driver.MakeAttribute(Color.Green, Color.Black),
+            }
+        };
         public TextField chatInputField = new TextField {X = 0, Y = Pos.AnchorEnd(1), Width = 50, Height = 2,
             ColorScheme = new ColorScheme
             {
@@ -47,6 +62,7 @@ namespace c_tier.src
 
 
             chatWindow.Add(chatInputField);
+            debugWindow.Add(debugLogHistory);
             //channelWindow.Add(generalChannelButton);
             profileWindow.Add(userNameLabel);
             profileWindow.Add(profileSeparator);
@@ -90,17 +106,37 @@ namespace c_tier.src
 
         }
 
-        public static void UpdateChannelList(List<string> channelNames)
+        public static void UpdateChannelList(string[] channelNames)
         {
+            // Clear existing buttons
             app.channelWindow.Clear();
-            // Add each channel to the UI
+
+            // Starting Y position for the first button
+            int yPosition = 0;
+
+            // Add each channel name as a button
             foreach (string channelName in channelNames)
             {
-                var button = new Button { Text = channelName };
+                var button = new Button
+                {
+                    Text = channelName,
+                    X = 1,          // Indent for visual appeal
+                    Y = yPosition,  // Dynamic vertical position
+                };
+
+                // Add button to the channelWindow
                 app.channelWindow.Add(button);
-       
+
+                // Increment position for the next button
+                yPosition += 2; // Adjust for spacing (e.g., 2 rows per button)
             }
+
+            Frontend.Log("Frontend: Updated channels list.");
+            // Explicitly refresh the UI
+            Application.Refresh();
         }
+
+
 
         /// <summary>
         /// Push a message to the chatWindow
@@ -117,8 +153,7 @@ namespace c_tier.src
         /// <param name="message"></param>
         public static void Log(string message)
         {
-            app.debugWindow.Text = "";
-            app.debugWindow.Text = message;
+            app.debugLogHistory.Text += "\n" + message;
         }
 
         public static void SwitchScene()
