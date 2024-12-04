@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.Sockets;
 
 namespace c_tier.src.backend.client
 {
@@ -11,12 +12,17 @@ namespace c_tier.src.backend.client
     {
         public string username { get; set; }
         public int id { get; set; }
+
+        public string password { get; set; }
         public List<Role> roles { get; set; }
 
         public Channel oldChannel, currentChannel;
 
+        public Socket socket;
+
         public User()
         {
+            oldChannel = currentChannel;
 
         }
 
@@ -28,6 +34,7 @@ namespace c_tier.src.backend.client
         /// <returns></returns>
         public bool HasRole(List<Role> requiredRoles)
         {
+            return true;
             foreach(var role in roles)
             {
                 if(requiredRoles.Contains(role)) return true;   
@@ -43,7 +50,20 @@ namespace c_tier.src.backend.client
         /// <returns></returns>
         public bool MoveToChannel(Channel channel)
         {
-            if(currentChannel != channel && HasRole(roles)) return true;
+            if (currentChannel != channel && HasRole(roles))
+            { 
+                oldChannel = currentChannel;
+                currentChannel = channel;
+
+                if (oldChannel !=null) oldChannel.users.Remove(socket); // remove from the old channel
+                channel.users.Add(socket,this); // cache the new user
+
+                channel.activeMembers++;
+                if (oldChannel != null) oldChannel.activeMembers--;
+
+                return true; 
+            }
+        
             return false;
         }
 
