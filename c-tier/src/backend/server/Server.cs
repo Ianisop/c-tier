@@ -102,13 +102,17 @@ namespace c_tier.src.backend.server
                     if (receivedBytes == 0) break; // Client disconnected
 
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+
+                    //LOGIN ENDPOINT
                     if(receivedText.StartsWith(".LOGIN"))
                     {
                         Console.WriteLine("SYSTEM: Attempting log in request validation. | " + receivedText);
+
                         string[] aux = receivedText.Split("|");
                         string username = aux[1]; 
                         string password = aux[2]; 
                         Console.WriteLine("SYSTEM: Log in request: " + username + " | " + password);
+
                         User newUser = new User()
                         {
                             username = username,
@@ -118,9 +122,15 @@ namespace c_tier.src.backend.server
                         newUser.MoveToChannel(channels.FirstOrDefault());
                         SendResponse(clientSocket, welcomeMessage);
                         SendResponse(clientSocket, "You're in " + newUser.currentChannel.channelName);
+
+                        // Send the channel list
+                        string channelNameList = "";
+                        foreach (Channel channel in channels) channelNameList += "|" + channel.channelName;
+                        SendResponse(clientSocket, ".CHANNELIST"+ channelNameList);
                         
                     }
-                    else
+
+                    else // if its just a message
                     {
                         CheckAndParseCommand(receivedText, clientSocket); // process a possible command
 

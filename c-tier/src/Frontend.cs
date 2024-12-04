@@ -36,6 +36,7 @@ namespace c_tier.src
         public Label userNameLabel = new Label{Text = "username", X = 0, Y =0, Width = 18, Height = 2};
         public Label profileSeparator = new Label{Text = "------------------------", X = 0, Y = 1, Width = 18, Height = 1};
         public Label roleListLabel = new Label{Text = "Roles", X = 0, Y =2, Width = 18, Height = 1};
+       // public Button generalChannelButton = new Button {Text= "General"};
         public App()
         {
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black);
@@ -46,7 +47,7 @@ namespace c_tier.src
 
 
             chatWindow.Add(chatInputField);
-
+            //channelWindow.Add(generalChannelButton);
             profileWindow.Add(userNameLabel);
             profileWindow.Add(profileSeparator);
             profileWindow.Add(roleListLabel);
@@ -89,7 +90,17 @@ namespace c_tier.src
 
         }
 
-        
+        public static void UpdateChannelList(List<string> channelNames)
+        {
+            app.channelWindow.Clear();
+            // Add each channel to the UI
+            foreach (string channelName in channelNames)
+            {
+                var button = new Button { Text = channelName };
+                app.channelWindow.Add(button);
+       
+            }
+        }
 
         /// <summary>
         /// Push a message to the chatWindow

@@ -77,10 +77,25 @@ namespace c_tier.src.backend.client
                     if (receivedBytes == 0) break; // Server closed the connection
 
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+
                     Frontend.Log($"Received from server: {receivedText}");
-                    Frontend.PushMessage(receivedText);
-                    isSpeaking = false;
+
+                    if (receivedText.StartsWith(".CHANNELIST"))
+                    {
+                        string[] aux = receivedText.Split("|").Skip(1).ToArray(); // Skip the ".CHANNELIST" part
+                        List<string> channelNames = aux.ToList();
+
+                        Frontend.UpdateChannelList(channelNames);
+                    }
+
+                    //just a chat message
+                    else
+                    {
+                        Frontend.PushMessage(receivedText);
+                        isSpeaking = false;
+                    }
                 }
+   
                 catch (Exception ex)
                 {
                     Frontend.Log($"Error receiving data: {ex.Message}");
