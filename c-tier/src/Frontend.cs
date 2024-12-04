@@ -18,7 +18,10 @@ namespace c_tier.src
         public Window channelWindow = new Window("Channels") { X = 0, Y = 0, Width = 15, Height = Dim.Percent(100) };
         public Window chatWindow = new Window("Chat") { X = 15, Y = 0, Width = 50, Height = Dim.Percent(50) };
         public Window profileWindow = new Window("Profile") { X = 80, Y = 0, Width = 20, Height = Dim.Percent(50) };
-       // public Window serverBrowserWindow = new Window("Server Browser") {X= 50, Y= 3, Width=20, Height = 40 };
+        // public Window serverBrowserWindow = new Window("Server Browser") {X= 50, Y= 3, Width=20, Height = 40 };
+        public Window profileEditor = new Window("Profile Editor") { X = 50, Y = 15, Width = 50, Height = Dim.Percent(50) };
+        public TextField usernameTextField = new TextField {Text="Username....", X=Pos.AnchorEnd(1), Y=Pos.AnchorEnd(2),Width=35,Height=3 };
+        public TextField passwordTextField = new TextField {Text="Password....", X=Pos.AnchorEnd(1), Y=Pos.AnchorEnd(4),Width=35,Height=3 };
         public TextView chatHistory = new TextView { X = 0, Y = 0, Width = 50, Height = 50,ReadOnly = true, Multiline = true, WordWrap = true,
             ColorScheme = new ColorScheme
             {
@@ -60,7 +63,7 @@ namespace c_tier.src
             // Add the chat history to the chat window
             chatWindow.Add(chatHistory);
 
-
+            profileEditor.Add(usernameTextField, passwordTextField);
             chatWindow.Add(chatInputField);
             debugWindow.Add(debugLogHistory);
             //channelWindow.Add(generalChannelButton);
@@ -85,7 +88,6 @@ namespace c_tier.src
             Application.Init();
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black);
             Colors.Base.Focus = Application.Driver.MakeAttribute(Color.Green, Color.DarkGray);
-         
 
             Task.Run(() => client.Connect()); // Connect to the server
                                          
@@ -102,8 +104,9 @@ namespace c_tier.src
             };
 
 
-            Application.Run(); // has to be the last line
 
+
+            Application.Run(); // has to be the last line
         }
 
         public static void UpdateChannelList(string[] channelNames)
@@ -158,7 +161,7 @@ namespace c_tier.src
 
         public static void SwitchScene()
         {
-
+            Application.Top.Add(app.profileEditor);
         }
 
         public static void Update()

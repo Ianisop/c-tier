@@ -114,7 +114,7 @@ namespace c_tier.src.backend.server
                             socket = clientSocket
                         };
 
-                        users.Add(clientSocket,newUser);
+                        users.Add(clientSocket,newUser); // cache the user
                         if(newUser.MoveToChannel(channels.FirstOrDefault()));
                             SendResponse(clientSocket, welcomeMessage + "\n"+ "You're in " + newUser.currentChannel.channelName);
                         
@@ -129,6 +129,7 @@ namespace c_tier.src.backend.server
                         SendResponse(clientSocket, ".CHANNELLIST" + channelNameList);
                         Console.WriteLine(Utils.GREEN + "SYSTEM: Channel list sent!");
                     }
+
                     else if (receivedText.StartsWith(".mc"))
                     {
                         Console.WriteLine(Utils.GREEN + $"SYSTEM: Attempting channel moving");

@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
+using Terminal.Gui;
 
 
 namespace c_tier.src.backend.client
@@ -35,14 +36,19 @@ namespace c_tier.src.backend.client
                 PropertyNameCaseInsensitive = true
             };
 
-            localUser = Utils.ReadFromFile<User>("src/user_config.json", options); // load user config
+            //localUser = Utils.ReadFromFile<User>("src/user_config.json", options); // load user config
 
    
 
             if (localUser == null)
             {
                 Frontend.Log(Utils.RED + "Client init failed....");
-
+                // int option= MessageBox.ErrorQuery("!!!!!ALERT!!!!!", "It appears that theres no profile created for this device, would you like to make a new one?", "Go to profile editor", "Quit");
+                //if (option == 0) Frontend.SwitchScene();
+                //else
+                //{
+               //     Application.RequestStop();
+               // }
             }
 
             localUser.socket = clientSocket;
