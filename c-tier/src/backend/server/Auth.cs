@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using c_tier.src.backend.client;
 
 namespace c_tier.src.backend.server
 {
@@ -39,6 +40,19 @@ namespace c_tier.src.backend.server
 
 
             return CryptographicOperations.FixedTimeEquals(hash, storedHashBytes);
+        }
+
+        public static string CreateSession(string username, string password)
+        {
+            string hashedPassword = Database.GetHashedPassword(username);
+
+            bool validPassword = VerifyPassword(password, hashedPassword);
+
+            if (!validPassword) 
+            {
+                throw new InvalidDataException("Invalid password for: " + username);
+            }
+            return Utils.GenerateRandomString(64);
         }
     }
 }

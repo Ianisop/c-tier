@@ -8,14 +8,15 @@ using System.Data.Common;
 using System.Data;
 using c_tier.src;
 using System.Threading.Channels;
+using System.Drawing.Printing;
 
 namespace c_tier.src.backend.server
 {
     public class Database
     {
-        private SQLiteConnection dbConnection;
+        private static SQLiteConnection dbConnection;
 
-        public SQLiteConnection InitDatabase(string dbPath)
+        public static SQLiteConnection InitDatabase(string dbPath)
         {
             var connectionString = $"Data Source={dbPath};Version=3;";
             dbConnection = new SQLiteConnection(connectionString);
@@ -25,13 +26,13 @@ namespace c_tier.src.backend.server
             return dbConnection;
         }
 
-        private void ExecuteNonQuery(string sql)
+        private static void ExecuteNonQuery(string sql)
         {
             using var command = new SQLiteCommand(sql, dbConnection);
             command.ExecuteNonQuery();
         }
 
-        private void CreateTables()
+        private static void CreateTables()
         {
             CreateUsersTable();
             CreateChannelsTable();
@@ -39,22 +40,21 @@ namespace c_tier.src.backend.server
             CreateUserChannelsTable();
         }
 
-        private void CreateUsersTable()
+        private static void CreateUsersTable()
         {
             string sql = @"
             CREATE TABLE IF NOT EXISTS users (
                 userid INTEGER PRIMARY KEY,
-                name TEXT NOT NULL,
+                name TEXT UNIQUE,
                 timestamp INTEGER,
-                password TEXT,
-                email TEXT UNIQUE
+                password TEXT
             );";
 
             ExecuteNonQuery(sql);
             Console.WriteLine("Created users table.");
         }
 
-        private void CreateChannelsTable()
+        private static void CreateChannelsTable()
         {
             string sql = @"
             CREATE TABLE IF NOT EXISTS channels (
@@ -70,7 +70,7 @@ namespace c_tier.src.backend.server
             Console.WriteLine("Created channels table.");
         }
 
-        private void CreateMessageTable()
+        private static void CreateMessageTable()
         {
             string sql = @"
             CREATE TABLE IF NOT EXISTS messages (
@@ -87,7 +87,7 @@ namespace c_tier.src.backend.server
             Console.WriteLine("Created messages table.");
         }
 
-        private void CreateUserChannelsTable()
+        private static void CreateUserChannelsTable()
         {
             string sql = @"
             CREATE TABLE IF NOT EXISTS user_channels (
@@ -102,10 +102,11 @@ namespace c_tier.src.backend.server
             Console.WriteLine("Created user_channels table.");
         }
 
-        public UInt64 CreateUser(string username, string password)
+        public static UInt64 CreateUser(string username, string password)
         {
             long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             UInt64 userID = Utils.GenerateID(18);
+            string hashedPassword = Auth.HashPassword(password);
 
             string sql = @"
             INSERT INTO users (userid, name, password, timestamp)
@@ -113,15 +114,15 @@ namespace c_tier.src.backend.server
 
             using var command = new SQLiteCommand(@sql, dbConnection);
             command.Parameters.AddWithValue("@userid", userID);
-            command.Parameters.AddWithValue("@named", username);
-            command.Parameters.AddWithValue("@password", password);
+            command.Parameters.AddWithValue("@name", username);
+            command.Parameters.AddWithValue("@password", hashedPassword);
             command.Parameters.AddWithValue("@timestamp", timestamp);
 
             command.ExecuteNonQuery();
             return userID;
         }
 
-        public UInt64 SendMessage(UInt64 authorID, string content, UInt64 channelID)
+        public static UInt64 SendMessage(UInt64 authorID, string content, UInt64 channelID)
         {
             long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             UInt64 messageID = Utils.GenerateID(18);
@@ -142,7 +143,7 @@ namespace c_tier.src.backend.server
         }
 
 
-        public List<int> GetUserChannels (UInt64 userID)
+        public static List<int> GetUserChannels (UInt64 userID)
         {
             string sql = "SELECT channelid FROM user_channels WHERE userid = @userid";
             using var command = new SQLiteCommand(sql, dbConnection);
@@ -157,7 +158,7 @@ namespace c_tier.src.backend.server
             return channels;
         }
 
-        public List<int> GetChannelUsers(UInt64 channelID)
+        public static List<int> GetChannelUsers(UInt64 channelID)
         {
             string sql = "SELECT userid FROM user_channels WHERE channel = @channelid";
             using var command = new SQLiteCommand(sql, dbConnection);
@@ -173,7 +174,7 @@ namespace c_tier.src.backend.server
             return channels;
         }
 
-        public List<(int messageID, string content, int authorID, string authorName)> GetChannelMessages(int channelId, int limit, int offset)
+        public static List<(int messageID, string content, int authorID, string authorName)> GetChannelMessages(int channelId, int limit, int offset)
         {
             string sql = @"
             SELECT 
@@ -206,5 +207,23 @@ namespace c_tier.src.backend.server
 
             return messages;
         }
+        public static string GetHashedPassword(string username)
+        {
+            string sql = @"SELECT password FROM users WHERE name = @name";
+
+            using var command = new SQLiteCommand(sql, dbConnection);
+            command.Parameters.AddWithValue("@name", username);
+
+            object result = command.ExecuteScalar();
+
+            // Handle null or non-existent usernames
+            if (result == null || result == DBNull.Value)
+            {
+                throw new NullReferenceException("Database value for userpassword is null");
+            }
+
+            return result.ToString();
+        }
+
     }
 }

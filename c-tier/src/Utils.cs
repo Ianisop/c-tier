@@ -27,7 +27,7 @@ namespace c_tier.src
         public static string REVERSE = Console.IsOutputRedirected ? "" : "\x1b[7m";
         public static string NOREVERSE = Console.IsOutputRedirected ? "" : "\x1b[27m";
 
-
+        private static readonly char[] DefaultCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".ToCharArray(); // char set for string generation
         /// <summary>
         /// Serializes json into object
         /// </summary>
@@ -66,6 +66,25 @@ namespace c_tier.src
                 string idString = id.ToString().Substring(0, Math.Min(length,id.ToString().Length));
                 return UInt64.Parse(idString);
             }
+        }
+        
+        public static string GenerateRandomString(int length)
+        {
+            if (length <= 0)
+            {
+                return "";
+            }
+
+            char[] characters = (new string(DefaultCharacters)).ToCharArray();
+            StringBuilder result = new StringBuilder(length);
+            Random random = new Random();
+
+            for (int i = 0; i < length; i++)
+            {
+                result.Append(characters[random.Next(characters.Length)]);
+            }
+
+            return result.ToString();
         }
 
     }
