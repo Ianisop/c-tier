@@ -23,12 +23,7 @@ namespace c_tier.src.backend.server
         { new Channel("General", "The Place to be!", new List<Role>(){ new Role(1, "Creator")}),
           new Channel("Staff", "Staff Only!", new List<Role>(){ new Role(1, "Creator")})
         };
-        public static readonly Dictionary<string, Action> commands = new Dictionary<string, Action>()    // Dict to hold all commands
-        {
-            
-        };
         private static Dictionary<Socket, User> users = new Dictionary<Socket, User>();
-        private static char commandPrefix = '/'; // Slash by default
 
         public Server(int targetPort, bool debug)
         {
@@ -93,7 +88,7 @@ namespace c_tier.src.backend.server
             try
             {
                 // Receive data from the client
-                byte[] buffer = new byte[1024];
+                byte[] buffer = new byte[2048];
                 while (true)
                 {
 
@@ -103,7 +98,7 @@ namespace c_tier.src.backend.server
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
 
                     //LOGIN ENDPOINT
-                    if(receivedText.StartsWith(".LOGIN"))
+                    if(receivedText.StartsWith(".login"))
                     {
                         Console.WriteLine("SYSTEM: Attempting log in request validation. | " + receivedText);
 
@@ -115,14 +110,16 @@ namespace c_tier.src.backend.server
                         User newUser = new User()
                         {
                             username = username,
-                            password = password
+                            password = password,
+                            socket = clientSocket
                         };
+
                         users.Add(clientSocket,newUser);
                         if(newUser.MoveToChannel(channels.FirstOrDefault()));
                             SendResponse(clientSocket, welcomeMessage + "\n"+ "You're in " + newUser.currentChannel.channelName);
                         
                     }
-                    else if(receivedText.StartsWith(".GETCHANNELS"))
+                    else if(receivedText.StartsWith(".getchannels") || receivedText.StartsWith(".gc"))
                     {
                         Console.Write("Client asked for channel list!");
 
@@ -132,10 +129,52 @@ namespace c_tier.src.backend.server
                         SendResponse(clientSocket, ".CHANNELLIST" + channelNameList);
                         Console.WriteLine("SYSTEM: Channel list sent!");
                     }
+                    else if (receivedText.StartsWith(".mc"))
+                    {
+                        Console.WriteLine($"SYSTEM: Attempting channel moving");
+                        // Correctly split the string using the '|' delimiter
+                        string[] aux = receivedText.Split(' ');
+
+                        // Ensure the array has the expected number of elements
+                        if (aux.Length >= 2)
+                        {
+                            string channelName = aux[1];
+                            Console.WriteLine($"SYSTEM: Moving client to channel {channelName}");
+
+                            // Try to get the user associated with the clientSocket
+                            if (users.TryGetValue(clientSocket, out var user))
+                            {
+                                // Find the channel by name
+                                var channel = channels.Find(a => a.channelName == channelName);
+                                if (channel != null)
+                                {
+                                    if (user.MoveToChannel(channel))
+                                    {
+                                        SendResponse(clientSocket, $"{welcomeMessage}\n Hopped to {user.currentChannel.channelName}");
+                                    }
+                                    else
+                                    {
+                                        SendResponse(clientSocket, "Error: Failed to join channel.");
+                                    }
+                                }
+                                else
+                                {
+                                    SendResponse(clientSocket, $"Error: Channel '{channelName}' not found.");
+                                }
+                            }
+                            else
+                            {
+                                SendResponse(clientSocket, "Error: User not found.");
+                            }
+                        }
+                        else
+                        {
+                            SendResponse(clientSocket, "Error: Invalid .mc command format.");
+                        }
+                    }
 
                     else // if its just a message
                     {
-                        CheckAndParseCommand(receivedText, clientSocket); // process a possible command
 
                         Console.WriteLine($"{Utils.GREEN}SERVER: Received from client : {Utils.NORMAL} {receivedText}");
 
@@ -147,7 +186,7 @@ namespace c_tier.src.backend.server
             }
             catch (Exception ex)
             {   users.TryGetValue(clientSocket, out var user);
-                Console.WriteLine($"Error handling client {user.username}: {ex.Message}");
+                Console.WriteLine($"Error handling: Client {user.username}: {ex.Message}");
             }
             finally
             {
@@ -188,9 +227,11 @@ namespace c_tier.src.backend.server
 
             byte[] msgBytes = Encoding.UTF8.GetBytes(message);
 
-            foreach (Socket socket in users.Keys)
+            users.TryGetValue(host, out var user);
+
+            foreach (var socket in user.currentChannel.users.Keys)
             {
-                if (users[socket].currentChannel == users[host].currentChannel) socket.Send(msgBytes); // bye bye
+                socket.Send(msgBytes); // bye bye
             }
         }
         /// <summary>
@@ -206,35 +247,6 @@ namespace c_tier.src.backend.server
             channels.Add(newChannel);
             Console.WriteLine("SYSTEM: CREATED NEW CHANNEL " + newChannelName);
             return true;
-        }
-
-        /// <summary>
-        /// Checks for a potential command 
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="clientSocket"></param>
-        /// <param name="clientId"></param>
-        private static void CheckAndParseCommand(string command, Socket clientSocket)
-        {
-            char prefix = command[0]; // fetch the prefix
-            if (prefix != commandPrefix) return;
-
-            command = command.Substring(1); // remove the prefix
-            try
-            {
-                if (commands.ContainsKey(command))
-                {
-                    commands[command](); // Execute command
-                }
-                else
-                {
-                    SendResponse(clientSocket, Utils.RED + "Invalid command."); // Misspellings, invalid perms
-                }
-            }
-            catch (Exception ex)
-            {
-                SendResponse(clientSocket, Utils.RED + "Error executing command."); // Anything else lol
-            }
         }
 
         /// <summary>

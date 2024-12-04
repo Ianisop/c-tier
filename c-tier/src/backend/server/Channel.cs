@@ -15,7 +15,7 @@ namespace c_tier.src.backend.server
         public string channelDescription;
         public List<Role> rolesWithAccess;
         public int activeMembers;
-        public List<User> users = new List<User>();
+        public Dictionary<Socket,User> users = new Dictionary<Socket,User>();
 
 
         public Channel(string channelName, string channelDescription, List<Role> rolesWithAcess)

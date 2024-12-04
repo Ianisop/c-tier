@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net.Sockets;
 
 namespace c_tier.src.backend.client
 {
@@ -17,9 +18,12 @@ namespace c_tier.src.backend.client
 
         public Channel oldChannel, currentChannel;
 
+        public Socket socket;
+
         public User()
         {
             oldChannel = currentChannel;
+
         }
 
 
@@ -51,8 +55,8 @@ namespace c_tier.src.backend.client
                 oldChannel = currentChannel;
                 currentChannel = channel;
 
-                if (oldChannel !=null) oldChannel.users.Remove(this); // remove from the old channel
-                channel.users.Add(this); // cache the new user
+                if (oldChannel !=null) oldChannel.users.Remove(socket); // remove from the old channel
+                channel.users.Add(socket,this); // cache the new user
 
                 channel.activeMembers++;
                 if (oldChannel != null) oldChannel.activeMembers--;

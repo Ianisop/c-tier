@@ -38,13 +38,15 @@ namespace c_tier.src.backend.client
 
             localUser = Utils.ReadFromFile<User>("src/user_config.json", options);
 
+   
+
             if (localUser == null)
             {
                 Frontend.Log(Utils.RED + "Client init failed....");
 
             }
 
-
+            localUser.socket = clientSocket;
             clientSocket.Connect(remoteEndPoint);
 
             Login(); // try logging in
@@ -57,9 +59,8 @@ namespace c_tier.src.backend.client
         
         private void Login()
         {
-            string message = ".LOGIN|" + localUser.username + "|" +localUser.password.ToString();
+            string message = ".login|" + localUser.username + "|" +localUser.password.ToString();
             Speak(message);
-            Speak(".GETCHANNELS");
             Frontend.Update();
         }
 
