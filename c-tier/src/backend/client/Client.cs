@@ -6,8 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using static System.Collections.Specialized.BitVector32;
+
 
 namespace c_tier.src.backend.client
 {
@@ -22,7 +21,7 @@ namespace c_tier.src.backend.client
 
         public Client()
         {
-            //ServerInfo serverData = Utils.ReadFromFile<ServerInfo>("C:/Users/bocia/Documents/GitHub/c-tier/c-tier/src/secret.json"); // TODO: FIX THIS GARBAGE
+            //ServerInfo serverData = Utils.ReadFromFile<ServerInfo>("C:/Users/bocia/Documents/GitHub/c-tier/c-tier/src/secret.json");
             remoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 25366);
             
         }
@@ -36,7 +35,7 @@ namespace c_tier.src.backend.client
                 PropertyNameCaseInsensitive = true
             };
 
-            localUser = Utils.ReadFromFile<User>("src/user_config.json", options);
+            localUser = Utils.ReadFromFile<User>("src/user_config.json", options); // load user config
 
    
 
@@ -47,6 +46,7 @@ namespace c_tier.src.backend.client
             }
 
             localUser.socket = clientSocket;
+
             clientSocket.Connect(remoteEndPoint);
 
             Login(); // try logging in
@@ -59,8 +59,9 @@ namespace c_tier.src.backend.client
         
         private void Login()
         {
-            string message = ".login|" + localUser.username + "|" +localUser.password.ToString();
+            string message = ".login|" + localUser.username + "|" + localUser.password.ToString();
             Speak(message);
+            Speak(".getchannels");
             Frontend.Update();
         }
 

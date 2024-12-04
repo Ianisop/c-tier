@@ -23,6 +23,7 @@ namespace c_tier.src.backend.server
             this.channelName = channelName;
             this.channelDescription = channelDescription;
             this.rolesWithAccess = rolesWithAcess;
+           
           
         }
 
