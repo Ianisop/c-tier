@@ -1,6 +1,7 @@
 {
     "username": "somethingfishy",
     "id": 1,
+    "password": "iaminsane123",
     "roles": [
         {
             "roleName": "Creator" ,

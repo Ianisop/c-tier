@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using static System.Collections.Specialized.BitVector32;
 
@@ -16,7 +17,7 @@ namespace c_tier.src.backend.client
         private readonly Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         private IPEndPoint remoteEndPoint;
         private bool isSpeaking = false;
-        public User localUser;
+        protected User localUser;
 
 
         public Client()
@@ -29,12 +30,38 @@ namespace c_tier.src.backend.client
 
         public void Connect()
         {
-            // Console.WriteLine($"{Utils.YELLOW}CLIENT: TRYING CONNECTION TO SERVER.");
+            JsonSerializerOptions options = new()
+            {
+                IncludeFields = true,
+                PropertyNameCaseInsensitive = true
+            };
+
+            localUser = Utils.ReadFromFile<User>("src/user_config.json", options);
+
+   
+
+            if (localUser == null)
+            {
+                Frontend.Log(Utils.RED + "Client init failed....");
+
+            }
+
+            localUser.socket = clientSocket;
             clientSocket.Connect(remoteEndPoint);
-            //Console.WriteLine($"{Utils.GREEN}CLIENT: Connected to server");
+
+            Login(); // try logging in
+
 
             // Start a background task to listen for incoming messages from the server
             Task.Run(() => ReceiveMessagesFromServer());
+        }
+
+        
+        private void Login()
+        {
+            string message = ".login|" + localUser.username + "|" +localUser.password.ToString();
+            Speak(message);
+            Frontend.Update();
         }
 
         /// <summary>
@@ -52,10 +79,25 @@ namespace c_tier.src.backend.client
                     if (receivedBytes == 0) break; // Server closed the connection
 
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+
                     Frontend.Log($"Received from server: {receivedText}");
-                    Frontend.PushMessage(receivedText);
-                    isSpeaking = false;
+
+                    if (receivedText.StartsWith(".CHANNELLIST"))
+                    {
+                        string[] aux = receivedText.Split("|").Skip(1).ToArray();// Skip the ".CHANNELIST" part
+                        Frontend.Log("Updating channels list");
+                        Frontend.UpdateChannelList(aux);
+                        isSpeaking = false;
+                    }
+
+                    //just a chat message
+                    else
+                    {
+                        Frontend.PushMessage(receivedText);
+                        isSpeaking = false;
+                    }
                 }
+   
                 catch (Exception ex)
                 {
                     Frontend.Log($"Error receiving data: {ex.Message}");
@@ -83,6 +125,11 @@ namespace c_tier.src.backend.client
 
         }
 
+
+        public string GetUsername()
+        {
+            return localUser.username;  
+        }
 
     }
 }
