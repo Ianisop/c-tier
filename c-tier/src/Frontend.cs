@@ -11,14 +11,14 @@ using Label = Terminal.Gui.Label;
 
 namespace c_tier.src
 {
-    internal class App
+    public class App
     {
         
         public Window debugWindow = new Window("Console") { X = 200, Y = 5, Width = 40, Height = Dim.Percent(30) };
         public Window channelWindow = new Window("Channels") { X = 0, Y = 0, Width = 15, Height = Dim.Percent(100) };
         public Window chatWindow = new Window("Chat") { X = 15, Y = 0, Width = 50, Height = Dim.Percent(50) };
         public Window profileWindow = new Window("Profile") { X = 80, Y = 0, Width = 20, Height = Dim.Percent(50) };
-        public Window serverBrowserWindow = new Window("Server Browser") {X= 50, Y= 3, Width=20, Height = 40 };
+       // public Window serverBrowserWindow = new Window("Server Browser") {X= 50, Y= 3, Width=20, Height = 40 };
         public TextView chatHistory = new TextView { X = 0, Y = 0, Width = 50, Height = 50,ReadOnly = true, Multiline = true, WordWrap = true,
             ColorScheme = new ColorScheme
             {
@@ -26,7 +26,7 @@ namespace c_tier.src
                 Focus = Application.Driver.MakeAttribute(Color.Green, Color.Black), 
             }
         };
-        public TextField chatInputField = new TextField {Text = "", X = 0, Y = Pos.AnchorEnd(1), Width = 50, Height = 2,
+        public TextField chatInputField = new TextField {X = 0, Y = Pos.AnchorEnd(1), Width = 50, Height = 2,
             ColorScheme = new ColorScheme
             {
                 Normal = Application.Driver.MakeAttribute(Color.Green, Color.DarkGray),
@@ -39,7 +39,7 @@ namespace c_tier.src
         public App()
         {
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black);
-            Application.Top.Add(channelWindow, chatWindow, debugWindow, profileWindow, serverBrowserWindow); // add the windows
+            Application.Top.Add(channelWindow, chatWindow, debugWindow, profileWindow); // add the windows
 
             // Add the chat history to the chat window
             chatWindow.Add(chatHistory);
@@ -61,47 +61,26 @@ namespace c_tier.src
     public static class Frontend
     {
         
-        static App app = new App();
-
+        public static App app = new App();
+        static Client client = new Client();
         public static void Init()
         {
             Application.Init();
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black);
             Colors.Base.Focus = Application.Driver.MakeAttribute(Color.Green, Color.DarkGray);
-
-            // Setup client first
-            Client client = new Client();
-            var options = new JsonSerializerOptions
-            {
-                IncludeFields = true,
-                PropertyNameCaseInsensitive = true // Add this
-            };
-            
-            client.localUser = Utils.ReadFromFile<User>("src/user_config.json",options);
-
-            if (client.localUser == null || client == null)
-            {
-                Frontend.Log(Utils.RED + "Client init failed...."); 
-
-            }
          
-            app.userNameLabel.Text = client.localUser.username;
-            foreach(var role in client.localUser.roles)
-            {
-                app.roleListLabel.Text += "\n" + role.roleName;
-            }
-           
-            Task.Run(() => client.Connect()); // Connect to the server
 
+            Task.Run(() => client.Connect()); // Connect to the server
+                                         
 
             // Define the KeyPress event to trigger on Enter key press
             app.chatInputField.KeyPress += (e) =>
             {
               
-                if (e.KeyEvent.Key == Key.Enter && app.chatInputField.HasFocus) // focus doesnt work
+                if (e.KeyEvent.Key == Key.Enter && app.chatInputField.HasFocus && !app.chatInputField.Text.IsEmpty) // focus doesnt work
                 {
                     client.Speak(app.chatInputField.Text.ToString()); // Send the message to the server
-                    app.chatInputField.Text = " ";
+                    app.chatInputField.Text = "";
                 }
             };
 
@@ -135,6 +114,12 @@ namespace c_tier.src
         {
 
         }
+
+        public static void Update()
+        {
+            app.userNameLabel.Text = client.GetUsername();
+        }
+     
 
     }
 }

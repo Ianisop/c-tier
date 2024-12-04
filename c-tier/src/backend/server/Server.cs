@@ -18,17 +18,16 @@ namespace c_tier.src.backend.server
         private static readonly IPAddress ipAddress = IPAddress.Any; // Listen on all network interfaces;
         private static readonly Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); // Create a socket
         private static readonly IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
+        public static readonly string welcomeMessage = "System: Welcome to the server!";
         public static List<Channel> channels = new List<Channel>()
         { new Channel("General", "The Place to be!", new List<Role>(){ new Role(1, "Creator")})};
-
-        public static List<User> users = new List<User>();
 
         public static readonly Dictionary<string, Action> commands = new Dictionary<string, Action>()    // Dict to hold all commands
         {
             
         };
 
-        private static Dictionary<int, Socket> connectedClients = new Dictionary<int, Socket>();
+        private static Dictionary<Socket, User> users = new Dictionary<Socket, User>();
         private static int nextClientId = 1;  // Client ID counter
         private static char commandPrefix = '/'; // Slash by default
 
@@ -72,13 +71,11 @@ namespace c_tier.src.backend.server
                 {
                     // Accept an incoming connection
                     Socket clientSocket = serverSocket.Accept();
-                    int clientId = nextClientId++; // Generate a unique ID for the client
-                    connectedClients[clientId] = clientSocket; // Store client in dictionary
 
-                    Console.WriteLine($"{Utils.GREEN}{Utils.BOLD}SERVER:{Utils.NOBOLD} Client {clientId} connected.");
+                    Console.WriteLine($"{Utils.GREEN}{Utils.BOLD}SERVER:{Utils.NOBOLD} Client connected.");
 
                     // Handle the client's communication asynchronously
-                    Task.Run(() => HandleClientCommunication(clientSocket, clientId));
+                    Task.Run(() => HandleClientCommunication(clientSocket));
                 }
             }
             catch (Exception ex)
@@ -92,7 +89,7 @@ namespace c_tier.src.backend.server
             }
         }
 
-        private static void HandleClientCommunication(Socket clientSocket, int clientId)
+        private static void HandleClientCommunication(Socket clientSocket)
         {
             try
             {
@@ -105,58 +102,82 @@ namespace c_tier.src.backend.server
                     if (receivedBytes == 0) break; // Client disconnected
 
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
-                    if(receivedText.StartsWith("LOGIN"))
+                    if(receivedText.StartsWith(".LOGIN"))
                     {
+                        Console.WriteLine("SYSTEM: Attempting log in request validation. | " + receivedText);
+                        string[] aux = receivedText.Split("|");
+                        string username = aux[1]; 
+                        string password = aux[2]; 
+                        Console.WriteLine("SYSTEM: Log in request: " + username + " | " + password);
+                        User newUser = new User()
+                        {
+                            username = username,
+                            password = password
+                        };
+                        users.Add(clientSocket,newUser);
+                        newUser.MoveToChannel(channels.FirstOrDefault());
+                        SendResponse(clientSocket, welcomeMessage);
+                        SendResponse(clientSocket, "You're in " + newUser.currentChannel.channelName);
                         
                     }
                     else
                     {
-                        CheckAndParseCommand(receivedText, clientSocket, clientId); // process a possible command
+                        CheckAndParseCommand(receivedText, clientSocket); // process a possible command
 
-                        Console.WriteLine($"{Utils.GREEN}SERVER: Received from client {clientId}: {Utils.NORMAL} {receivedText}");
+                        Console.WriteLine($"{Utils.GREEN}SERVER: Received from client : {Utils.NORMAL} {receivedText}");
 
-                        UpdateClientsAndHost($"{clientId}: {receivedText}");
+                        users.TryGetValue(clientSocket, out var user); // find the user
+                        UpdateClientsAndHost($"{user.username}: {receivedText}", clientSocket); // send the message
                     }
 
                 }
             }
             catch (Exception ex)
-            {
-                Console.WriteLine($"Error handling client {clientId}: {ex.Message}");
+            {   users.TryGetValue(clientSocket, out var user);
+                Console.WriteLine($"Error handling client {user.username}: {ex.Message}");
             }
             finally
             {
+                users.TryGetValue(clientSocket, out var user);
+
                 // Clean up after client disconnects
-                Console.WriteLine($"Client {clientId} disconnected.");
-                connectedClients.Remove(clientId); // Remove from dictionary
+                Console.WriteLine($"Client {user.username} disconnected.");
+                users.Remove(clientSocket); // Remove from dictionary
                 clientSocket.Close(); // Close the socket
             }
         }
+
 
         /// <summary>
         /// Updates all clients besides the message provider
         /// </summary>
         /// <param name="message"></param>
         /// <param name="clientToIgnore"></param>
-        private static void UpdateClientsNoHost(string message, int clientToIgnore)
+        private static void UpdateClientsNoHost(string message, Socket clientToIgnore)
         {
-            connectedClients.TryGetValue(clientToIgnore, out var socketToIgnore);
             byte[] msgBytes = Encoding.UTF8.GetBytes(message);
 
-            foreach (Socket socket in connectedClients.Values)
+            foreach (Socket socket in users.Keys)
             {
-                if (socket == socketToIgnore) continue; // ignore the og client when spreading the word
+                if (socket == clientToIgnore) continue; // ignore the og client when spreading the word
                 socket.Send(msgBytes); // bye bye
             }
         }
-        private static void UpdateClientsAndHost(string message)
+
+
+        /// <summary>
+        /// Sends a message in the same channel as the host
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="host"></param>
+        private static void UpdateClientsAndHost(string message, Socket host)
         {
 
             byte[] msgBytes = Encoding.UTF8.GetBytes(message);
 
-            foreach (Socket socket in connectedClients.Values)
+            foreach (Socket socket in users.Keys)
             {
-                socket.Send(msgBytes); // bye bye
+                if (users[socket].currentChannel == users[host].currentChannel) socket.Send(msgBytes); // bye bye
             }
         }
         /// <summary>
@@ -180,7 +201,7 @@ namespace c_tier.src.backend.server
         /// <param name="command"></param>
         /// <param name="clientSocket"></param>
         /// <param name="clientId"></param>
-        private static void CheckAndParseCommand(string command, Socket clientSocket, int clientId)
+        private static void CheckAndParseCommand(string command, Socket clientSocket)
         {
             char prefix = command[0]; // fetch the prefix
             if (prefix != commandPrefix) return;
