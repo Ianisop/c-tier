@@ -10,6 +10,9 @@ using c_tier.src.backend.client;
 using System.Security.Cryptography.X509Certificates;
 using System.Data.SQLite;
 using System.Drawing.Printing;
+using System.Reflection;
+using System.Timers;
+using System.Threading;
 
 namespace c_tier.src.backend.server
 {
@@ -22,11 +25,14 @@ namespace c_tier.src.backend.server
         private static readonly Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); // Create a socket
         private static readonly IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
         public static readonly string welcomeMessage = "System: Welcome to the server!";
+        public static readonly int badValidationRequestLimit = 4;
         public static List<Channel> channels = new List<Channel>()
         { new Channel("General", "The Place to be!", new List<Role>(){ new Role(1, "Creator")}),
           new Channel("Staff", "Staff Only!", new List<Role>(){ new Role(1, "Creator")})
         };
         private static Dictionary<Socket, User> users = new Dictionary<Socket, User>();
+
+        private static System.Timers.Timer validationTimer = new System.Timers.Timer();
 
         public Server(int targetPort, bool debug)
         {
@@ -101,29 +107,79 @@ namespace c_tier.src.backend.server
 
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
 
-                    //LOGIN ENDPOINT
-                    if(receivedText.StartsWith(".login"))
+                    // LOGIN ENDPOINT
+                    if (receivedText.StartsWith(".login"))
                     {
                         Console.WriteLine("SYSTEM: Attempting log in request validation. | " + receivedText);
 
                         string[] aux = receivedText.Split("|");
-                        string username = aux[1]; 
-                        string password = aux[2]; 
-                        Console.WriteLine("SYSTEM: Log in request: " + username + " | " + password);
+                        string username = aux[1];
+                        string password = aux[2];
+                        Console.WriteLine("SYSTEM: Log in request for account: " + username);
 
+                        //Init validation timer
+                        var timer = new System.Timers.Timer(3000);
+                        var userTimer = new UserTimer();
+
+                        //Create a local user 
                         User newUser = new User()
                         {
                             username = username,
                             password = password,
-                            socket = clientSocket
+                            socket = clientSocket,
+                            sessionToken = Auth.CreateSession(username, password),
+                            sessionValidationTimer = userTimer
+
                         };
 
-                        users.Add(clientSocket,newUser); // cache the user
-                        if(newUser.MoveToChannel(channels.FirstOrDefault()));
-                            SendResponse(clientSocket, welcomeMessage + "\n"+ "You're in " + newUser.currentChannel.channelName);
-                        
+                        //setup validation timer for user
+                        newUser.sessionValidationTimer.user = newUser;
+                        newUser.sessionValidationTimer.timer = timer;
+                        newUser.sessionValidationTimer.timer.Elapsed +=(sender,args) => ValidateSessionForClient(userTimer);
+                        newUser.sessionValidationTimer.timer.AutoReset = true;
+                        newUser.sessionValidationTimer.timer.Enabled = true;
+
+                        users.Add(clientSocket, newUser); // Cache the user
+
+  
+
+                        SendResponse(clientSocket, ".sessiontoken " + newUser.sessionToken); // send token
+                        if (newUser.MoveToChannel(channels.FirstOrDefault()))
+                        {
+                            SendResponse(clientSocket, welcomeMessage + "\n" + "You're in " + newUser.currentChannel.channelName);
+                        }
                     }
-                    else if(receivedText.StartsWith(".createaccount"))
+
+                    else if (receivedText.StartsWith(".validate"))
+                    {
+                        string[] aux = receivedText.Split(' ');
+                        if (aux.Length >= 2)
+                        {
+                            string token = aux[1];
+                            // Perform token validation logic
+                            if (users.TryGetValue(clientSocket, out User targetUser) && targetUser.sessionToken == token)
+                            {
+                                Console.WriteLine("SYSTEM: Token for " + targetUser.username + " validated successfully.");
+                                targetUser.validationCounter--;
+
+                            }
+                            else
+                            {
+                                Console.WriteLine("SYSTEM: Invalid token. Disconnecting client.");
+                                SendResponse(clientSocket, "Error: Invalid session token.");
+                                clientSocket.Disconnect(true);
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            SendResponse(clientSocket, "Error: Invalid .validate command format.");
+                        }
+                    }
+
+
+                    //create account endpoint
+                    else if (receivedText.StartsWith(".createaccount"))
                     {
                         Console.WriteLine(Utils.GREEN + "SERVER: Account creation request");
 
@@ -133,19 +189,20 @@ namespace c_tier.src.backend.server
                         string password = aux[2];
 
                         var user_id = Database.CreateUser(username, password);
-                        if (user_id == 0) SendResponse(clientSocket,"Account request failed");
+                        if (user_id == 0) SendResponse(clientSocket, "Account request failed");
                         else
                         {
                             SendResponse(clientSocket, ".ACCOUNTOK");
                             Console.WriteLine("SERVER: Account created for user " + username);
-                            Task.Run(()=>clientSocket.Disconnect(true));
+                            Task.Run(() => clientSocket.Disconnect(true));
                             Console.WriteLine("SERVER: Disconnecting client " + username);
 
                         }
 
 
                     }
-                    else if(receivedText.StartsWith(".getchannels") || receivedText.StartsWith(".gc"))
+                    //get channels endpoint
+                    else if (receivedText.StartsWith(".getchannels") || receivedText.StartsWith(".gc"))
                     {
                         Console.WriteLine(Utils.GREEN + "SERVER: Client asked for channel list!");
 
@@ -155,11 +212,11 @@ namespace c_tier.src.backend.server
                         SendResponse(clientSocket, ".CHANNELLIST" + channelNameList);
                         Console.WriteLine(Utils.GREEN + "SYSTEM: Channel list sent!");
                     }
-
+                    // move channel endpoint
                     else if (receivedText.StartsWith(".mc"))
                     {
                         Console.WriteLine(Utils.GREEN + $"SYSTEM: Attempting channel moving");
-                        // Correctly split the string using the '|' delimiter
+
                         string[] aux = receivedText.Split(' ');
 
                         // Ensure the array has the expected number of elements
@@ -177,7 +234,7 @@ namespace c_tier.src.backend.server
                                 {
                                     if (user.MoveToChannel(channel))
                                     {
-                                        SendResponse(clientSocket, $"{welcomeMessage}\n Hopped to {user.currentChannel.channelName}");
+                                        SendResponse(clientSocket, $"{welcomeMessage}\n Hopped to {user.currentChannel.channelName}"); // success
                                     }
                                     else
                                     {
@@ -199,14 +256,12 @@ namespace c_tier.src.backend.server
                             SendResponse(clientSocket, "Error: Invalid .mc command format.");
                         }
                     }
-
-                    else // if its just a message
+                    else // If it's just a message
                     {
-
                         Console.WriteLine($"{Utils.GREEN}SERVER: Received from client : {Utils.NORMAL} {receivedText}");
 
-                        users.TryGetValue(clientSocket, out var user); // find the user
-                        UpdateClientsAndHost($"{user.username}: {receivedText}", clientSocket); // send the message
+                        users.TryGetValue(clientSocket, out var user); // Find the user
+                        UpdateClientsAndHost($"{user.username}: {receivedText}", clientSocket); // Send the message
                     }
 
                 }
@@ -219,16 +274,17 @@ namespace c_tier.src.backend.server
             }
             finally
             {
+       
                 users.TryGetValue(clientSocket, out var user);
                 if (user != null)
                 {
                     // Clean up after client disconnects
                     Console.WriteLine($"Client {user.username} disconnected.");
                     users.Remove(clientSocket); // Remove from dictionary
- 
-
                 }
             }
+
+
         }
 
 
@@ -248,6 +304,28 @@ namespace c_tier.src.backend.server
             }
         }
 
+
+        /// <summary>
+        /// Callback method to validate user sessions
+        /// </summary>
+        /// <param name="userTimer"></param>
+        private static void ValidateSessionForClient(UserTimer userTimer)
+        {
+            if (userTimer.user.validationCounter >= badValidationRequestLimit)
+            {
+                Console.WriteLine(Utils.RED + "SYSTEM: Disconnecting client(failed to validate session)"+Utils.GREEN);
+                SendResponse(userTimer.user.socket,".DISCONNECT");
+                userTimer.timer.Stop();
+                return;
+            }
+            else
+            {
+                SendResponse(userTimer.user.socket, ".SENDTOKEN");
+                Console.WriteLine("SYSTEM: asked for validation for client " + userTimer.user.username);
+                userTimer.user.validationCounter++;
+            }
+
+        }
 
         /// <summary>
         /// Sends a message in the same channel as the host

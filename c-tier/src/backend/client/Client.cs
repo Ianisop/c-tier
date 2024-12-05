@@ -19,7 +19,7 @@ namespace c_tier.src.backend.client
         private bool isSpeaking = false;
         protected User localUser;
         public bool isConnected = false;
-
+        
 
         public Client()
         {
@@ -27,6 +27,8 @@ namespace c_tier.src.backend.client
             remoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 25366);
             
         }
+
+       
 
         public void Stop()
         {
@@ -167,6 +169,25 @@ namespace c_tier.src.backend.client
                         string[] aux = receivedText.Split("|").Skip(1).ToArray();// Skip the ".CHANNELIST" part
                         Frontend.Log("Updating channels list");
                         Frontend.UpdateChannelList(aux);
+                        isSpeaking = false;
+                    }
+
+                    if(receivedText.StartsWith(".sessiontoken"))
+                    {
+                        string[] aux = receivedText.Split(" ");
+                        localUser.sessionToken = aux[1]; // cache the new session token
+                        Frontend.Log("SessionToken updated: " + aux[1]);
+             
+
+                    }
+                    if(receivedText.StartsWith(".DISCONNECT"))
+                    {
+                        clientSocket.Disconnect(true);
+                    }
+                    if(receivedText.StartsWith(".SENDTOKEN"))
+                    {
+                        Speak(".validate " + localUser.sessionToken);
+                        Frontend.Log("Validating session");
                         isSpeaking = false;
                     }
 

@@ -17,8 +17,13 @@ namespace c_tier.src.backend.client
         public List<Role> roles { get; set; }
 
         public Channel oldChannel, currentChannel;
+        public UserTimer sessionValidationTimer { get; set; } // Timer for session validation
+        public string sessionToken { get; set; }
 
         public Socket socket;
+
+        public int validationCounter;
+
 
         public User()
         {
