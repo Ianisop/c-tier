@@ -119,6 +119,15 @@ namespace c_tier.src.backend.server
                             SendResponse(clientSocket, welcomeMessage + "\n"+ "You're in " + newUser.currentChannel.channelName);
                         
                     }
+                    else if(receivedText.StartsWith(".createaccount"))
+                    {
+                        Console.WriteLine(Utils.GREEN + "SERVER: Account creation request");
+
+                        //validate data
+                        string[] aux = receivedText.Split(" ");
+                        string username = aux[1];
+                        string password = aux[2];
+                    }
                     else if(receivedText.StartsWith(".getchannels") || receivedText.StartsWith(".gc"))
                     {
                         Console.WriteLine(Utils.GREEN + "SERVER: Client asked for channel list!");

@@ -19,9 +19,9 @@ namespace c_tier.src
         public Window chatWindow = new Window("Chat") { X = 15, Y = 0, Width = 50, Height = Dim.Percent(50) };
         public Window profileWindow = new Window("Profile") { X = 80, Y = 0, Width = 20, Height = Dim.Percent(50) };
         // public Window serverBrowserWindow = new Window("Server Browser") {X= 50, Y= 3, Width=20, Height = 40 };
-        public Window profileEditor = new Window("Profile Editor") { X = 50, Y = 15, Width = 50, Height = Dim.Percent(50) };
-        public TextField usernameTextField = new TextField {Text="Username....", X=Pos.AnchorEnd(1), Y=Pos.AnchorEnd(2),Width=35,Height=3 };
-        public TextField passwordTextField = new TextField {Text="Password....", X=Pos.AnchorEnd(1), Y=Pos.AnchorEnd(4),Width=35,Height=3 };
+        public TextField usernameTextField = new TextField {Text="Username....", X=0, Y=Pos.AnchorEnd(8),Width=15,Height=3 };
+        public TextField passwordTextField = new TextField {Text="Password....", X=0, Y=Pos.AnchorEnd(6),Width=15,Height=3 };
+        public Button submitButton = new Button() { Text = "Submit", X = 3, Y = 8, Width = 5, Height = 5};
         public TextView chatHistory = new TextView { X = 0, Y = 0, Width = 50, Height = 50,ReadOnly = true, Multiline = true, WordWrap = true,
             ColorScheme = new ColorScheme
             {
@@ -62,14 +62,10 @@ namespace c_tier.src
 
             // Add the chat history to the chat window
             chatWindow.Add(chatHistory);
-
-            profileEditor.Add(usernameTextField, passwordTextField);
             chatWindow.Add(chatInputField);
             debugWindow.Add(debugLogHistory);
             //channelWindow.Add(generalChannelButton);
-            profileWindow.Add(userNameLabel);
-            profileWindow.Add(profileSeparator);
-            profileWindow.Add(roleListLabel);
+          
         }
 
 
@@ -88,9 +84,23 @@ namespace c_tier.src
             Application.Init();
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black);
             Colors.Base.Focus = Application.Driver.MakeAttribute(Color.Green, Color.DarkGray);
+            if (client.Init())
+            {
+                Frontend.Log("Client init successful");
+                Task.Run(() => client.Connect()); // Connect to the server
+            }
+            else
+            {
+                Frontend.Log("Client init failed");
 
-            Task.Run(() => client.Connect()); // Connect to the server
-                                         
+                
+                app.profileWindow.Add(app.submitButton);
+                app.profileWindow.Add(app.passwordTextField);
+                app.profileWindow.Add(app.usernameTextField);
+                Application.Refresh();
+
+            }
+
 
             // Define the KeyPress event to trigger on Enter key press
             app.chatInputField.KeyPress += (e) =>
@@ -103,12 +113,35 @@ namespace c_tier.src
                 }
             };
 
+            app.submitButton.Clicked += OnAccountFormSubmit;
+           
 
-
-
+           
             Application.Run(); // has to be the last line
+
+
+
         }
 
+        //Method to try the db
+        public static void OnAccountFormSubmit()
+        {
+            string username = app.usernameTextField.Text.ToString();
+            string password = app.passwordTextField.Text.ToString();
+
+            //try creating an account
+            if (client.CreateAccount(username, password))
+            {
+                //serialize into json, and try connecting
+            };
+
+
+        }
+
+        public static int Prompt(string title,string description, params NStack.ustring[] buttons)
+        {
+            return MessageBox.Query(title, description, buttons);
+        }
         public static void UpdateChannelList(string[] channelNames)
         {
             // Clear existing buttons
@@ -161,7 +194,7 @@ namespace c_tier.src
 
         public static void SwitchScene()
         {
-            Application.Top.Add(app.profileEditor);
+         
         }
 
         public static void Update()

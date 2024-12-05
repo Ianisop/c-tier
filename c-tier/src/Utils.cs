@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
+using c_tier.src.backend.client;
 
 namespace c_tier.src
 {
@@ -43,7 +44,7 @@ namespace c_tier.src
             {
                 // Console.WriteLine($"Error reading or deserializing file: {ex.Message}");
                 Frontend.Log(ex.Message);
-                return default;
+                return default(T);
             }
         }
 

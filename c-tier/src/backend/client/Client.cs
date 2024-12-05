@@ -17,7 +17,7 @@ namespace c_tier.src.backend.client
         private readonly Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         private IPEndPoint remoteEndPoint;
         private bool isSpeaking = false;
-        protected User localUser;
+        protected User localUser = null;
 
 
         public Client()
@@ -28,6 +28,77 @@ namespace c_tier.src.backend.client
         }
 
 
+        public bool Init()
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                IncludeFields = true,
+            };
+            User user = Utils.ReadFromFile<User>("src/usasd", options);
+            if (user == null)
+            {
+                
+                return false;
+            }
+            else
+            {
+                localUser = user;
+                return true;
+            }
+       
+        }
+
+        public bool CreateAccount(string username, string password)
+        {
+
+            clientSocket.Connect(remoteEndPoint);
+
+            Speak(".createaccount " + username + " " + password);
+
+            byte[] buffer = new byte[1024];
+
+            while (true)
+            {
+                try
+                {
+                    int receivedBytes = clientSocket.Receive(buffer);
+                    if (receivedBytes == 0) break; // Server closed the connection
+
+                    string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+
+                    Frontend.Log($"Received from server: {receivedText}");
+
+                    if (receivedText.StartsWith(".ACCOUNTOK"))
+                    {
+                        Frontend.Log("Account created succsefully!");
+                        isSpeaking = false;
+                        return true;
+                   
+                    }
+
+                    //just a chat message
+                    else
+                    {
+                        Frontend.Log("Error: " + receivedText);
+                        isSpeaking = false;
+                        return false;
+                    }
+                }
+
+                catch (Exception ex)
+                {
+                    Frontend.Log($"Error receiving data: {ex.Message}");
+                    isSpeaking = false;
+                    return false;
+                    break;
+                }
+
+            }
+            return false;
+
+        }
+
         public void Connect()
         {
             JsonSerializerOptions options = new()
@@ -36,21 +107,8 @@ namespace c_tier.src.backend.client
                 PropertyNameCaseInsensitive = true
             };
 
-            //localUser = Utils.ReadFromFile<User>("src/user_config.json", options); // load user config
 
    
-
-            if (localUser == null)
-            {
-                Frontend.Log(Utils.RED + "Client init failed....");
-                // int option= MessageBox.ErrorQuery("!!!!!ALERT!!!!!", "It appears that theres no profile created for this device, would you like to make a new one?", "Go to profile editor", "Quit");
-                //if (option == 0) Frontend.SwitchScene();
-                //else
-                //{
-               //     Application.RequestStop();
-               // }
-            }
-
             localUser.socket = clientSocket;
 
             clientSocket.Connect(remoteEndPoint);
