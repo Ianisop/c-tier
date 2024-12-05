@@ -32,10 +32,10 @@ namespace c_tier.src.backend.client
 
         public void Stop()
         {
-
             clientSocket.Disconnect(true);
             isConnected = false;
         }
+
         public bool Init()
         {
             var options = new JsonSerializerOptions
@@ -43,7 +43,9 @@ namespace c_tier.src.backend.client
                 PropertyNameCaseInsensitive = true,
                 IncludeFields = true,
             };
+
             User user = Utils.ReadFromFile<User>("src/user_config.json", options);
+
             if (user == null)
             {
                 
