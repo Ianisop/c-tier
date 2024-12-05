@@ -13,16 +13,16 @@ namespace c_tier.src.backend.server
         public string channelName;
         public int channelID;
         public string channelDescription;
-        public List<Role> rolesWithAccess;
+        public int minRolePermLevel;
         public int activeMembers;
         public Dictionary<Socket,User> users = new Dictionary<Socket,User>();
 
 
-        public Channel(string channelName, string channelDescription, List<Role> rolesWithAcess)
+        public Channel(string channelName, string channelDescription, int minRolePermLevel)
         {
             this.channelName = channelName;
             this.channelDescription = channelDescription;
-            this.rolesWithAccess = rolesWithAcess;
+            this.minRolePermLevel = minRolePermLevel;
            
           
         }

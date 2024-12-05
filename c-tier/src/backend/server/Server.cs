@@ -13,6 +13,7 @@ using System.Drawing.Printing;
 using System.Reflection;
 using System.Timers;
 using System.Threading;
+using System.Data;
 
 namespace c_tier.src.backend.server
 {
@@ -27,9 +28,17 @@ namespace c_tier.src.backend.server
         public static readonly string welcomeMessage = "System: Welcome to the server!";
         public static readonly int badValidationRequestLimit = 4;
         public static readonly int sessionTokenValidationTimeout = 30000; // im ms (default 5 mins)
+        public static readonly string ownerUsername = "somethingfishy";
         public static List<Channel> channels = new List<Channel>()
-        { new Channel("General", "The Place to be!", new List<Role>(){ new Role(1, "Creator")}),
-          new Channel("Staff", "Staff Only!", new List<Role>(){ new Role(1, "Creator")})
+        { new Channel("General", "The Place to be!",1),
+         new Channel("General 2", "The Place to be again!",1),
+          new Channel("Staff", "Staff Only!",5)
+        };
+
+        public static List<Role> serverRoles = new List<Role>()
+        {
+            new Role("Owner",9,"Red"),
+            new Role("Member",1,"White", true)
         };
         private static Dictionary<Socket, User> users = new Dictionary<Socket, User>();
 
@@ -47,6 +56,7 @@ namespace c_tier.src.backend.server
             try
             {
                 SQLiteConnection tempdb = Database.InitDatabase("db.db");
+                Console.WriteLine("SYSTEM: Found " + channels.Count + " channels, " + serverRoles.Count + " roles!");
                 serverSocket.Bind(endPoint);
                 serverSocket.Listen(1); // Backlog 1 connection
             }
@@ -129,10 +139,17 @@ namespace c_tier.src.backend.server
                             password = password,
                             socket = clientSocket,
                             sessionToken = Auth.CreateSession(username, password),
-                            sessionValidationTimer = userTimer
+                            sessionValidationTimer = userTimer,
+                            
 
                         };
 
+                        //setup default role for new user
+     
+            
+                        newUser.roles.Add(GetDefaultRole());
+
+                        Console.WriteLine("SYSTEM: Gave user " + username + " role "+ GetDefaultRole().roleName ); 
                         //setup validation timer for user
                         newUser.sessionValidationTimer.user = newUser;
                         newUser.sessionValidationTimer.timer = timer;
@@ -177,6 +194,8 @@ namespace c_tier.src.backend.server
                             SendResponse(clientSocket, "Error: Invalid .validate command format.");
                         }
                     }
+
+
 
 
                     //create account endpoint
@@ -289,6 +308,20 @@ namespace c_tier.src.backend.server
 
         }
 
+        //TODO: REPLACE THIS BY SORTING THE ENTIRE ROLES LIST ON INIT AND PUT THE DEFAULT ROLE FIRST
+        public static Role GetDefaultRole()
+        {
+       
+            foreach (var i in serverRoles)
+            {
+                if (i.isDefault == true)
+                {
+                    Console.WriteLine("Default Role Found! : " + i.isDefault);;
+                    return i;
+                }
+            }
+            return null;
+        }
 
         /// <summary>
         /// Updates all clients besides the message provider
@@ -351,11 +384,11 @@ namespace c_tier.src.backend.server
         /// </summary>
         /// <param name="channelName"></param>
         /// <param name="rolesWithAccess"></param>
-        public static bool CreateChannel(string newChannelName, string newChannelDesc, List<Role> rolesWithBaseAccess)
+        public static bool CreateChannel(string newChannelName, string newChannelDesc, int minRolePermLevel)
         {
             Channel aux = channels.Find(x => x.channelName == newChannelName); // Check if theres a channel with the same name already
             if (aux != null) return false; // channel already exists
-            Channel newChannel = new Channel(newChannelName, newChannelDesc, rolesWithBaseAccess);
+            Channel newChannel = new Channel(newChannelName, newChannelDesc, minRolePermLevel);
             channels.Add(newChannel);
             Console.WriteLine("SYSTEM: CREATED NEW CHANNEL " + newChannelName);
             return true;

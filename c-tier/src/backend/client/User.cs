@@ -14,7 +14,7 @@ namespace c_tier.src.backend.client
         public int id { get; set; }
 
         public string password { get; set; }
-        public List<Role> roles { get; set; }
+        public List<Role> roles = new List<Role>();
 
         public Channel oldChannel, currentChannel;
         public UserTimer sessionValidationTimer { get; set; } // Timer for session validation
@@ -37,12 +37,12 @@ namespace c_tier.src.backend.client
         /// </summary>
         /// <param name="requiredRoles"></param>
         /// <returns></returns>
-        public bool HasRole(List<Role> requiredRoles)
+        public bool HasRole(int minPermLevel)
         {
-            return true;
+         
             foreach(var role in roles)
             {
-                if(requiredRoles.Contains(role)) return true;   
+                if(role.permLevel >= minPermLevel) return true;   
             }
 
             return false;
@@ -55,7 +55,7 @@ namespace c_tier.src.backend.client
         /// <returns></returns>
         public bool MoveToChannel(Channel channel)
         {
-            if (currentChannel != channel && HasRole(roles))
+            if (currentChannel != channel && HasRole(channel.minRolePermLevel))
             { 
                 oldChannel = currentChannel;
                 currentChannel = channel;
@@ -71,6 +71,7 @@ namespace c_tier.src.backend.client
         
             return false;
         }
+
 
     }
 }
