@@ -9,16 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
     <PackageReference Include="Terminal.Gui" Version="1.17.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="src\secret.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="src\user_config.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

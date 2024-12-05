@@ -7,6 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using c_tier.src.backend.client;
+using System.Security.Cryptography.X509Certificates;
+using System.Data.SQLite;
+using System.Drawing.Printing;
 
 namespace c_tier.src.backend.server
 {
@@ -36,6 +39,7 @@ namespace c_tier.src.backend.server
             shouldStop = false;
             try
             {
+                SQLiteConnection tempdb = Database.InitDatabase("db.db");
                 serverSocket.Bind(endPoint);
                 serverSocket.Listen(1); // Backlog 1 connection
             }

@@ -4,7 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json;
-using c_tier.src.backend.client;
+using System.Security.Policy;
+using System.Security.Cryptography;
 
 namespace c_tier.src
 {
@@ -26,7 +27,7 @@ namespace c_tier.src
         public static string REVERSE = Console.IsOutputRedirected ? "" : "\x1b[7m";
         public static string NOREVERSE = Console.IsOutputRedirected ? "" : "\x1b[27m";
 
-
+        private static readonly char[] DefaultCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".ToCharArray(); // char set for string generation
         /// <summary>
         /// Serializes json into object
         /// </summary>
@@ -44,8 +45,46 @@ namespace c_tier.src
             {
                 // Console.WriteLine($"Error reading or deserializing file: {ex.Message}");
                 Frontend.Log(ex.Message);
-                return default(T);
+                return default;
             }
+        }
+
+        public static UInt64 GenerateID(int length)
+        {
+            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            byte[] randomBytes = new byte[8];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomBytes);
+            }
+            UInt64 randomPort = BitConverter.ToUInt64(randomBytes, 0);
+            string combined = timestamp.ToString() + randomPort.ToString();
+            using (var sha256 =  SHA256.Create())
+            {
+                byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(combined));
+                UInt64 id = BitConverter.ToUInt64(hash, 0);
+                string idString = id.ToString().Substring(0, Math.Min(length,id.ToString().Length));
+                return UInt64.Parse(idString);
+            }
+        }
+        
+        public static string GenerateRandomString(int length)
+        {
+            if (length <= 0)
+            {
+                return "";
+            }
+
+            char[] characters = (new string(DefaultCharacters)).ToCharArray();
+            StringBuilder result = new StringBuilder(length);
+            Random random = new Random();
+
+            for (int i = 0; i < length; i++)
+            {
+                result.Append(characters[random.Next(characters.Length)]);
+            }
+
+            return result.ToString();
         }
 
     }
