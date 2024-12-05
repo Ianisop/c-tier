@@ -108,7 +108,9 @@ namespace c_tier.src
 
         }
 
-        
+        /// <summary>
+        /// Cleans the chat history 
+        /// </summary>
         public static void CleanChat()
         {
             app.chatHistory.Text = "";

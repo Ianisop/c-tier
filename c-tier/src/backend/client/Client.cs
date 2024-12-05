@@ -197,7 +197,7 @@ namespace c_tier.src.backend.client
                     }
 
                     //just a chat message
-                    else
+                    else if(!receivedText.StartsWith('.'))
                     {
                         Frontend.PushMessage(receivedText);
                         isSpeaking = false;
