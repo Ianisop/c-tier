@@ -109,7 +109,10 @@ namespace c_tier.src
         }
 
         
-
+        public static void CleanChat()
+        {
+            app.chatHistory.Text = "";
+        }
         private static void SetupClient()
         {
             if (client.Init())

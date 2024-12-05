@@ -26,6 +26,7 @@ namespace c_tier.src.backend.server
         private static readonly IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
         public static readonly string welcomeMessage = "System: Welcome to the server!";
         public static readonly int badValidationRequestLimit = 4;
+        public static readonly int sessionTokenValidationTimeout = 30000; // im ms (default 5 mins)
         public static List<Channel> channels = new List<Channel>()
         { new Channel("General", "The Place to be!", new List<Role>(){ new Role(1, "Creator")}),
           new Channel("Staff", "Staff Only!", new List<Role>(){ new Role(1, "Creator")})
@@ -118,7 +119,7 @@ namespace c_tier.src.backend.server
                         Console.WriteLine("SYSTEM: Log in request for account: " + username);
 
                         //Init validation timer
-                        var timer = new System.Timers.Timer(3000);
+                        var timer = new System.Timers.Timer(sessionTokenValidationTimeout);
                         var userTimer = new UserTimer();
 
                         //Create a local user 
@@ -234,6 +235,7 @@ namespace c_tier.src.backend.server
                                 {
                                     if (user.MoveToChannel(channel))
                                     {
+                                        SendResponse(clientSocket, ".clear"); // clear the chatlog
                                         SendResponse(clientSocket, $"{welcomeMessage}\n Hopped to {user.currentChannel.channelName}"); // success
                                     }
                                     else

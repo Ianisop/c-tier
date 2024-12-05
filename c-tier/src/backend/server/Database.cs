@@ -21,9 +21,9 @@ namespace c_tier.src.backend.server
             var connectionString = $"Data Source={dbPath};Version=3;";
             dbConnection = new SQLiteConnection(connectionString);
             dbConnection.Open();
-            Console.WriteLine("DATABASE: Up and running!");
+            Console.WriteLine(Utils.GREEN+"DATABASE: Up and running!");
             CreateTables();
-            Console.WriteLine("DATABASE: Tables created!");
+            Console.WriteLine(Utils.GREEN+"DATABASE: Tables created!");
             return dbConnection;
         }
 
@@ -52,7 +52,7 @@ namespace c_tier.src.backend.server
             );";
 
             ExecuteNonQuery(sql);
-            Console.WriteLine("Created users table.");
+            Console.WriteLine(Utils.GREEN + "DATABASE: Created users table.");
         }
 
         private static void CreateChannelsTable()
@@ -68,7 +68,7 @@ namespace c_tier.src.backend.server
             );";
 
             ExecuteNonQuery(sql);
-            Console.WriteLine("Created channels table.");
+            Console.WriteLine(Utils.GREEN + "DATABASE: Created channels table.");
         }
 
         private static void CreateMessageTable()
@@ -85,7 +85,7 @@ namespace c_tier.src.backend.server
             );";
 
             ExecuteNonQuery(sql);
-            Console.WriteLine("Created messages table.");
+            Console.WriteLine(Utils.GREEN + "DATABASE: Created messages table.");
         }
 
         private static void CreateUserChannelsTable()
@@ -100,7 +100,7 @@ namespace c_tier.src.backend.server
             );";
 
             ExecuteNonQuery(sql);
-            Console.WriteLine("Created user_channels table.");
+            Console.WriteLine(Utils.GREEN + "DATABASE: Created user_channels table.");
         }
 
         public static UInt64 CreateUser(string username, string password)

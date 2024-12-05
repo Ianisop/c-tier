@@ -176,7 +176,7 @@ namespace c_tier.src.backend.client
                     {
                         string[] aux = receivedText.Split(" ");
                         localUser.sessionToken = aux[1]; // cache the new session token
-                        Frontend.Log("SessionToken updated: " + aux[1]);
+                        //Frontend.Log("SessionToken updated: " + aux[1]);
              
 
                     }
@@ -187,7 +187,12 @@ namespace c_tier.src.backend.client
                     if(receivedText.StartsWith(".SENDTOKEN"))
                     {
                         Speak(".validate " + localUser.sessionToken);
-                        Frontend.Log("Validating session");
+                        //Frontend.Log("Validating session");
+                        isSpeaking = false;
+                    }
+                    if(receivedText.StartsWith(".clear"))
+                    {
+                        Frontend.CleanChat();
                         isSpeaking = false;
                     }
 
@@ -222,6 +227,7 @@ namespace c_tier.src.backend.client
             byte[] rawData = Encoding.UTF8.GetBytes(message);
             clientSocket.Send(rawData);
             Frontend.Log($"Sending message: {message}");
+            isSpeaking = false;
 
 
         }
