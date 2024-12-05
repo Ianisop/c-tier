@@ -7,6 +7,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using c_tier.src.backend.client;
+using System.Security.Cryptography.X509Certificates;
+using System.Data.SQLite;
+using System.Drawing.Printing;
+using System.Reflection;
+using System.Timers;
+using System.Threading;
+using System.Data;
 
 namespace c_tier.src.backend.server
 {
@@ -19,11 +26,23 @@ namespace c_tier.src.backend.server
         private static readonly Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); // Create a socket
         private static readonly IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
         public static readonly string welcomeMessage = "System: Welcome to the server!";
+        public static readonly int badValidationRequestLimit = 4;
+        public static readonly int sessionTokenValidationTimeout = 30000; // im ms (default 5 mins)
+        public static readonly string ownerUsername = "somethingfishy";
         public static List<Channel> channels = new List<Channel>()
-        { new Channel("General", "The Place to be!", new List<Role>(){ new Role(1, "Creator")}),
-          new Channel("Staff", "Staff Only!", new List<Role>(){ new Role(1, "Creator")})
+        { new Channel("General", "The Place to be!",1),
+         new Channel("General 2", "The Place to be again!",1),
+          new Channel("Staff", "Staff Only!",5)
+        };
+
+        public static List<Role> serverRoles = new List<Role>()
+        {
+            new Role("Owner",9,"Red"),
+            new Role("Member",1,"White", true)
         };
         private static Dictionary<Socket, User> users = new Dictionary<Socket, User>();
+
+        private static System.Timers.Timer validationTimer = new System.Timers.Timer();
 
         public Server(int targetPort, bool debug)
         {
@@ -36,6 +55,8 @@ namespace c_tier.src.backend.server
             shouldStop = false;
             try
             {
+                SQLiteConnection tempdb = Database.InitDatabase("db.db");
+                Console.WriteLine("SYSTEM: Found " + channels.Count + " channels, " + serverRoles.Count + " roles!");
                 serverSocket.Bind(endPoint);
                 serverSocket.Listen(1); // Backlog 1 connection
             }
@@ -97,29 +118,111 @@ namespace c_tier.src.backend.server
 
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
 
-                    //LOGIN ENDPOINT
-                    if(receivedText.StartsWith(".login"))
+                    // LOGIN ENDPOINT
+                    if (receivedText.StartsWith(".login"))
                     {
                         Console.WriteLine("SYSTEM: Attempting log in request validation. | " + receivedText);
 
                         string[] aux = receivedText.Split("|");
-                        string username = aux[1]; 
-                        string password = aux[2]; 
-                        Console.WriteLine("SYSTEM: Log in request: " + username + " | " + password);
+                        string username = aux[1];
+                        string password = aux[2];
+                        Console.WriteLine("SYSTEM: Log in request for account: " + username);
 
+                        //Init validation timer
+                        var timer = new System.Timers.Timer(sessionTokenValidationTimeout);
+                        var userTimer = new UserTimer();
+
+                        //Create a local user 
                         User newUser = new User()
                         {
                             username = username,
                             password = password,
-                            socket = clientSocket
+                            socket = clientSocket,
+                            sessionToken = Auth.CreateSession(username, password),
+                            sessionValidationTimer = userTimer,
+                            
+
                         };
 
-                        users.Add(clientSocket,newUser);
-                        if(newUser.MoveToChannel(channels.FirstOrDefault()));
-                            SendResponse(clientSocket, welcomeMessage + "\n"+ "You're in " + newUser.currentChannel.channelName);
-                        
+                        //setup default role for new user
+     
+            
+                        newUser.roles.Add(GetDefaultRole());
+
+                        Console.WriteLine("SYSTEM: Gave user " + username + " role "+ GetDefaultRole().roleName ); 
+                        //setup validation timer for user
+                        newUser.sessionValidationTimer.user = newUser;
+                        newUser.sessionValidationTimer.timer = timer;
+                        newUser.sessionValidationTimer.timer.Elapsed +=(sender,args) => ValidateSessionForClient(userTimer);
+                        newUser.sessionValidationTimer.timer.AutoReset = true;
+                        newUser.sessionValidationTimer.timer.Enabled = true;
+
+                        users.Add(clientSocket, newUser); // Cache the user
+
+  
+
+                        SendResponse(clientSocket, ".sessiontoken " + newUser.sessionToken); // send token
+                        if (newUser.MoveToChannel(channels.FirstOrDefault()))
+                        {
+                            SendResponse(clientSocket, welcomeMessage + "\n" + "You're in " + newUser.currentChannel.channelName);
+                        }
                     }
-                    else if(receivedText.StartsWith(".getchannels") || receivedText.StartsWith(".gc"))
+
+                    else if (receivedText.StartsWith(".validate"))
+                    {
+                        string[] aux = receivedText.Split(' ');
+                        if (aux.Length >= 2)
+                        {
+                            string token = aux[1];
+                            // Perform token validation logic
+                            if (users.TryGetValue(clientSocket, out User targetUser) && targetUser.sessionToken == token)
+                            {
+                                Console.WriteLine("SYSTEM: Token for " + targetUser.username + " validated successfully.");
+                                targetUser.validationCounter--;
+
+                            }
+                            else
+                            {
+                                Console.WriteLine("SYSTEM: Invalid token. Disconnecting client.");
+                                SendResponse(clientSocket, "Error: Invalid session token.");
+                                clientSocket.Disconnect(true);
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            SendResponse(clientSocket, "Error: Invalid .validate command format.");
+                        }
+                    }
+
+
+
+
+                    //create account endpoint
+                    else if (receivedText.StartsWith(".createaccount"))
+                    {
+                        Console.WriteLine(Utils.GREEN + "SERVER: Account creation request");
+
+                        //validate data
+                        string[] aux = receivedText.Split(" ");
+                        string username = aux[1];
+                        string password = aux[2];
+
+                        var user_id = Database.CreateUser(username, password);
+                        if (user_id == 0) SendResponse(clientSocket, "Account request failed");
+                        else
+                        {
+                            SendResponse(clientSocket, ".ACCOUNTOK");
+                            Console.WriteLine("SERVER: Account created for user " + username);
+                            Task.Run(() => clientSocket.Disconnect(true));
+                            Console.WriteLine("SERVER: Disconnecting client " + username);
+
+                        }
+
+
+                    }
+                    //get channels endpoint
+                    else if (receivedText.StartsWith(".getchannels") || receivedText.StartsWith(".gc"))
                     {
                         Console.WriteLine(Utils.GREEN + "SERVER: Client asked for channel list!");
 
@@ -129,10 +232,11 @@ namespace c_tier.src.backend.server
                         SendResponse(clientSocket, ".CHANNELLIST" + channelNameList);
                         Console.WriteLine(Utils.GREEN + "SYSTEM: Channel list sent!");
                     }
+                    // move channel endpoint
                     else if (receivedText.StartsWith(".mc"))
                     {
                         Console.WriteLine(Utils.GREEN + $"SYSTEM: Attempting channel moving");
-                        // Correctly split the string using the '|' delimiter
+
                         string[] aux = receivedText.Split(' ');
 
                         // Ensure the array has the expected number of elements
@@ -150,7 +254,8 @@ namespace c_tier.src.backend.server
                                 {
                                     if (user.MoveToChannel(channel))
                                     {
-                                        SendResponse(clientSocket, $"{welcomeMessage}\n Hopped to {user.currentChannel.channelName}");
+                                        SendResponse(clientSocket, ".clear"); // clear the chatlog
+                                        SendResponse(clientSocket, $"{welcomeMessage}\n Hopped to {user.currentChannel.channelName}"); // success
                                     }
                                     else
                                     {
@@ -172,33 +277,51 @@ namespace c_tier.src.backend.server
                             SendResponse(clientSocket, "Error: Invalid .mc command format.");
                         }
                     }
-
-                    else // if its just a message
+                    else // If it's just a message
                     {
-
                         Console.WriteLine($"{Utils.GREEN}SERVER: Received from client : {Utils.NORMAL} {receivedText}");
 
-                        users.TryGetValue(clientSocket, out var user); // find the user
-                        UpdateClientsAndHost($"{user.username}: {receivedText}", clientSocket); // send the message
+                        users.TryGetValue(clientSocket, out var user); // Find the user
+                        UpdateClientsAndHost($"{user.username}: {receivedText}", clientSocket); // Send the message
                     }
 
                 }
             }
             catch (Exception ex)
             {   users.TryGetValue(clientSocket, out var user);
-                Console.WriteLine($"Error handling: Client {user.username}: {ex.Message}");
+                if(user != null) Console.WriteLine($"Error handling: Client {user.username}: {ex.Message}");
+                else Console.WriteLine($"Error handling: Client (unknown): {ex.Message}");
+
             }
             finally
             {
+       
                 users.TryGetValue(clientSocket, out var user);
-
-                // Clean up after client disconnects
-                Console.WriteLine($"Client {user.username} disconnected.");
-                users.Remove(clientSocket); // Remove from dictionary
-                clientSocket.Close(); // Close the socket
+                if (user != null)
+                {
+                    // Clean up after client disconnects
+                    Console.WriteLine($"Client {user.username} disconnected.");
+                    users.Remove(clientSocket); // Remove from dictionary
+                }
             }
+
+
         }
 
+        //TODO: REPLACE THIS BY SORTING THE ENTIRE ROLES LIST ON INIT AND PUT THE DEFAULT ROLE FIRST
+        public static Role GetDefaultRole()
+        {
+       
+            foreach (var i in serverRoles)
+            {
+                if (i.isDefault == true)
+                {
+                    Console.WriteLine("Default Role Found! : " + i.isDefault);;
+                    return i;
+                }
+            }
+            return null;
+        }
 
         /// <summary>
         /// Updates all clients besides the message provider
@@ -216,6 +339,28 @@ namespace c_tier.src.backend.server
             }
         }
 
+
+        /// <summary>
+        /// Callback method to validate user sessions
+        /// </summary>
+        /// <param name="userTimer"></param>
+        private static void ValidateSessionForClient(UserTimer userTimer)
+        {
+            if (userTimer.user.validationCounter >= badValidationRequestLimit)
+            {
+                Console.WriteLine(Utils.RED + "SYSTEM: Disconnecting client(failed to validate session)"+Utils.GREEN);
+                SendResponse(userTimer.user.socket,".DISCONNECT");
+                userTimer.timer.Stop();
+                return;
+            }
+            else
+            {
+                SendResponse(userTimer.user.socket, ".SENDTOKEN");
+                Console.WriteLine("SYSTEM: asked for validation for client " + userTimer.user.username);
+                userTimer.user.validationCounter++;
+            }
+
+        }
 
         /// <summary>
         /// Sends a message in the same channel as the host
@@ -239,11 +384,11 @@ namespace c_tier.src.backend.server
         /// </summary>
         /// <param name="channelName"></param>
         /// <param name="rolesWithAccess"></param>
-        public static bool CreateChannel(string newChannelName, string newChannelDesc, List<Role> rolesWithBaseAccess)
+        public static bool CreateChannel(string newChannelName, string newChannelDesc, int minRolePermLevel)
         {
             Channel aux = channels.Find(x => x.channelName == newChannelName); // Check if theres a channel with the same name already
             if (aux != null) return false; // channel already exists
-            Channel newChannel = new Channel(newChannelName, newChannelDesc, rolesWithBaseAccess);
+            Channel newChannel = new Channel(newChannelName, newChannelDesc, minRolePermLevel);
             channels.Add(newChannel);
             Console.WriteLine("SYSTEM: CREATED NEW CHANNEL " + newChannelName);
             return true;

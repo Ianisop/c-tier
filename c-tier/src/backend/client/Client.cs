@@ -6,28 +6,117 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using static System.Collections.Specialized.BitVector32;
+using Terminal.Gui;
+
 
 namespace c_tier.src.backend.client
 {
     public class Client
     {
         // Create a TCP socket
-        private readonly Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        private  Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         private IPEndPoint remoteEndPoint;
         private bool isSpeaking = false;
         protected User localUser;
-
+        public bool isConnected = false;
+        
 
         public Client()
         {
-            //ServerInfo serverData = Utils.ReadFromFile<ServerInfo>("C:/Users/bocia/Documents/GitHub/c-tier/c-tier/src/secret.json"); // TODO: FIX THIS GARBAGE
+            //ServerInfo serverData = Utils.ReadFromFile<ServerInfo>("C:/Users/bocia/Documents/GitHub/c-tier/c-tier/src/secret.json");
             remoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 25366);
             
         }
 
+       
 
+        public void Stop()
+        {
+            clientSocket.Disconnect(true);
+            isConnected = false;
+        }
+
+        public bool Init()
+        {
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                IncludeFields = true,
+            };
+
+            User user = Utils.ReadFromFile<User>("src/user_config.json", options);
+
+            if (user == null)
+            {
+                
+                return false;
+            }
+            else
+            {
+                localUser = user;
+                return true;
+            }
+       
+        }
+
+        public bool CreateAccount(string username, string password)
+        {
+
+            clientSocket.Connect(remoteEndPoint);
+            isConnected = true;
+            Speak(".createaccount " + username + " " + password);
+
+            byte[] buffer = new byte[1024];
+
+            while (true)
+            {
+                try
+                {
+                    int receivedBytes = clientSocket.Receive(buffer);
+                    if (receivedBytes == 0) break; // Server closed the connection
+
+                    string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+
+                    Frontend.Log($"Received from server: {receivedText}");
+
+                    if (receivedText.StartsWith(".ACCOUNTOK"))
+                    {
+                        Frontend.Log("Account created succsefully!");
+                        isSpeaking = false;
+                        return true;
+                   
+                    }
+
+                    //just a chat message
+                    else
+                    {
+                        Frontend.Log("Error: " + receivedText);
+                        isSpeaking = false;
+                        return false;
+                    }
+                }
+
+                catch (Exception ex)
+                {
+                    Frontend.Log($"Error receiving data: {ex.Message}");
+                    isSpeaking = false;
+                    return false;
+             
+                }
+
+            }
+            return false;
+
+        }
+
+
+        public void Restart()
+        {
+           clientSocket.Dispose();
+            clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+
+        }
         public void Connect()
         {
             JsonSerializerOptions options = new()
@@ -36,21 +125,15 @@ namespace c_tier.src.backend.client
                 PropertyNameCaseInsensitive = true
             };
 
-            localUser = Utils.ReadFromFile<User>("src/user_config.json", options);
 
    
-
-            if (localUser == null)
-            {
-                Frontend.Log(Utils.RED + "Client init failed....");
-
-            }
-
             localUser.socket = clientSocket;
+            Frontend.Log("Trying socket connection...");
             clientSocket.Connect(remoteEndPoint);
-
+            isConnected = true;
+            Frontend.Log("Connection established...");
             Login(); // try logging in
-
+            Frontend.Update();
 
             // Start a background task to listen for incoming messages from the server
             Task.Run(() => ReceiveMessagesFromServer());
@@ -59,7 +142,8 @@ namespace c_tier.src.backend.client
         
         private void Login()
         {
-            string message = ".login|" + localUser.username + "|" +localUser.password.ToString();
+            Frontend.Log("logging in!");
+            string message = ".login|" + localUser.username + "|" + localUser.password.ToString();
             Speak(message);
             Frontend.Update();
         }
@@ -90,8 +174,32 @@ namespace c_tier.src.backend.client
                         isSpeaking = false;
                     }
 
+                    if(receivedText.StartsWith(".sessiontoken"))
+                    {
+                        string[] aux = receivedText.Split(" ");
+                        localUser.sessionToken = aux[1]; // cache the new session token
+                        //Frontend.Log("SessionToken updated: " + aux[1]);
+             
+
+                    }
+                    if(receivedText.StartsWith(".DISCONNECT"))
+                    {
+                        clientSocket.Disconnect(true);
+                    }
+                    if(receivedText.StartsWith(".SENDTOKEN"))
+                    {
+                        Speak(".validate " + localUser.sessionToken);
+                        //Frontend.Log("Validating session");
+                        isSpeaking = false;
+                    }
+                    if(receivedText.StartsWith(".clear"))
+                    {
+                        Frontend.CleanChat();
+                        isSpeaking = false;
+                    }
+
                     //just a chat message
-                    else
+                    else if(!receivedText.StartsWith('.'))
                     {
                         Frontend.PushMessage(receivedText);
                         isSpeaking = false;
@@ -121,6 +229,7 @@ namespace c_tier.src.backend.client
             byte[] rawData = Encoding.UTF8.GetBytes(message);
             clientSocket.Send(rawData);
             Frontend.Log($"Sending message: {message}");
+            isSpeaking = false;
 
 
         }
