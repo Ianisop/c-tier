@@ -24,7 +24,7 @@ namespace c_tier.src.backend.client
         public Client()
         {
             //ServerInfo serverData = Utils.ReadFromFile<ServerInfo>("C:/Users/bocia/Documents/GitHub/c-tier/c-tier/src/secret.json");
-            remoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 25366);
+            remoteEndPoint = new IPEndPoint(IPAddress.Parse("148.251.110.26"), 25366);
             
         }
 
