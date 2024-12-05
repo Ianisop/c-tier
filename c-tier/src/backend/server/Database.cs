@@ -12,7 +12,7 @@ using System.Drawing.Printing;
 
 namespace c_tier.src.backend.server
 {
-    public class Database
+    public static class Database
     {
         private static SQLiteConnection dbConnection;
 
@@ -21,8 +21,9 @@ namespace c_tier.src.backend.server
             var connectionString = $"Data Source={dbPath};Version=3;";
             dbConnection = new SQLiteConnection(connectionString);
             dbConnection.Open();
-
+            Console.WriteLine("DATABASE: Up and running!");
             CreateTables();
+            Console.WriteLine("DATABASE: Tables created!");
             return dbConnection;
         }
 

@@ -14,10 +14,11 @@ namespace c_tier.src.backend.client
     public class Client
     {
         // Create a TCP socket
-        private readonly Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        private  Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         private IPEndPoint remoteEndPoint;
         private bool isSpeaking = false;
-        protected User localUser = null;
+        protected User localUser;
+        public bool isConnected = false;
 
 
         public Client()
@@ -27,7 +28,12 @@ namespace c_tier.src.backend.client
             
         }
 
+        public void Stop()
+        {
 
+            clientSocket.Disconnect(true);
+            isConnected = false;
+        }
         public bool Init()
         {
             var options = new JsonSerializerOptions
@@ -35,7 +41,7 @@ namespace c_tier.src.backend.client
                 PropertyNameCaseInsensitive = true,
                 IncludeFields = true,
             };
-            User user = Utils.ReadFromFile<User>("src/usasd", options);
+            User user = Utils.ReadFromFile<User>("src/user_config.json", options);
             if (user == null)
             {
                 
@@ -53,7 +59,7 @@ namespace c_tier.src.backend.client
         {
 
             clientSocket.Connect(remoteEndPoint);
-
+            isConnected = true;
             Speak(".createaccount " + username + " " + password);
 
             byte[] buffer = new byte[1024];
@@ -91,7 +97,7 @@ namespace c_tier.src.backend.client
                     Frontend.Log($"Error receiving data: {ex.Message}");
                     isSpeaking = false;
                     return false;
-                    break;
+             
                 }
 
             }
@@ -99,6 +105,14 @@ namespace c_tier.src.backend.client
 
         }
 
+
+        public void Restart()
+        {
+           clientSocket.Dispose();
+            clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+
+        }
         public void Connect()
         {
             JsonSerializerOptions options = new()
@@ -110,11 +124,12 @@ namespace c_tier.src.backend.client
 
    
             localUser.socket = clientSocket;
-
+            Frontend.Log("Trying socket connection...");
             clientSocket.Connect(remoteEndPoint);
-
+            isConnected = true;
+            Frontend.Log("Connection established...");
             Login(); // try logging in
-
+            Frontend.Update();
 
             // Start a background task to listen for incoming messages from the server
             Task.Run(() => ReceiveMessagesFromServer());
@@ -123,9 +138,9 @@ namespace c_tier.src.backend.client
         
         private void Login()
         {
+            Frontend.Log("logging in!");
             string message = ".login|" + localUser.username + "|" + localUser.password.ToString();
             Speak(message);
-            Speak(".getchannels");
             Frontend.Update();
         }
 

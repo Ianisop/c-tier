@@ -8,7 +8,7 @@ using c_tier.src.backend.client;
 
 namespace c_tier.src.backend.server
 {
-    internal class Auth
+    public static class Auth
     {
 
         private const int SaltSize = 32;

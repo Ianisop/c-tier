@@ -48,6 +48,23 @@ namespace c_tier.src
                 return default;
             }
         }
+        public static bool WriteToFile(object tempObj,string fileName)
+        {
+            try
+            {
+
+                string jsonString = JsonSerializer.Serialize(tempObj);
+                File.WriteAllText(fileName, jsonString);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Console.WriteLine($"Error reading or deserializing file: {ex.Message}");
+                Frontend.Log(ex.Message);
+                return false;
+            }
+        }
+
 
         public static UInt64 GenerateID(int length)
         {

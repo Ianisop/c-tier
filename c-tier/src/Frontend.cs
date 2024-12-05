@@ -6,6 +6,7 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Terminal.Gui;
 using Label = Terminal.Gui.Label;
 
@@ -84,24 +85,8 @@ namespace c_tier.src
             Application.Init();
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black);
             Colors.Base.Focus = Application.Driver.MakeAttribute(Color.Green, Color.DarkGray);
-            if (client.Init())
-            {
-                Frontend.Log("Client init successful");
-                Task.Run(() => client.Connect()); // Connect to the server
-            }
-            else
-            {
-                Frontend.Log("Client init failed");
 
-                
-                app.profileWindow.Add(app.submitButton);
-                app.profileWindow.Add(app.passwordTextField);
-                app.profileWindow.Add(app.usernameTextField);
-                Application.Refresh();
-
-            }
-
-
+            SetupClient();
             // Define the KeyPress event to trigger on Enter key press
             app.chatInputField.KeyPress += (e) =>
             {
@@ -123,6 +108,31 @@ namespace c_tier.src
 
         }
 
+        
+
+        private static void SetupClient()
+        {
+            if (client.Init())
+            {
+                Frontend.Log("Client init successful");
+                Task.Run(() => client.Connect()); // Connect to the server
+              
+                app.profileWindow.Remove(app.submitButton);
+                app.profileWindow.Remove(app.passwordTextField);
+                app.profileWindow.Remove(app.usernameTextField);
+            }
+            else
+            {
+                Frontend.Log("Client init failed");
+                app.profileWindow.Add(app.submitButton);
+                app.profileWindow.Add(app.passwordTextField);
+                app.profileWindow.Add(app.usernameTextField);
+             
+
+            }
+            Application.Refresh();
+        }
+
         //Method to try the db
         public static void OnAccountFormSubmit()
         {
@@ -133,6 +143,17 @@ namespace c_tier.src
             if (client.CreateAccount(username, password))
             {
                 //serialize into json, and try connecting
+                User newUser = new User()
+                {
+                    username = username,
+                    password = password
+                };
+                if (Utils.WriteToFile(newUser, "src/user_config.json"))
+                {
+                    Frontend.Log("user_config.json created, logging in...");
+                    client.Restart();
+                    SetupClient();
+                }
             };
 
 

@@ -131,6 +131,19 @@ namespace c_tier.src.backend.server
                         string[] aux = receivedText.Split(" ");
                         string username = aux[1];
                         string password = aux[2];
+
+                        var user_id = Database.CreateUser(username, password);
+                        if (user_id == 0) SendResponse(clientSocket,"Account request failed");
+                        else
+                        {
+                            SendResponse(clientSocket, ".ACCOUNTOK");
+                            Console.WriteLine("SERVER: Account created for user " + username);
+                            Task.Run(()=>clientSocket.Disconnect(true));
+                            Console.WriteLine("SERVER: Disconnecting client " + username);
+
+                        }
+
+
                     }
                     else if(receivedText.StartsWith(".getchannels") || receivedText.StartsWith(".gc"))
                     {
@@ -200,16 +213,21 @@ namespace c_tier.src.backend.server
             }
             catch (Exception ex)
             {   users.TryGetValue(clientSocket, out var user);
-                Console.WriteLine($"Error handling: Client {user.username}: {ex.Message}");
+                if(user != null) Console.WriteLine($"Error handling: Client {user.username}: {ex.Message}");
+                else Console.WriteLine($"Error handling: Client (unknown): {ex.Message}");
+
             }
             finally
             {
                 users.TryGetValue(clientSocket, out var user);
+                if (user != null)
+                {
+                    // Clean up after client disconnects
+                    Console.WriteLine($"Client {user.username} disconnected.");
+                    users.Remove(clientSocket); // Remove from dictionary
+ 
 
-                // Clean up after client disconnects
-                Console.WriteLine($"Client {user.username} disconnected.");
-                users.Remove(clientSocket); // Remove from dictionary
-                clientSocket.Close(); // Close the socket
+                }
             }
         }
 
