@@ -39,6 +39,8 @@ namespace c_tier.src.backend.server
             CreateChannelsTable();
             CreateMessageTable();
             CreateUserChannelsTable();
+            CreateDMsTable();
+            CreateDirectMessagesTable();
         }
 
         private static void CreateUsersTable()
@@ -101,6 +103,38 @@ namespace c_tier.src.backend.server
 
             ExecuteNonQuery(sql);
             Console.WriteLine(Utils.GREEN + "DATABASE: Created user_channels table.");
+        }
+
+        private static void CreateDMsTable()
+        {
+            string sql = @"
+            CREATE TABLE IF NOT EXISTS direct_messages (
+                dmid INTEGER PRIMARY KEY,
+                user1id INTEGER,
+                user2id INTEGER,
+                FOREIGN KEY (user1id) REFERENCES users(userid),
+                FOREIGN KEY (user2id) REFERENCES users(userid),
+            );";
+
+            ExecuteNonQuery(sql);
+            Console.WriteLine(Utils.GREEN + "DATABASE: Created direct_messages table.");
+        }
+
+        private static void CreateDirectMessagesTable()
+        {
+            string sql = @"
+            CREATE TABLE IF NOT EXISTS messages_dms (
+                messageid INTEGER PRIMARY KEY,
+                authorid INTEGER,
+                dmid INTEGER,
+                content TEXT,
+                timestamp INTEGER,
+                FOREIGN KEY (authorid) REFERENCES users(userid),
+                FOREIGN KEY (dmid) REFERENCES direct_messages(dmid)
+            );";
+
+            ExecuteNonQuery(sql);
+            Console.WriteLine(Utils.GREEN + "DATABASE: Created messages_dms table.");
         }
 
         public static UInt64 CreateUser(string username, string password)
