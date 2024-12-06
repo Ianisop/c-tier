@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -40,7 +40,7 @@ namespace c_tier.src.backend.server
             new Role("Owner",9,"Red"),
             new Role("Member",1,"White", true)
         };
-        private static Dictionary<Socket, User> users = new Dictionary<Socket, User>();
+        public static Dictionary<Socket, User> users = new Dictionary<Socket, User>();
 
         private static System.Timers.Timer validationTimer = new System.Timers.Timer();
 
@@ -132,7 +132,7 @@ namespace c_tier.src.backend.server
                         var timer = new System.Timers.Timer(sessionTokenValidationTimeout);
                         var userTimer = new UserTimer();
 
-                        //Create a local user 
+                        //Create a local user
                         User newUser = new User()
                         {
                             username = username,
@@ -140,26 +140,26 @@ namespace c_tier.src.backend.server
                             socket = clientSocket,
                             sessionToken = Auth.CreateSession(username, password),
                             sessionValidationTimer = userTimer,
-                            
+
 
                         };
 
                         //setup default role for new user
-     
-            
+
+
                         newUser.roles.Add(GetDefaultRole());
 
-                        Console.WriteLine("SYSTEM: Gave user " + username + " role "+ GetDefaultRole().roleName ); 
+                        Console.WriteLine("SYSTEM: Gave user " + username + " role " + GetDefaultRole().roleName);
                         //setup validation timer for user
                         newUser.sessionValidationTimer.user = newUser;
                         newUser.sessionValidationTimer.timer = timer;
-                        newUser.sessionValidationTimer.timer.Elapsed +=(sender,args) => ValidateSessionForClient(userTimer);
+                        newUser.sessionValidationTimer.timer.Elapsed += (sender, args) => ValidateSessionForClient(userTimer);
                         newUser.sessionValidationTimer.timer.AutoReset = true;
                         newUser.sessionValidationTimer.timer.Enabled = true;
 
                         users.Add(clientSocket, newUser); // Cache the user
 
-  
+
 
                         SendResponse(clientSocket, ".sessiontoken " + newUser.sessionToken); // send token
                         if (newUser.MoveToChannel(channels.FirstOrDefault()))
@@ -288,14 +288,15 @@ namespace c_tier.src.backend.server
                 }
             }
             catch (Exception ex)
-            {   users.TryGetValue(clientSocket, out var user);
-                if(user != null) Console.WriteLine($"Error handling: Client {user.username}: {ex.Message}");
+            {
+                users.TryGetValue(clientSocket, out var user);
+                if (user != null) Console.WriteLine($"Error handling: Client {user.username}: {ex.Message}");
                 else Console.WriteLine($"Error handling: Client (unknown): {ex.Message}");
 
             }
             finally
             {
-       
+
                 users.TryGetValue(clientSocket, out var user);
                 if (user != null)
                 {
@@ -311,12 +312,12 @@ namespace c_tier.src.backend.server
         //TODO: REPLACE THIS BY SORTING THE ENTIRE ROLES LIST ON INIT AND PUT THE DEFAULT ROLE FIRST
         public static Role GetDefaultRole()
         {
-       
+
             foreach (var i in serverRoles)
             {
                 if (i.isDefault == true)
                 {
-                    Console.WriteLine("Default Role Found! : " + i.isDefault);;
+                    Console.WriteLine("Default Role Found! : " + i.isDefault); ;
                     return i;
                 }
             }
@@ -348,8 +349,8 @@ namespace c_tier.src.backend.server
         {
             if (userTimer.user.validationCounter >= badValidationRequestLimit)
             {
-                Console.WriteLine(Utils.RED + "SYSTEM: Disconnecting client(failed to validate session)"+Utils.GREEN);
-                SendResponse(userTimer.user.socket,".DISCONNECT");
+                Console.WriteLine(Utils.RED + "SYSTEM: Disconnecting client(failed to validate session)" + Utils.GREEN);
+                SendResponse(userTimer.user.socket, ".DISCONNECT");
                 userTimer.timer.Stop();
                 return;
             }
@@ -399,7 +400,7 @@ namespace c_tier.src.backend.server
         /// </summary>
         /// <param name="clientSocket"></param>
         /// <param name="responseText"></param>
-        private static void SendResponse(Socket clientSocket, string responseText)
+        public static void SendResponse(Socket clientSocket, string responseText)
         {
             byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
             clientSocket.Send(responseBytes);
