@@ -61,13 +61,9 @@ Modern Take on IRC: Inspired by classic chat systems, c-tier brings modern desig
   dotnet build
   ```
 ## Running c-tier
-  Start the server:
+ Launch the CLI client/Server(s or c):
   ```
-  dotnet run src/ServerStart.cs
-  ```
- Launch the CLI client:
-  ```
-  dotnet run src/ClientStart.cs
+  dotnet run src/Program.cs
   ```
 ## 📚 Documentation
 Comprehensive documentation is available here. You’ll find:
