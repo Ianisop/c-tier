@@ -113,7 +113,7 @@ namespace c_tier.src.backend.server
                 user1id INTEGER,
                 user2id INTEGER,
                 FOREIGN KEY (user1id) REFERENCES users(userid),
-                FOREIGN KEY (user2id) REFERENCES users(userid),
+                FOREIGN KEY (user2id) REFERENCES users(userid)
             );";
 
             ExecuteNonQuery(sql);
