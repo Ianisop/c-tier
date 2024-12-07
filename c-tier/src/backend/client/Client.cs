@@ -178,7 +178,7 @@ namespace c_tier.src.backend.client
                     {
                         string[] aux = receivedText.Split(" ");
                         localUser.sessionToken = aux[1]; // cache the new session token
-                        //Frontend.Log("SessionToken updated: " + aux[1]);
+                        Frontend.Log("SessionToken updated: " + aux[1]);
              
 
                     }

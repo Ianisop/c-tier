@@ -55,6 +55,8 @@ namespace c_tier.src
         public Label userNameLabel = new Label{Text = "username", X = 0, Y =0, Width = 18, Height = 2};
         public Label profileSeparator = new Label{Text = "------------------------", X = 0, Y = 1, Width = 18, Height = 1};
         public Label roleListLabel = new Label{Text = "Roles", X = 0, Y =2, Width = 18, Height = 1};
+
+
        // public Button generalChannelButton = new Button {Text= "General"};
         public App()
         {
@@ -82,6 +84,7 @@ namespace c_tier.src
         
         public static App app = new App();
         static Client client = new Client();
+        private static List<string> chatTextHistory = new List<string>();
         public static void Init()
         {
             Application.Init();
@@ -209,9 +212,11 @@ namespace c_tier.src
         /// <param name="message"></param>
         public static void PushMessage(string message)
         {
+            chatTextHistory.Add(message);
             app.chatHistory.Text += message + '\n';
-            Frontend.Log("Jumping to row: " + app.chatHistory.Text.IndexOf(app.chatHistory.Text));
-            app.chatHistory.ScrollTo(app.chatHistory.Text.LastIndexOf(app.chatHistory.Text),true); // scroll to the latest message
+            UpdateTextHistory();
+
+
         }
 
         /// <summary>
@@ -221,13 +226,19 @@ namespace c_tier.src
         public static void Log(string message)
         {
             app.debugLogHistory.Text += "\n" + message;
+            
         }
 
-        public static void SwitchScene()
+        public static void UpdateTextHistory()
         {
-         
+            // Scroll to the last line
+            app.chatHistory.ScrollTo(chatTextHistory.Count - 1,true);
+            Frontend.Log("SCROLLING TO: " + (chatTextHistory.Count - 1).ToString());
         }
 
+        /// <summary>
+        /// Updates profile ui elements
+        /// </summary>
         public static void Update()
         {
             app.userNameLabel.Text = client.GetUsername();
