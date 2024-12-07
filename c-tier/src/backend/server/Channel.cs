@@ -13,7 +13,7 @@ namespace c_tier.src.backend.server
         public string channelName;
         public int channelID;
         public string channelDescription;
-        public int minRolePermLevel;
+        public int minRolePermLevel = 1;
         public int activeMembers;
         public Dictionary<Socket,User> users = new Dictionary<Socket,User>();
         public string welcomeMessage;

@@ -143,7 +143,7 @@ namespace c_tier.src.backend.client
         private void Login()
         {
             Frontend.Log("logging in!");
-            string message = ".login|" + localUser.username + "|" + localUser.password.ToString();
+            string message = ".login " + localUser.username + " " + localUser.password.ToString();
             Speak(message);
             Frontend.Update();
         }

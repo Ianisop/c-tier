@@ -144,136 +144,31 @@ namespace c_tier.src.backend.server
                 byte[] buffer = new byte[2048];
                 while (true)
                 {
-
                     int receivedBytes = clientSocket.Receive(buffer);
                     if (receivedBytes == 0) break; // Client disconnected
-
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+                    string[] aux = receivedText.Split(" ");
 
+                    //route to the right endpoint
+                   // Console.WriteLine(aux[0]);
+            
 
-                    if (receivedText.StartsWith(".validate"))
+                    foreach(var endpoint in endpoints)
                     {
-                        string[] aux = receivedText.Split(' ');
-                        if (aux.Length >= 2)
-                        {
-                            string token = aux[1];
-                            // Perform token validation logic
-                            if (users.TryGetValue(clientSocket, out User targetUser) && targetUser.sessionToken == token)
-                            {
-                                Console.WriteLine("SYSTEM: Token for " + targetUser.username + " validated successfully.");
-                                targetUser.validationCounter--;
-
-                            }
-                            else
-                            {
-                                Console.WriteLine("SYSTEM: Invalid token. Disconnecting client.");
-                                SendResponse(clientSocket, "Error: Invalid session token.");
-                                clientSocket.Disconnect(true);
-                                break;
-                            }
-                        }
-                        else
-                        {
-                            SendResponse(clientSocket, "Error: Invalid .validate command format.");
+                        if (endpoint.destination.Equals(aux[0]))
+                        { 
+                            endpoint.Route(clientSocket, receivedText, users);
+                            Console.WriteLine("SERVER: Routing to endpoint " + endpoint.destination +"! (" + receivedText + ")");
                         }
                     }
 
-
-
-
-                    //create account endpoint
-                    else if (receivedText.StartsWith(".createaccount"))
+                    // If it's just a message ( program shouldnt reach this if a valid command has been entered and processed)
+                    if (!receivedText.StartsWith('.'))
                     {
-                        Console.WriteLine(Utils.GREEN + "SERVER: Account creation request");
-
-                        //validate data
-                        string[] aux = receivedText.Split(" ");
-                        string username = aux[1];
-                        string password = aux[2];
-
-                        var user_id = Database.CreateUser(username, password);
-                        if (user_id == 0) SendResponse(clientSocket, "Account request failed");
-                        else
-                        {
-                            SendResponse(clientSocket, ".ACCOUNTOK");
-                            Console.WriteLine("SERVER: Account created for user " + username);
-                            Task.Run(() => clientSocket.Disconnect(true));
-                            Console.WriteLine("SERVER: Disconnecting client " + username);
-
-                        }
-
-
+                        Console.WriteLine($"{Utils.GREEN}SERVER: Received from client: {Utils.NORMAL} {receivedText}");
+                        if (users.TryGetValue(clientSocket, out var user)) // Find the user
+                            UpdateClientsAndHost($"{user.username}: {receivedText}", clientSocket); // Send the message}
                     }
-                    //get channels endpoint
-                    else if (receivedText.StartsWith(".getchannels") || receivedText.StartsWith(".gc"))
-                    {
-                        Console.WriteLine(Utils.GREEN + "SERVER: Client asked for channel list!");
-
-                        // Send the channel list
-                        string channelNameList = "";
-                        foreach (Channel channel in channels) channelNameList += "|" + channel.channelName;
-                        SendResponse(clientSocket, ".CHANNELLIST" + channelNameList);
-                        Console.WriteLine(Utils.GREEN + "SYSTEM: Channel list sent!");
-                    }
-                    // move channel endpoint
-                    else if (receivedText.StartsWith(".mc"))
-                    {
-                        Console.WriteLine(Utils.GREEN + $"SYSTEM: Attempting channel moving");
-
-                        string[] aux = receivedText.Split(' ');
-
-                        // Ensure the array has the expected number of elements
-                        if (aux.Length >= 2)
-                        {
-                            string channelName = aux[1];
-
-                            // Try to get the user associated with the clientSocket
-                            if (users.TryGetValue(clientSocket, out var user))
-                            {
-                                // Find the channel by name
-                                var channel = channels.Find(a => a.channelName == channelName);
-                                if (channel != null)
-                                {
-                                    if (user.MoveToChannel(channel))
-                                    {
-                                        Console.WriteLine(Utils.GREEN + $"SYSTEM: Moving client to channel {channelName}");
-                                        SendResponse(clientSocket, ".clear"); // clear the chatlog
-                                        SendResponse(clientSocket, $"{user.currentChannel.welcomeMessage}\n Hopped to {user.currentChannel.channelName}"); // success
-                                    }
-                                    else
-                                    {
-                                        SendResponse(clientSocket, "Error: Failed to join channel.");
-                                    }
-                                }
-                                else
-                                {
-                                    SendResponse(clientSocket, $"Error: Channel '{channelName}' not found.");
-                                }
-                            }
-                            else
-                            {
-                                SendResponse(clientSocket, "Error: User not found.");
-                            }
-                        }
-                        else
-                        {
-                            SendResponse(clientSocket, "Error: Invalid .mc command format.");
-                        }
-                    }
-
-                    else if(receivedText.StartsWith(".gr"))
-                    {
-                        
-                    }
-
-                    else // If it's just a message
-                    {
-                        Console.WriteLine($"{Utils.GREEN}SERVER: Received from client : {Utils.NORMAL} {receivedText}");
-
-                        users.TryGetValue(clientSocket, out var user); // Find the user
-                        UpdateClientsAndHost($"{user.username}: {receivedText}", clientSocket); // Send the message
-                    }
-
                 }
             }
             catch (Exception ex)
@@ -283,17 +178,7 @@ namespace c_tier.src.backend.server
                 else Console.WriteLine($"Error handling: Client (unknown): {ex.Message}");
 
             }
-            finally
-            {
 
-                users.TryGetValue(clientSocket, out var user);
-                if (user != null)
-                {
-                    // Clean up after client disconnects
-                    Console.WriteLine($"Client {user.username} disconnected.");
-                    users.Remove(clientSocket); // Remove from dictionary
-                }
-            }
 
 
         }
@@ -301,7 +186,6 @@ namespace c_tier.src.backend.server
         //TODO: REPLACE THIS BY SORTING THE ENTIRE ROLES LIST ON INIT AND PUT THE DEFAULT ROLE FIRST
         public static Role GetDefaultRole()
         {
-
             foreach (var i in serverRoles)
             {
                 if (i.isDefault == true)

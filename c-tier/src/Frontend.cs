@@ -61,11 +61,13 @@ namespace c_tier.src
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black);
             Application.Top.Add(channelWindow, chatWindow, debugWindow, profileWindow); // add the windows
 
-            // Add the chat history to the chat window
+
+
+            //Setup base widgets
             chatWindow.Add(chatHistory);
             chatWindow.Add(chatInputField);
             debugWindow.Add(debugLogHistory);
-            //channelWindow.Add(generalChannelButton);
+
           
         }
 
@@ -123,6 +125,8 @@ namespace c_tier.src
                 app.profileWindow.Remove(app.submitButton);
                 app.profileWindow.Remove(app.passwordTextField);
                 app.profileWindow.Remove(app.usernameTextField);
+                app.profileWindow.Add(app.userNameLabel);
+                app.profileWindow.Add(app.profileSeparator);
             }
             else
             {
@@ -166,6 +170,7 @@ namespace c_tier.src
         {
             return MessageBox.Query(title, description, buttons);
         }
+
         public static void UpdateChannelList(string[] channelNames)
         {
             // Clear existing buttons
@@ -205,6 +210,8 @@ namespace c_tier.src
         public static void PushMessage(string message)
         {
             app.chatHistory.Text += message + '\n';
+            Frontend.Log("Jumping to row: " + app.chatHistory.Text.IndexOf(app.chatHistory.Text));
+            app.chatHistory.ScrollTo(app.chatHistory.Text.LastIndexOf(app.chatHistory.Text),true); // scroll to the latest message
         }
 
         /// <summary>

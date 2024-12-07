@@ -17,17 +17,15 @@ using System.Data;
 
 public abstract class Endpoint
 {
-    public readonly string destination = ""; // readonly bcs this shouldnt be changeable at runtime
-    public string response = "";
+    abstract public string destination { get; set; } 
+
     public Endpoint()
     {
 
     }
 
     //Each endpoint should get the same data ig
-    public virtual string Route(Socket clientSocket, string receivedText, User users)
-    {
-        return response;
-    }
+    public abstract void Route(Socket clientSocket, string receivedText, Dictionary<Socket, User> users);
+
 
 }

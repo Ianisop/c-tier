@@ -9,19 +9,27 @@ using c_tier.src;
 
 public class LoginEndpoint : Endpoint
 {
-    public readonly string destination = "login";
-    public string response = "";
+    public override string destination
+    {
+        get { return ".login"; }
+        set { }
+    }
 
 
-    public override string Route(Socket clientSocket, string receivedText, User users)
+
+    public override void Route(Socket clientSocket, string receivedText, Dictionary<Socket,User> users)
     {
 
-        // LOGIN ENDPOINT
-        if (receivedText.StartsWith(".login"))
-        {
             Console.WriteLine("SYSTEM: Attempting log in request validation. | " + receivedText);
 
-            string[] aux = receivedText.Split("|");
+            //early check if theres a fuck up and the socket is already cached
+            if (Server.users.ContainsKey(clientSocket))
+            {
+                Console.WriteLine("SYSTEM: User already logged in for this socket.");
+                return;
+            }
+
+            string[] aux = receivedText.Split(" ");
             string username = aux[1];
             string password = aux[2];
             Console.WriteLine("SYSTEM: Log in request for account: " + username);
@@ -46,8 +54,7 @@ public class LoginEndpoint : Endpoint
 
             if (newUser.username == ServerConfigData.ownerUsername) newUser.roles.Add(Server.ownerRole);
             newUser.roles.Add(Server.GetDefaultRole());
-
-            Console.WriteLine("SYSTEM: Gave user " + username + " role " + Server.GetDefaultRole().roleName);
+           // Console.WriteLine("SYSTEM: Gave user " + username + " role " + Server.GetDefaultRole().roleName);
             //setup validation timer for user
             newUser.sessionValidationTimer.user = newUser;
             newUser.sessionValidationTimer.timer = timer;
@@ -64,8 +71,8 @@ public class LoginEndpoint : Endpoint
             {
                 Server.SendResponse(clientSocket, channel.welcomeMessage + "\n" + "You're in " + newUser.currentChannel.channelName);
             }
-        }
-        return response;
+        
+       
     }
 
     /// <summary>
