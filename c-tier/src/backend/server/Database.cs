@@ -41,6 +41,8 @@ namespace c_tier.src.backend.server
             CreateUserChannelsTable();
             CreateDMsTable();
             CreateDirectMessagesTable();
+            CreateRolesTable();
+            CreateUserRolesTable();
         }
 
         private static void CreateUsersTable()
@@ -66,7 +68,9 @@ namespace c_tier.src.backend.server
                 channelowner INTEGER,
                 description TEXT,
                 timestamp INTEGER,
-                FOREIGN KEY (channelowner) REFERENCES users(userid)
+                requiredlevel INTEGER,
+                FOREIGN KEY (channelowner) REFERENCES users(userid),
+                FOREIGN KEY (requiredlevel) REFERENCES roles(roleid)
             );";
 
             ExecuteNonQuery(sql);
@@ -136,6 +140,34 @@ namespace c_tier.src.backend.server
             ExecuteNonQuery(sql);
             Console.WriteLine(Utils.GREEN + "DATABASE: Created messages_dms table.");
         }
+
+        private static void CreateRolesTable()
+        {
+            string sql = @"
+            CREATE TABLE IF NOT EXISTS roles (
+                roleid INTEGER PRIMARY KEY,
+                rolename TEXT,
+                permissionlevel INTEGER
+            );";
+            ExecuteNonQuery(sql);
+            Console.WriteLine(Utils.GREEN + "DATABASE: Created roles table.");
+        }
+
+        private static void CreateUserRolesTable()
+        {
+            string sql = @"
+            CREATE TABLE IF NOT EXISTS user_roles (
+                userid INTEGER,
+                roleid INTEGER,
+                PRIMARY KEY (userid, roleid),
+                FOREIGN KEY (userid) REFERENCES users(userid),
+                FOREIGN KEY (roleid) REFERENCES roles(roleid)
+            );";
+
+            ExecuteNonQuery(sql);
+            Console.WriteLine(Utils.GREEN + "DATABASE: Created user_roles table.");
+        }
+
 
         public static UInt64 CreateUser(string username, string password)
         {
