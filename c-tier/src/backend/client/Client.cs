@@ -23,8 +23,9 @@ namespace c_tier.src.backend.client
 
         public Client()
         {
-            //ServerInfo serverData = Utils.ReadFromFile<ServerInfo>("C:/Users/bocia/Documents/GitHub/c-tier/c-tier/src/secret.json");
-            remoteEndPoint = new IPEndPoint(IPAddress.Parse("148.251.110.26"), 25366);
+
+            ServerInfo serverData = Utils.ReadFromFile<ServerInfo>("src/secret.json");
+            remoteEndPoint = new IPEndPoint(IPAddress.Parse(serverData.ip), serverData.port);
             
         }
 
@@ -125,13 +126,12 @@ namespace c_tier.src.backend.client
                 PropertyNameCaseInsensitive = true
             };
 
-
-   
             localUser.socket = clientSocket;
             Frontend.Log("Trying socket connection...");
             clientSocket.Connect(remoteEndPoint);
             isConnected = true;
             Frontend.Log("Connection established...");
+
             Login(); // try logging in
             Frontend.Update();
 

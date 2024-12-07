@@ -26,20 +26,27 @@ namespace c_tier.src
         public static string NOUNDERLINE = Console.IsOutputRedirected ? "" : "\x1b[24m";
         public static string REVERSE = Console.IsOutputRedirected ? "" : "\x1b[7m";
         public static string NOREVERSE = Console.IsOutputRedirected ? "" : "\x1b[27m";
+        public static JsonSerializerOptions defaultJsonSerializerOptions = new JsonSerializerOptions
+        {
+            IncludeFields = true,
+            PropertyNameCaseInsensitive = true,
+        };
 
         private static readonly char[] DefaultCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".ToCharArray(); // char set for string generation
         /// <summary>
-        /// Serializes json into object
+        /// Serializes json into object, optionally pass JsonSerializerOptions if you dont want to use the default ones
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="filePath"></param>
         /// <returns> :shrug: </returns>
-        public static T ReadFromFile<T>(string filePath, JsonSerializerOptions options)
+        public static T ReadFromFile<T>(string filePath, JsonSerializerOptions options = null)
         {
             try
             {
+                
                 string jsonContent = File.ReadAllText(filePath);
-                return JsonSerializer.Deserialize<T>(jsonContent, options);
+                if(options != null)return JsonSerializer.Deserialize<T>(jsonContent, options);
+                return JsonSerializer.Deserialize<T>(jsonContent, defaultJsonSerializerOptions);
             }
             catch (Exception ex)
             {

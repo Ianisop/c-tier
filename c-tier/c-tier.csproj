@@ -13,4 +13,13 @@
     <PackageReference Include="Terminal.Gui" Version="1.17.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="src\secret.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="src\server_config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

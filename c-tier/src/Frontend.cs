@@ -17,7 +17,7 @@ namespace c_tier.src
         
         public Window debugWindow = new Window("Console") { X = 200, Y = 5, Width = 40, Height = Dim.Percent(30) };
         public Window channelWindow = new Window("Channels") { X = 0, Y = 0, Width = 15, Height = Dim.Percent(100) };
-        public Window chatWindow = new Window("Chat") { X = 15, Y = 0, Width = 50, Height = Dim.Percent(50) };
+        public Window chatWindow = new Window("Chat") { X = 15, Y = 0, Width = 50, Height = Dim.Percent(70) };
         public Window profileWindow = new Window("Profile") { X = 80, Y = 0, Width = 20, Height = Dim.Percent(50) };
         // public Window serverBrowserWindow = new Window("Server Browser") {X= 50, Y= 3, Width=20, Height = 40 };
         public TextField usernameTextField = new TextField {Text="Username....", X=0, Y=Pos.AnchorEnd(8),Width=15,Height=3 };
@@ -103,8 +103,6 @@ namespace c_tier.src
 
            
             Application.Run(); // has to be the last line
-
-
 
         }
 

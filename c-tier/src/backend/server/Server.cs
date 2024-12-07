@@ -27,12 +27,14 @@ namespace c_tier.src.backend.server
         private static readonly IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
         public static readonly string welcomeMessage = "System: Welcome to the server!";
         public static readonly int badValidationRequestLimit = 4;
-        public static readonly int sessionTokenValidationTimeout = 30000; // im ms (default 5 mins)
-        public static readonly string ownerUsername = "somethingfishy";
+        public static readonly int sessionTokenValidationTimeout = 300000; // im ms (default 5 mins)
+        public static readonly ulong ownerUserId;
+        private static ServerConfigData serverConfigData;
+
         public static List<Channel> channels = new List<Channel>()
-        { new Channel("General", "The Place to be!",1),
-         new Channel("General 2", "The Place to be again!",1),
-          new Channel("Staff", "Staff Only!",5)
+        { new Channel("General", "The Place to be!",1, "Welcome to General!"),
+         new Channel("General 2", "The Place to be again!",1, "Welcome to General 2!"),
+          new Channel("Staff", "Staff Only!",5, "Welcome to Staff only!")
         };
 
         public static List<Role> serverRoles = new List<Role>()
@@ -40,7 +42,8 @@ namespace c_tier.src.backend.server
             new Role("Owner",9,"Red"),
             new Role("Member",1,"White", true)
         };
-        public static Dictionary<Socket, User> users = new Dictionary<Socket, User>();
+
+        private static Dictionary<Socket, User> users = new Dictionary<Socket, User>();
 
         private static System.Timers.Timer validationTimer = new System.Timers.Timer();
 
@@ -48,6 +51,7 @@ namespace c_tier.src.backend.server
         {
             port = targetPort;
             SHOULD_DEBUG = debug;
+
         }
 
         public static void Start()
@@ -55,6 +59,15 @@ namespace c_tier.src.backend.server
             shouldStop = false;
             try
             {
+                serverConfigData = Utils.ReadFromFile<ServerConfigData>("src/server_config.json"); // load the server config
+
+                //If theres no config data, quit
+                if(serverConfigData == null) 
+                {
+                    Console.WriteLine(Utils.RED + "SYSTEM: NO SERVER CONFIG FOUND. PLEASE CREATE A server_config.json FILE IN THE SOURCE(SRC) DIRECTORY.");
+                    return;
+                }
+                Console.WriteLine(Utils.GREEN + "SYSTEM: Loaded server config...");
                 SQLiteConnection tempdb = Database.InitDatabase("db.db");
                 Console.WriteLine("SYSTEM: Found " + channels.Count + " channels, " + serverRoles.Count + " roles!");
                 serverSocket.Bind(endPoint);
@@ -145,8 +158,8 @@ namespace c_tier.src.backend.server
                         };
 
                         //setup default role for new user
-
-
+     
+                        if(newUser.username == ServerConfigData.ownerUsername) newUser.roles.Add();
                         newUser.roles.Add(GetDefaultRole());
 
                         Console.WriteLine("SYSTEM: Gave user " + username + " role " + GetDefaultRole().roleName);
@@ -243,7 +256,6 @@ namespace c_tier.src.backend.server
                         if (aux.Length >= 2)
                         {
                             string channelName = aux[1];
-                            Console.WriteLine(Utils.GREEN + $"SYSTEM: Moving client to channel {channelName}");
 
                             // Try to get the user associated with the clientSocket
                             if (users.TryGetValue(clientSocket, out var user))
@@ -254,8 +266,9 @@ namespace c_tier.src.backend.server
                                 {
                                     if (user.MoveToChannel(channel))
                                     {
+                                        Console.WriteLine(Utils.GREEN + $"SYSTEM: Moving client to channel {channelName}");
                                         SendResponse(clientSocket, ".clear"); // clear the chatlog
-                                        SendResponse(clientSocket, $"{welcomeMessage}\n Hopped to {user.currentChannel.channelName}"); // success
+                                        SendResponse(clientSocket, $"{user.currentChannel.welcomeMessage}\n Hopped to {user.currentChannel.channelName}"); // success
                                     }
                                     else
                                     {
@@ -277,6 +290,12 @@ namespace c_tier.src.backend.server
                             SendResponse(clientSocket, "Error: Invalid .mc command format.");
                         }
                     }
+
+                    else if(receivedText.StartsWith(".gr"))
+                    {
+                        
+                    }
+
                     else // If it's just a message
                     {
                         Console.WriteLine($"{Utils.GREEN}SERVER: Received from client : {Utils.NORMAL} {receivedText}");
@@ -380,16 +399,17 @@ namespace c_tier.src.backend.server
                 socket.Send(msgBytes); // bye bye
             }
         }
+
         /// <summary>
         /// Method to create a new channel
         /// </summary>
         /// <param name="channelName"></param>
         /// <param name="rolesWithAccess"></param>
-        public static bool CreateChannel(string newChannelName, string newChannelDesc, int minRolePermLevel)
+        public static bool CreateChannel(string newChannelName, string newChannelDesc, int minRolePermLevel, string welcomeMessage)
         {
             Channel aux = channels.Find(x => x.channelName == newChannelName); // Check if theres a channel with the same name already
             if (aux != null) return false; // channel already exists
-            Channel newChannel = new Channel(newChannelName, newChannelDesc, minRolePermLevel);
+            Channel newChannel = new Channel(newChannelName, newChannelDesc, minRolePermLevel,welcomeMessage);
             channels.Add(newChannel);
             Console.WriteLine("SYSTEM: CREATED NEW CHANNEL " + newChannelName);
             return true;

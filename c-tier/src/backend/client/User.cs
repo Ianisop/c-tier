@@ -20,6 +20,7 @@ namespace c_tier.src.backend.client
         public UserTimer sessionValidationTimer { get; set; } // Timer for session validation
         public string sessionToken { get; set; }
 
+
         public Socket socket;
 
         public int validationCounter;
