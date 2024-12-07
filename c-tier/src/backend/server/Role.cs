@@ -15,6 +15,11 @@ namespace c_tier.src.backend.server
         public string roleColor;
         public bool isDefault;
 
+        public Role()
+        {
+
+        }
+
         public Role(string roleName, int permLevel, string roleColor)
         {
             this.roleID = Utils.GenerateID(6);

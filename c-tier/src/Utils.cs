@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System.Security.Policy;
 using System.Security.Cryptography;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis;
+using System.Reflection;
 
 namespace c_tier.src
 {
@@ -43,9 +46,9 @@ namespace c_tier.src
         {
             try
             {
-                
+
                 string jsonContent = File.ReadAllText(filePath);
-                if(options != null)return JsonSerializer.Deserialize<T>(jsonContent, options);
+                if (options != null) return JsonSerializer.Deserialize<T>(jsonContent, options);
                 return JsonSerializer.Deserialize<T>(jsonContent, defaultJsonSerializerOptions);
             }
             catch (Exception ex)
@@ -55,7 +58,7 @@ namespace c_tier.src
                 return default;
             }
         }
-        public static bool WriteToFile(object tempObj,string fileName)
+        public static bool WriteToFile(object tempObj, string fileName)
         {
             try
             {
@@ -72,6 +75,58 @@ namespace c_tier.src
             }
         }
 
+        //method to load instances of an abstract class
+        // Dynamic method to load instances of a specified base class or interface
+        public static List<T> LoadAndCreateInstances<T>(string[] csFiles)
+        {
+            var syntaxTrees = csFiles.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file))).ToList();
+
+            var references = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => !a.IsDynamic && !string.IsNullOrWhiteSpace(a.Location))
+                .Select(a => MetadataReference.CreateFromFile(a.Location));
+
+            var compilation = CSharpCompilation.Create(
+                "DynamicAssembly",
+                syntaxTrees,
+                references,
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+            using (var ms = new MemoryStream())
+            {
+                var result = compilation.Emit(ms);
+
+                if (!result.Success)
+                {
+                    foreach (var diagnostic in result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error))
+                    {
+                        Console.WriteLine(diagnostic.GetMessage());
+                    }
+                    throw new Exception("Compilation failed!");
+                }
+
+                ms.Seek(0, SeekOrigin.Begin);
+                var assembly = Assembly.Load(ms.ToArray());
+
+                // Find all types that inherit from or implement T
+                var baseClassType = typeof(T);
+                if (!baseClassType.IsClass && !baseClassType.IsInterface)
+                {
+                    throw new ArgumentException("T must be a class or interface");
+                }
+
+                var types = assembly.GetTypes().Where(t => baseClassType.IsAssignableFrom(t) && !t.IsAbstract);
+
+                // Create instances of the found types
+                var instances = new List<T>();
+                foreach (var type in types)
+                {
+                    var instance = (T)Activator.CreateInstance(type);
+                    instances.Add(instance);
+                }
+
+                return instances;
+            }
+        }
 
         public static UInt64 GenerateID(int length)
         {
@@ -83,15 +138,15 @@ namespace c_tier.src
             }
             UInt64 randomPort = BitConverter.ToUInt64(randomBytes, 0);
             string combined = timestamp.ToString() + randomPort.ToString();
-            using (var sha256 =  SHA256.Create())
+            using (var sha256 = SHA256.Create())
             {
                 byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(combined));
                 UInt64 id = BitConverter.ToUInt64(hash, 0);
-                string idString = id.ToString().Substring(0, Math.Min(length,id.ToString().Length));
+                string idString = id.ToString().Substring(0, Math.Min(length, id.ToString().Length));
                 return UInt64.Parse(idString);
             }
         }
-        
+
         public static string GenerateRandomString(int length)
         {
             if (length <= 0)

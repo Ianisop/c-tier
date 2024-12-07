@@ -14,6 +14,10 @@ using System.Reflection;
 using System.Timers;
 using System.Threading;
 using System.Data;
+using System.Reflection;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+
 
 namespace c_tier.src.backend.server
 {
@@ -25,11 +29,18 @@ namespace c_tier.src.backend.server
         private static readonly IPAddress ipAddress = IPAddress.Any; // Listen on all network interfaces;
         private static readonly Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); // Create a socket
         private static readonly IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
-        public static readonly string welcomeMessage = "System: Welcome to the server!";
         public static readonly int badValidationRequestLimit = 4;
         public static readonly int sessionTokenValidationTimeout = 300000; // im ms (default 5 mins)
+        public static List<Endpoint> endpoints = new List<Endpoint>();
         public static readonly ulong ownerUserId;
         private static ServerConfigData serverConfigData;
+
+        public static readonly Role ownerRole = new Role()
+        {
+            roleName = "Owner",
+            permLevel = 9,
+            
+        };
 
         public static List<Channel> channels = new List<Channel>()
         { new Channel("General", "The Place to be!",1, "Welcome to General!"),
@@ -39,11 +50,10 @@ namespace c_tier.src.backend.server
 
         public static List<Role> serverRoles = new List<Role>()
         {
-            new Role("Owner",9,"Red"),
             new Role("Member",1,"White", true)
         };
 
-        private static Dictionary<Socket, User> users = new Dictionary<Socket, User>();
+        public static Dictionary<Socket, User> users = new Dictionary<Socket, User>();
 
         private static System.Timers.Timer validationTimer = new System.Timers.Timer();
 
@@ -67,7 +77,15 @@ namespace c_tier.src.backend.server
                     Console.WriteLine(Utils.RED + "SYSTEM: NO SERVER CONFIG FOUND. PLEASE CREATE A server_config.json FILE IN THE SOURCE(SRC) DIRECTORY.");
                     return;
                 }
+
                 Console.WriteLine(Utils.GREEN + "SYSTEM: Loaded server config...");
+                string[] csFiles = Directory.GetFiles("src/backend/endpoints", "*.cs");
+
+                Console.WriteLine(Utils.GREEN + "SYSTEM: Loading endpoints...");
+
+                endpoints = Utils.LoadAndCreateInstances<Endpoint>(csFiles); // try some shit
+                Console.WriteLine(Utils.GREEN + "SYSTEM: " + endpoints.Count + " endpoints loaded!");
+             
                 SQLiteConnection tempdb = Database.InitDatabase("db.db");
                 Console.WriteLine("SYSTEM: Found " + channels.Count + " channels, " + serverRoles.Count + " roles!");
                 serverSocket.Bind(endPoint);
@@ -81,6 +99,7 @@ namespace c_tier.src.backend.server
             Work();
         }
 
+      
         public static void Stop()
         {
             serverSocket.Close();
@@ -131,57 +150,8 @@ namespace c_tier.src.backend.server
 
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
 
-                    // LOGIN ENDPOINT
-                    if (receivedText.StartsWith(".login"))
-                    {
-                        Console.WriteLine("SYSTEM: Attempting log in request validation. | " + receivedText);
 
-                        string[] aux = receivedText.Split("|");
-                        string username = aux[1];
-                        string password = aux[2];
-                        Console.WriteLine("SYSTEM: Log in request for account: " + username);
-
-                        //Init validation timer
-                        var timer = new System.Timers.Timer(sessionTokenValidationTimeout);
-                        var userTimer = new UserTimer();
-
-                        //Create a local user
-                        User newUser = new User()
-                        {
-                            username = username,
-                            password = password,
-                            socket = clientSocket,
-                            sessionToken = Auth.CreateSession(username, password),
-                            sessionValidationTimer = userTimer,
-
-
-                        };
-
-                        //setup default role for new user
-     
-                        if(newUser.username == ServerConfigData.ownerUsername) newUser.roles.Add();
-                        newUser.roles.Add(GetDefaultRole());
-
-                        Console.WriteLine("SYSTEM: Gave user " + username + " role " + GetDefaultRole().roleName);
-                        //setup validation timer for user
-                        newUser.sessionValidationTimer.user = newUser;
-                        newUser.sessionValidationTimer.timer = timer;
-                        newUser.sessionValidationTimer.timer.Elapsed += (sender, args) => ValidateSessionForClient(userTimer);
-                        newUser.sessionValidationTimer.timer.AutoReset = true;
-                        newUser.sessionValidationTimer.timer.Enabled = true;
-
-                        users.Add(clientSocket, newUser); // Cache the user
-
-
-
-                        SendResponse(clientSocket, ".sessiontoken " + newUser.sessionToken); // send token
-                        if (newUser.MoveToChannel(channels.FirstOrDefault()))
-                        {
-                            SendResponse(clientSocket, welcomeMessage + "\n" + "You're in " + newUser.currentChannel.channelName);
-                        }
-                    }
-
-                    else if (receivedText.StartsWith(".validate"))
+                    if (receivedText.StartsWith(".validate"))
                     {
                         string[] aux = receivedText.Split(' ');
                         if (aux.Length >= 2)
@@ -359,28 +329,6 @@ namespace c_tier.src.backend.server
             }
         }
 
-
-        /// <summary>
-        /// Callback method to validate user sessions
-        /// </summary>
-        /// <param name="userTimer"></param>
-        private static void ValidateSessionForClient(UserTimer userTimer)
-        {
-            if (userTimer.user.validationCounter >= badValidationRequestLimit)
-            {
-                Console.WriteLine(Utils.RED + "SYSTEM: Disconnecting client(failed to validate session)" + Utils.GREEN);
-                SendResponse(userTimer.user.socket, ".DISCONNECT");
-                userTimer.timer.Stop();
-                return;
-            }
-            else
-            {
-                SendResponse(userTimer.user.socket, ".SENDTOKEN");
-                Console.WriteLine("SYSTEM: asked for validation for client " + userTimer.user.username);
-                userTimer.user.validationCounter++;
-            }
-
-        }
 
         /// <summary>
         /// Sends a message in the same channel as the host
