@@ -8,6 +8,10 @@ using System.Security.Policy;
 using System.Security.Cryptography;
 using System.Diagnostics;
 using System.Net.NetworkInformation;
+using Microsoft.CodeAnalysis;
+using Microsoft.CSharp;
+using System.Reflection;
+using Microsoft.CodeAnalysis.CSharp;
 
 
 namespace c_tier.src
