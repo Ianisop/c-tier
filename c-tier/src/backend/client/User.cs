@@ -20,6 +20,7 @@ namespace c_tier.src.backend.client
         public UserTimer sessionValidationTimer { get; set; } // Timer for session validation
         public string sessionToken { get; set; }
 
+
         public Socket socket;
 
         public int validationCounter;
@@ -62,7 +63,7 @@ namespace c_tier.src.backend.client
 
                 if (oldChannel !=null) oldChannel.users.Remove(socket); // remove from the old channel
                 channel.users.Add(socket,this); // cache the new user
-
+                Console.WriteLine("SYSTEM: ");
                 channel.activeMembers++;
                 if (oldChannel != null) oldChannel.activeMembers--;
 

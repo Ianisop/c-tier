@@ -17,7 +17,7 @@ namespace c_tier.src
         
         public Window debugWindow = new Window("Console") { X = 200, Y = 5, Width = 40, Height = Dim.Percent(30) };
         public Window channelWindow = new Window("Channels") { X = 0, Y = 0, Width = 15, Height = Dim.Percent(100) };
-        public Window chatWindow = new Window("Chat") { X = 15, Y = 0, Width = 50, Height = Dim.Percent(50) };
+        public Window chatWindow = new Window("Chat") { X = 15, Y = 0, Width = 50, Height = Dim.Percent(70) };
         public Window profileWindow = new Window("Profile") { X = 80, Y = 0, Width = 20, Height = Dim.Percent(50) };
         // public Window serverBrowserWindow = new Window("Server Browser") {X= 50, Y= 3, Width=20, Height = 40 };
         public TextField usernameTextField = new TextField {Text="Username....", X=0, Y=Pos.AnchorEnd(8),Width=15,Height=3 };
@@ -55,17 +55,21 @@ namespace c_tier.src
         public Label userNameLabel = new Label{Text = "username", X = 0, Y =0, Width = 18, Height = 2};
         public Label profileSeparator = new Label{Text = "------------------------", X = 0, Y = 1, Width = 18, Height = 1};
         public Label roleListLabel = new Label{Text = "Roles", X = 0, Y =2, Width = 18, Height = 1};
+
+
        // public Button generalChannelButton = new Button {Text= "General"};
         public App()
         {
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black);
             Application.Top.Add(channelWindow, chatWindow, debugWindow, profileWindow); // add the windows
 
-            // Add the chat history to the chat window
+
+
+            //Setup base widgets
             chatWindow.Add(chatHistory);
             chatWindow.Add(chatInputField);
             debugWindow.Add(debugLogHistory);
-            //channelWindow.Add(generalChannelButton);
+
           
         }
 
@@ -80,6 +84,7 @@ namespace c_tier.src
         
         public static App app = new App();
         static Client client = new Client();
+        private static List<string> chatTextHistory = new List<string>();
         public static void Init()
         {
             Application.Init();
@@ -104,8 +109,6 @@ namespace c_tier.src
            
             Application.Run(); // has to be the last line
 
-
-
         }
 
         /// <summary>
@@ -125,6 +128,8 @@ namespace c_tier.src
                 app.profileWindow.Remove(app.submitButton);
                 app.profileWindow.Remove(app.passwordTextField);
                 app.profileWindow.Remove(app.usernameTextField);
+                app.profileWindow.Add(app.userNameLabel);
+                app.profileWindow.Add(app.profileSeparator);
             }
             else
             {
@@ -168,6 +173,7 @@ namespace c_tier.src
         {
             return MessageBox.Query(title, description, buttons);
         }
+
         public static void UpdateChannelList(string[] channelNames)
         {
             // Clear existing buttons
@@ -206,7 +212,11 @@ namespace c_tier.src
         /// <param name="message"></param>
         public static void PushMessage(string message)
         {
+            chatTextHistory.Add(message);
             app.chatHistory.Text += message + '\n';
+            UpdateTextHistory();
+
+
         }
 
         /// <summary>
@@ -216,13 +226,19 @@ namespace c_tier.src
         public static void Log(string message)
         {
             app.debugLogHistory.Text += "\n" + message;
+            
         }
 
-        public static void SwitchScene()
+        public static void UpdateTextHistory()
         {
-         
+            // Scroll to the last line
+            app.chatHistory.ScrollTo(chatTextHistory.Count - 1,true);
+            Frontend.Log("SCROLLING TO: " + (chatTextHistory.Count - 1).ToString());
         }
 
+        /// <summary>
+        /// Updates profile ui elements
+        /// </summary>
         public static void Update()
         {
             app.userNameLabel.Text = client.GetUsername();

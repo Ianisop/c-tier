@@ -1,0 +1,4 @@
+C:\Users\bocia\Documents\GitHub\c-tier\c-tier-server\obj\x86\Debug\c-tier-server.csproj.AssemblyReference.cache
+C:\Users\bocia\Documents\GitHub\c-tier\c-tier-server\obj\x86\Debug\c-tier-server.csproj.CoreCompileInputs.cache
+C:\Users\bocia\Documents\GitHub\c-tier\c-tier-server\obj\x86\Debug\c-tier-server.csproj.SuggestedBindingRedirects.cache
+C:\Users\bocia\Documents\GitHub\c-tier\c-tier-server\obj\x86\Debug\ConsoleApplication.exe.config

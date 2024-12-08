@@ -23,8 +23,9 @@ namespace c_tier.src.backend.client
 
         public Client()
         {
-            //ServerInfo serverData = Utils.ReadFromFile<ServerInfo>("C:/Users/bocia/Documents/GitHub/c-tier/c-tier/src/secret.json");
-            remoteEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 25366);
+
+            ServerInfo serverData = Utils.ReadFromFile<ServerInfo>("src/secret.json");
+            remoteEndPoint = new IPEndPoint(IPAddress.Parse(serverData.ip), serverData.port);
             
         }
 
@@ -125,13 +126,12 @@ namespace c_tier.src.backend.client
                 PropertyNameCaseInsensitive = true
             };
 
-
-   
             localUser.socket = clientSocket;
             Frontend.Log("Trying socket connection...");
             clientSocket.Connect(remoteEndPoint);
             isConnected = true;
             Frontend.Log("Connection established...");
+
             Login(); // try logging in
             Frontend.Update();
 
@@ -143,7 +143,7 @@ namespace c_tier.src.backend.client
         private void Login()
         {
             Frontend.Log("logging in!");
-            string message = ".login|" + localUser.username + "|" + localUser.password.ToString();
+            string message = ".login " + localUser.username + " " + localUser.password.ToString();
             Speak(message);
             Frontend.Update();
         }
@@ -178,7 +178,7 @@ namespace c_tier.src.backend.client
                     {
                         string[] aux = receivedText.Split(" ");
                         localUser.sessionToken = aux[1]; // cache the new session token
-                        //Frontend.Log("SessionToken updated: " + aux[1]);
+                        Frontend.Log("SessionToken updated: " + aux[1]);
              
 
                     }
