@@ -48,6 +48,7 @@ namespace c_tier.src.backend.client
             return false;
         }
 
+        //TODO: make this method also update the ui for the client
         public void AddRole(Role role)
         {
             if(!roles.Contains(role))
