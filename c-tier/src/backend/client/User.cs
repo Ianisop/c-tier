@@ -52,7 +52,7 @@ namespace c_tier.src.backend.client
         {
             if(!roles.Contains(role))
                 roles.Add(role);
-            ClientFrontend.Update(); // update roles list locally
+            //ClientFrontend.Update(); // update roles list locally
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace c_tier.src.backend.client
 
                 if (oldChannel !=null) oldChannel.users.Remove(socket); // remove from the old channel
                 channel.users.Add(socket,this); // cache the new user
-                Console.WriteLine("SYSTEM: ");
+         
                 channel.activeMembers++;
                 if (oldChannel != null) oldChannel.activeMembers--;
 

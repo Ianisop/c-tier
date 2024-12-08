@@ -50,8 +50,6 @@ public class LoginEndpoint : Endpoint
             };
 
             //setup default role for new user
-
-            if (newUser.username == ServerConfigData.ownerUsername) newUser.roles.Add(Server.ownerRole);
             newUser.roles.Add(Server.GetDefaultRole());
            // Console.WriteLine("SYSTEM: Gave user " + username + " role " + Server.GetDefaultRole().roleName);
             //setup validation timer for user

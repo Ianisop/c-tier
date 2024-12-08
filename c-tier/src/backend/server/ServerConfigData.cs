@@ -8,7 +8,7 @@ namespace c_tier.src.backend.server
 {
     public class ServerConfigData
     {
-        public static string ownerUsername = "";
+        public int port;
 
 
 

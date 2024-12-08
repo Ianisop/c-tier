@@ -28,7 +28,7 @@ namespace c_tier.src.backend.server
         private static int port = 25366; // Port number to listen on
         private static readonly IPAddress ipAddress = IPAddress.Any; // Listen on all network interfaces;
         private static readonly Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); // Create a socket
-        private static readonly IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, port);
+
         public static readonly int badValidationRequestLimit = 4;
         public static readonly int sessionTokenValidationTimeout = 300000; // im ms (default 5 mins)
         public static List<Endpoint> endpoints = new List<Endpoint>();
@@ -80,6 +80,9 @@ namespace c_tier.src.backend.server
                     ServerFrontend.Log("SYSTEM: NO SERVER CONFIG FOUND. PLEASE CREATE A server_config.json FILE IN THE SOURCE(SRC) DIRECTORY.");
                     return;
                 }
+
+                IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, serverConfigData.port);
+          
 
                 ServerFrontend.Log(Utils.GREEN + "SYSTEM: Loaded server config...");
                 
@@ -152,7 +155,7 @@ namespace c_tier.src.backend.server
         public static void ProcessCommand(string command)
         {
             ServerFrontend.Log(command);
-            string prefix = command.Split(' ').First();
+            string prefix = command.Split(' ')[0];
             foreach (var cmd in commands)
             {
                 if (cmd.prefix == prefix)

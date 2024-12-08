@@ -16,20 +16,20 @@ namespace c_tier.src.backend.commands
             set { }
         }
 
-
+        //do stuff
         public override void Execute(string input)
         {
             string[] aux = input.Split(' ');
             string username = aux[1];
-            User targetUser = Server.FindUserByUsername(username);
-            if(targetUser != null)
+
+            try
             {
+                User targetUser = Server.FindUserByUsername(username);
                 targetUser.AddRole(Server.ownerRole);
-                ServerFrontend.LogToConsole("Command " + input + " executed!");
-            }
-            else
+                ServerFrontend.Log("Command " + input + " executed!");
+            } catch(Exception ex) //in case anything goes wrong
             {
-                ServerFrontend.LogError("Error: Command " + input + " failed to execute");
+                ServerFrontend.LogError("Failed to execute " + input + " because " + ex.Message);
             }
             
         }
