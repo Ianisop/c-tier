@@ -75,7 +75,58 @@ namespace c_tier.src
             }
         }
 
+        //method to load instances of an abstract class
+        // Dynamic method to load instances of a specified base class or interface
+        public static List<T> LoadAndCreateInstances<T>(string[] csFiles)
+        {
+            var syntaxTrees = csFiles.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file))).ToList();
 
+            var references = AppDomain.CurrentDomain.GetAssemblies()
+                .Where(a => !a.IsDynamic && !string.IsNullOrWhiteSpace(a.Location))
+                .Select(a => MetadataReference.CreateFromFile(a.Location));
+
+            var compilation = CSharpCompilation.Create(
+                "DynamicAssembly",
+                syntaxTrees,
+                references,
+                new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+            using (var ms = new MemoryStream())
+            {
+                var result = compilation.Emit(ms);
+
+                if (!result.Success)
+                {
+                    foreach (var diagnostic in result.Diagnostics.Where(d => d.Severity == DiagnosticSeverity.Error))
+                    {
+                        Console.WriteLine(diagnostic.GetMessage());
+                    }
+                    throw new Exception("Compilation failed!");
+                }
+
+                ms.Seek(0, SeekOrigin.Begin);
+                var assembly = Assembly.Load(ms.ToArray());
+
+                // Find all types that inherit from or implement T
+                var baseClassType = typeof(T);
+                if (!baseClassType.IsClass && !baseClassType.IsInterface)
+                {
+                    throw new ArgumentException("T must be a class or interface");
+                }
+
+                var types = assembly.GetTypes().Where(t => baseClassType.IsAssignableFrom(t) && !t.IsAbstract);
+
+                // Create instances of the found types
+                var instances = new List<T>();
+                foreach (var type in types)
+                {
+                    var instance = (T)Activator.CreateInstance(type);
+                    instances.Add(instance);
+                }
+
+                return instances;
+            }
+        }
         public static UInt64 GenerateID(int length)
         {
             long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
