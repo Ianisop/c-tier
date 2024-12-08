@@ -14,14 +14,13 @@ namespace c_tier.src.program
 
             if (mode == "server" || mode == "s")
             {
-                Console.WriteLine("Starting in server mode...");
-                Server server = new Server(25366, true);
-                Server.Start(); // Start the server
+                Console.Clear();
+                ServerFrontend.Init();
             }
             else if (mode == "client" || mode == "c")
             {
                 Console.Clear();
-                Frontend.Init();
+                ClientFrontend.Init();
              
             }
             else

@@ -20,7 +20,7 @@ namespace c_tier.src.backend.endpoints
 
         public override void Route(Socket clientSocket, string receivedText, Dictionary<Socket, User> users)
         {
-            Console.WriteLine(Utils.GREEN + $"SYSTEM: Attempting channel moving");
+            ServerFrontend.Log(Utils.GREEN + $"SYSTEM: Attempting channel moving");
 
             string channelName = receivedText.Substring(4);
                 
@@ -34,7 +34,7 @@ namespace c_tier.src.backend.endpoints
                     {
                         if (user.MoveToChannel(channel))
                         {
-                            Console.WriteLine(Utils.GREEN + $"SYSTEM: Moving client to channel {channelName}");
+                            ServerFrontend.Log($"SYSTEM: Moving client to channel {channelName}");
                             Server.SendResponse(clientSocket, ".clear"); // clear the chatlog
                             Server.SendResponse(clientSocket, $"{user.currentChannel.welcomeMessage}\n Hopped to {user.currentChannel.channelName}"); // success
                         }

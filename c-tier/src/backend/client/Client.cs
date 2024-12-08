@@ -78,11 +78,11 @@ namespace c_tier.src.backend.client
 
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
 
-                    Frontend.Log($"Received from server: {receivedText}");
+                    ClientFrontend.Log($"Received from server: {receivedText}");
 
                     if (receivedText.StartsWith(".ACCOUNTOK"))
                     {
-                        Frontend.Log("Account created succsefully!");
+                        ClientFrontend.Log("Account created succsefully!");
                         isSpeaking = false;
                         return true;
                    
@@ -91,7 +91,7 @@ namespace c_tier.src.backend.client
                     //just a chat message
                     else
                     {
-                        Frontend.Log("Error: " + receivedText);
+                        ClientFrontend.Log("Error: " + receivedText);
                         isSpeaking = false;
                         return false;
                     }
@@ -99,7 +99,7 @@ namespace c_tier.src.backend.client
 
                 catch (Exception ex)
                 {
-                    Frontend.Log($"Error receiving data: {ex.Message}");
+                    ClientFrontend.Log($"Error receiving data: {ex.Message}");
                     isSpeaking = false;
                     return false;
              
@@ -127,13 +127,13 @@ namespace c_tier.src.backend.client
             };
 
             localUser.socket = clientSocket;
-            Frontend.Log("Trying socket connection...");
+            ClientFrontend.Log("Trying socket connection...");
             clientSocket.Connect(remoteEndPoint);
             isConnected = true;
-            Frontend.Log("Connection established...");
+            ClientFrontend.Log("Connection established...");
 
             Login(); // try logging in
-            Frontend.Update();
+            ClientFrontend.Update();
 
             // Start a background task to listen for incoming messages from the server
             Task.Run(() => ReceiveMessagesFromServer());
@@ -142,10 +142,10 @@ namespace c_tier.src.backend.client
         
         private void Login()
         {
-            Frontend.Log("logging in!");
+            ClientFrontend.Log("logging in!");
             string message = ".login " + localUser.username + " " + localUser.password.ToString();
             Speak(message);
-            Frontend.Update();
+            ClientFrontend.Update();
         }
 
         /// <summary>
@@ -164,13 +164,13 @@ namespace c_tier.src.backend.client
 
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
 
-                    Frontend.Log($"Received from server: {receivedText}");
+                    ClientFrontend.Log($"Received from server: {receivedText}");
 
                     if (receivedText.StartsWith(".CHANNELLIST"))
                     {
                         string[] aux = receivedText.Split("|").Skip(1).ToArray();// Skip the ".CHANNELIST" part
-                        Frontend.Log("Updating channels list");
-                        Frontend.UpdateChannelList(aux);
+                        ClientFrontend.Log("Updating channels list");
+                        ClientFrontend.UpdateChannelList(aux);
                         isSpeaking = false;
                     }
 
@@ -178,7 +178,7 @@ namespace c_tier.src.backend.client
                     {
                         string[] aux = receivedText.Split(" ");
                         localUser.sessionToken = aux[1]; // cache the new session token
-                        Frontend.Log("SessionToken updated: " + aux[1]);
+                        ClientFrontend.Log("SessionToken updated: " + aux[1]);
              
 
                     }
@@ -194,21 +194,21 @@ namespace c_tier.src.backend.client
                     }
                     if(receivedText.StartsWith(".clear"))
                     {
-                        Frontend.CleanChat();
+                        ClientFrontend.CleanChat();
                         isSpeaking = false;
                     }
 
                     //just a chat message
                     else if(!receivedText.StartsWith('.'))
                     {
-                        Frontend.PushMessage(receivedText);
+                        ClientFrontend.PushMessage(receivedText);
                         isSpeaking = false;
                     }
                 }
    
                 catch (Exception ex)
                 {
-                    Frontend.Log($"Error receiving data: {ex.Message}");
+                    ClientFrontend.Log($"Error receiving data: {ex.Message}");
                     isSpeaking = false;
                     break;
                 }
@@ -228,7 +228,7 @@ namespace c_tier.src.backend.client
             isSpeaking = true;
             byte[] rawData = Encoding.UTF8.GetBytes(message);
             clientSocket.Send(rawData);
-            Frontend.Log($"Sending message: {message}");
+            ClientFrontend.Log($"Sending message: {message}");
             isSpeaking = false;
 
 

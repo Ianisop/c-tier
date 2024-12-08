@@ -50,19 +50,20 @@ namespace c_tier.src.backend.server
 
         public static List<Role> serverRoles = new List<Role>()
         {
-            new Role("Member",1,"White", true)
+            new Role("Member",1,"White", true),
+            ownerRole
         };
 
         public static Dictionary<Socket, User> users = new Dictionary<Socket, User>();
 
         private static System.Timers.Timer validationTimer = new System.Timers.Timer();
 
-        public Server(int targetPort, bool debug)
+        public Server()
         {
-            port = targetPort;
-            SHOULD_DEBUG = debug;
+
 
         }
+
 
         public static void Start()
         {
@@ -74,28 +75,29 @@ namespace c_tier.src.backend.server
                 //If theres no config data, quit
                 if(serverConfigData == null) 
                 {
-                    Console.WriteLine(Utils.RED + "SYSTEM: NO SERVER CONFIG FOUND. PLEASE CREATE A server_config.json FILE IN THE SOURCE(SRC) DIRECTORY.");
+                    ServerFrontend.Log("SYSTEM: NO SERVER CONFIG FOUND. PLEASE CREATE A server_config.json FILE IN THE SOURCE(SRC) DIRECTORY.");
                     return;
                 }
 
-                Console.WriteLine(Utils.GREEN + "SYSTEM: Loaded server config...");
+                ServerFrontend.Log(Utils.GREEN + "SYSTEM: Loaded server config...");
                 string[] csFiles = Directory.GetFiles("src/backend/endpoints", "*.cs");
 
-                Console.WriteLine(Utils.GREEN + "SYSTEM: Loading endpoints...");
+                ServerFrontend.Log(Utils.GREEN + "SYSTEM: Loading endpoints...");
 
                 endpoints = Utils.LoadAndCreateInstances<Endpoint>(csFiles); // try some shit
-                Console.WriteLine(Utils.GREEN + "SYSTEM: " + endpoints.Count + " endpoints loaded!");
+                ServerFrontend.Log(Utils.GREEN + "SYSTEM: " + endpoints.Count + " endpoints loaded!");
              
                 SQLiteConnection tempdb = Database.InitDatabase("db.db");
-                Console.WriteLine("SYSTEM: Found " + channels.Count + " channels, " + serverRoles.Count + " roles!");
+                ServerFrontend.Log("SYSTEM: Found " + channels.Count + " channels, " + serverRoles.Count + " roles!");
                 serverSocket.Bind(endPoint);
                 serverSocket.Listen(1); // Backlog 1 connection
             }
             catch (Exception e)
             {
-                Console.WriteLine($"{Utils.RED}Something went wrong! Stopping! {e.Message}");
+                ServerFrontend.LogError($"Something went wrong! Stopping! {e.Message}");
             }
-            Console.WriteLine(Utils.GREEN + "SERVER: Running on " + ipAddress.ToString());
+            ServerFrontend.Log("SERVER: Running on " + ipAddress.ToString());
+            Task.Run(() => ServerFrontend.UpdatePerformanceMetrics()); // update performance labels in the backend 
             Work();
         }
 
@@ -109,25 +111,28 @@ namespace c_tier.src.backend.server
         {
             try
             {
-                Console.WriteLine($"{Utils.GREEN}SERVER: Listening on port {port}...");
+                ServerFrontend.Log($"SERVER: Listening on port {port}...");
 
                 // Start listening for incoming connections
                 serverSocket.Listen(10); // Backlog of 10 connections
 
                 while (true)
                 {
+                    
                     // Accept an incoming connection
                     Socket clientSocket = serverSocket.Accept();
 
-                    Console.WriteLine($"{Utils.GREEN}{Utils.BOLD}SERVER:{Utils.NOBOLD} Client connected.");
+                    ServerFrontend.Log($"SERVER: Client connected.");
 
                     // Handle the client's communication asynchronously
                     Task.Run(() => HandleClientCommunication(clientSocket));
+
+                    
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                ServerFrontend.LogError($"Error: {ex.Message}");
             }
             finally
             {
@@ -136,6 +141,17 @@ namespace c_tier.src.backend.server
             }
         }
 
+        //TODO: implement this
+        public static void ProcessCommand(string command)
+        {
+
+        }
+
+
+        /// <summary>
+        /// Method to handle client communication asynchroniously
+        /// </summary>
+        /// <param name="clientSocket"></param>
         private static void HandleClientCommunication(Socket clientSocket)
         {
             try
@@ -158,14 +174,14 @@ namespace c_tier.src.backend.server
                         if (endpoint.destination.Equals(aux[0]))
                         { 
                             endpoint.Route(clientSocket, receivedText, users);
-                            Console.WriteLine("SERVER: Routing to endpoint " + endpoint.destination +"! (" + receivedText + ")");
+                            ServerFrontend.Log("SERVER: Routing to endpoint " + endpoint.destination +"! (" + receivedText + ")");
                         }
                     }
 
                     // If it's just a message ( program shouldnt reach this if a valid command has been entered and processed)
                     if (!receivedText.StartsWith('.'))
                     {
-                        Console.WriteLine($"{Utils.GREEN}SERVER: Received from client: {Utils.NORMAL} {receivedText}");
+                        ServerFrontend.Log($"SERVER: Received from client: {receivedText}");
                         if (users.TryGetValue(clientSocket, out var user)) // Find the user
                             UpdateClientsAndHost($"{user.username}: {receivedText}", clientSocket); // Send the message}
                     }
@@ -174,8 +190,8 @@ namespace c_tier.src.backend.server
             catch (Exception ex)
             {
                 users.TryGetValue(clientSocket, out var user);
-                if (user != null) Console.WriteLine($"Error handling: Client {user.username}: {ex.Message}");
-                else Console.WriteLine($"Error handling: Client (unknown): {ex.Message}");
+                if (user != null) ServerFrontend.LogError($"Error handling: Client {user.username}: {ex.Message}");
+                else ServerFrontend.LogError($"Error handling: Client (unknown): {ex.Message}");
 
             }
 
@@ -190,7 +206,7 @@ namespace c_tier.src.backend.server
             {
                 if (i.isDefault == true)
                 {
-                    Console.WriteLine("Default Role Found! : " + i.isDefault); ;
+                    ServerFrontend.Log("Default Role Found! : " + i.isDefault); ;
                     return i;
                 }
             }
@@ -243,7 +259,7 @@ namespace c_tier.src.backend.server
             if (aux != null) return false; // channel already exists
             Channel newChannel = new Channel(newChannelName, newChannelDesc, minRolePermLevel,welcomeMessage);
             channels.Add(newChannel);
-            Console.WriteLine("SYSTEM: CREATED NEW CHANNEL " + newChannelName);
+            ServerFrontend.Log("SYSTEM: CREATED NEW CHANNEL " + newChannelName);
             return true;
         }
 

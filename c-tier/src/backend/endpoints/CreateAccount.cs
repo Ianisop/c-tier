@@ -20,7 +20,7 @@ namespace c_tier.src.backend.endpoints
 
         public override void Route(Socket clientSocket, string receivedText, Dictionary<Socket, User> users)
         {
-            Console.WriteLine(Utils.GREEN + "SERVER: Account creation request");
+            ServerFrontend.Log("SERVER: Account creation request");
 
             //validate data
             string[] aux = receivedText.Split(" ");
@@ -33,9 +33,9 @@ namespace c_tier.src.backend.endpoints
             else
             {
                 Server.SendResponse(clientSocket, ".ACCOUNTOK");
-                Console.WriteLine("SERVER: Account created for user " + username);
+                ServerFrontend.Log("SERVER: Account created for user " + username);
                 Task.Run(() => clientSocket.Disconnect(true));
-                Console.WriteLine("SERVER: Disconnecting client " + username);
+                ServerFrontend.Log("SERVER: Disconnecting client " + username);
 
             }
 

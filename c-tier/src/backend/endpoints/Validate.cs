@@ -24,13 +24,13 @@ namespace c_tier.src.backend.endpoints
             // Perform token validation logic
             if (users.TryGetValue(clientSocket, out User targetUser) && targetUser.sessionToken == token)
             {
-                Console.WriteLine("SYSTEM: Token for " + targetUser.username + " validated successfully.");
+                ServerFrontend.Log("SYSTEM: Token for " + targetUser.username + " validated successfully.");
                 targetUser.validationCounter--;
 
             }
             else
             {
-                Console.WriteLine("SYSTEM: Invalid token. Disconnecting client.");
+                ServerFrontend.Log("SYSTEM: Invalid token. Disconnecting client.");
                 Server.SendResponse(clientSocket, "Error: Invalid session token.");
                 clientSocket.Disconnect(true);
 

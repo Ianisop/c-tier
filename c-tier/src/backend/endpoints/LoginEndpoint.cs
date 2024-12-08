@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Sockets;
 using c_tier.src.backend.client;
 using c_tier.src.backend.server;
-using c_tier.src;
 
 
 public class LoginEndpoint : Endpoint
@@ -20,19 +19,19 @@ public class LoginEndpoint : Endpoint
     public override void Route(Socket clientSocket, string receivedText, Dictionary<Socket,User> users)
     {
 
-            Console.WriteLine("SYSTEM: Attempting log in request validation. | " + receivedText);
+        ServerFrontend.Log("SYSTEM: Attempting log in request validation. | " + receivedText);
 
             //early check if theres a fuck up and the socket is already cached
             if (Server.users.ContainsKey(clientSocket))
             {
-                Console.WriteLine("SYSTEM: User already logged in for this socket.");
+                ServerFrontend.Log("SYSTEM: User already logged in for this socket.");
                 return;
             }
 
             string[] aux = receivedText.Split(" ");
             string username = aux[1];
             string password = aux[2];
-            Console.WriteLine("SYSTEM: Log in request for account: " + username);
+        ServerFrontend.Log("SYSTEM: Log in request for account: " + username);
 
             //Init validation timer
             var timer = new System.Timers.Timer(Server.sessionTokenValidationTimeout);
@@ -83,7 +82,7 @@ public class LoginEndpoint : Endpoint
     {
         if (userTimer.user.validationCounter >= Server.badValidationRequestLimit)
         {
-            Console.WriteLine(Utils.RED + "SYSTEM: Disconnecting client(failed to validate session)" + Utils.GREEN);
+            ServerFrontend.Log("SYSTEM: Disconnecting client(failed to validate session)");
             Server.SendResponse(userTimer.user.socket, ".DISCONNECT");
             userTimer.timer.Stop();
             return;
@@ -91,7 +90,7 @@ public class LoginEndpoint : Endpoint
         else
         {
             Server.SendResponse(userTimer.user.socket, ".SENDTOKEN");
-            Console.WriteLine("SYSTEM: asked for validation for client " + userTimer.user.username);
+            ServerFrontend.Log("SYSTEM: asked for validation for client " + userTimer.user.username);
             userTimer.user.validationCounter++;
         }
 
