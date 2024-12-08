@@ -58,7 +58,7 @@ namespace c_tier.src
             catch (Exception ex)
             {
                 // Console.WriteLine($"Error reading or deserializing file: {ex.Message}");
-                Frontend.Log(ex.Message);
+                ClientFrontend.Log(ex.Message);
                 return default;
             }
         }
@@ -74,7 +74,7 @@ namespace c_tier.src
             catch (Exception ex)
             {
                 // Console.WriteLine($"Error reading or deserializing file: {ex.Message}");
-                Frontend.Log(ex.Message);
+                ClientFrontend.Log(ex.Message);
                 return false;
             }
         }

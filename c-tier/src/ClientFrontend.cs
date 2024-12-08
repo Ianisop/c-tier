@@ -79,7 +79,7 @@ namespace c_tier.src
     /// <summary>
     /// Static class for accesing UI in the terminal
     /// </summary>
-    public static class Frontend
+    public static class ClientFrontend
     {
         
         public static App app = new App();
@@ -122,7 +122,7 @@ namespace c_tier.src
         {
             if (client.Init())
             {
-                Frontend.Log("Client init successful");
+                ClientFrontend.Log("Client init successful");
                 Task.Run(() => client.Connect()); // Connect to the server
               
                 app.profileWindow.Remove(app.submitButton);
@@ -133,7 +133,7 @@ namespace c_tier.src
             }
             else
             {
-                Frontend.Log("Client init failed");
+                ClientFrontend.Log("Client init failed");
                 app.profileWindow.Add(app.submitButton);
                 app.profileWindow.Add(app.passwordTextField);
                 app.profileWindow.Add(app.usernameTextField);
@@ -160,7 +160,7 @@ namespace c_tier.src
                 };
                 if (Utils.WriteToFile(newUser, "src/user_config.json"))
                 {
-                    Frontend.Log("user_config.json created, logging in...");
+                    ClientFrontend.Log("user_config.json created, logging in...");
                     client.Restart();
                     SetupClient();
                 }
@@ -199,7 +199,7 @@ namespace c_tier.src
                 yPosition += 2; // Adjust for spacing (e.g., 2 rows per button)
             }
 
-            Frontend.Log("Frontend: Updated channels list.");
+            ClientFrontend.Log("Frontend: Updated channels list.");
             // Explicitly refresh the UI
             //Application.Refresh();
         }
@@ -233,7 +233,7 @@ namespace c_tier.src
         {
             // Scroll to the last line
             app.chatHistory.ScrollTo(chatTextHistory.Count - 1,true);
-            Frontend.Log("SCROLLING TO: " + (chatTextHistory.Count - 1).ToString());
+            ClientFrontend.Log("SCROLLING TO: " + (chatTextHistory.Count - 1).ToString());
         }
 
         /// <summary>
