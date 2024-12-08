@@ -7,13 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using c_tier.src.backend.client;
-using System.Security.Cryptography.X509Certificates;
 using System.Data.SQLite;
-using System.Drawing.Printing;
-using System.Reflection;
-using System.Timers;
-using System.Threading;
-using System.Data;
+
 
 namespace c_tier.src.backend.server
 {
