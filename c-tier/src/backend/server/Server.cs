@@ -58,10 +58,9 @@ namespace c_tier.src.backend.server
 
         private static System.Timers.Timer validationTimer = new System.Timers.Timer();
 
-        public Server(int targetPort, bool debug)
+        public Server()
         {
-            port = targetPort;
-            SHOULD_DEBUG = debug;
+
 
         }
 
@@ -76,7 +75,7 @@ namespace c_tier.src.backend.server
                 //If theres no config data, quit
                 if(serverConfigData == null) 
                 {
-                    ServerFrontend.Log(Utils.RED + "SYSTEM: NO SERVER CONFIG FOUND. PLEASE CREATE A server_config.json FILE IN THE SOURCE(SRC) DIRECTORY.");
+                    ServerFrontend.Log("SYSTEM: NO SERVER CONFIG FOUND. PLEASE CREATE A server_config.json FILE IN THE SOURCE(SRC) DIRECTORY.");
                     return;
                 }
 
@@ -95,9 +94,10 @@ namespace c_tier.src.backend.server
             }
             catch (Exception e)
             {
-                ServerFrontend.LogError($"{Utils.RED}Something went wrong! Stopping! {e.Message}");
+                ServerFrontend.LogError($"Something went wrong! Stopping! {e.Message}");
             }
-            ServerFrontend.Log(Utils.GREEN + "SERVER: Running on " + ipAddress.ToString());
+            ServerFrontend.Log("SERVER: Running on " + ipAddress.ToString());
+            Task.Run(() => ServerFrontend.UpdatePerformanceMetrics()); // update performance labels in the backend 
             Work();
         }
 
@@ -111,20 +111,23 @@ namespace c_tier.src.backend.server
         {
             try
             {
-                ServerFrontend.Log($"{Utils.GREEN}SERVER: Listening on port {port}...");
+                ServerFrontend.Log($"SERVER: Listening on port {port}...");
 
                 // Start listening for incoming connections
                 serverSocket.Listen(10); // Backlog of 10 connections
 
                 while (true)
                 {
+                    
                     // Accept an incoming connection
                     Socket clientSocket = serverSocket.Accept();
 
-                    ServerFrontend.Log($"{Utils.GREEN}{Utils.BOLD}SERVER:{Utils.NOBOLD} Client connected.");
+                    ServerFrontend.Log($"SERVER: Client connected.");
 
                     // Handle the client's communication asynchronously
                     Task.Run(() => HandleClientCommunication(clientSocket));
+
+                    
                 }
             }
             catch (Exception ex)
@@ -138,12 +141,17 @@ namespace c_tier.src.backend.server
             }
         }
 
-
+        //TODO: implement this
         public static void ProcessCommand(string command)
         {
 
         }
 
+
+        /// <summary>
+        /// Method to handle client communication asynchroniously
+        /// </summary>
+        /// <param name="clientSocket"></param>
         private static void HandleClientCommunication(Socket clientSocket)
         {
             try
@@ -173,7 +181,7 @@ namespace c_tier.src.backend.server
                     // If it's just a message ( program shouldnt reach this if a valid command has been entered and processed)
                     if (!receivedText.StartsWith('.'))
                     {
-                        ServerFrontend.Log($"{Utils.GREEN}SERVER: Received from client: {Utils.NORMAL} {receivedText}");
+                        ServerFrontend.Log($"SERVER: Received from client: {receivedText}");
                         if (users.TryGetValue(clientSocket, out var user)) // Find the user
                             UpdateClientsAndHost($"{user.username}: {receivedText}", clientSocket); // Send the message}
                     }

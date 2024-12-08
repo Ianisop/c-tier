@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Sockets;
 using c_tier.src.backend.client;
 using c_tier.src.backend.server;
-using c_tier.src;
 
 
 public class LoginEndpoint : Endpoint
@@ -83,7 +82,7 @@ public class LoginEndpoint : Endpoint
     {
         if (userTimer.user.validationCounter >= Server.badValidationRequestLimit)
         {
-            ServerFrontend.Log(Utils.RED + "SYSTEM: Disconnecting client(failed to validate session)" + Utils.GREEN);
+            ServerFrontend.Log("SYSTEM: Disconnecting client(failed to validate session)");
             Server.SendResponse(userTimer.user.socket, ".DISCONNECT");
             userTimer.timer.Stop();
             return;

@@ -1,5 +1,4 @@
-﻿using c_tier.src.backend.client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
@@ -10,27 +9,35 @@ using System.Xml.Linq;
 using Terminal.Gui;
 using Label = Terminal.Gui.Label;
 
-namespace c_tier.src
+namespace c_tier.src.backend.client
 {
     public class App
     {
-        
+
         public Window debugWindow = new Window("Console") { X = 200, Y = 5, Width = 40, Height = Dim.Percent(30) };
         public Window channelWindow = new Window("Channels") { X = 0, Y = 0, Width = 15, Height = Dim.Percent(100) };
         public Window chatWindow = new Window("Chat") { X = 15, Y = 0, Width = 50, Height = Dim.Percent(70) };
         public Window profileWindow = new Window("Profile") { X = 80, Y = 0, Width = 20, Height = Dim.Percent(50) };
         // public Window serverBrowserWindow = new Window("Server Browser") {X= 50, Y= 3, Width=20, Height = 40 };
-        public TextField usernameTextField = new TextField {Text="Username....", X=0, Y=Pos.AnchorEnd(8),Width=15,Height=3 };
-        public TextField passwordTextField = new TextField {Text="Password....", X=0, Y=Pos.AnchorEnd(6),Width=15,Height=3 };
-        public Button submitButton = new Button() { Text = "Submit", X = 3, Y = 8, Width = 5, Height = 5};
-        public TextView chatHistory = new TextView { X = 0, Y = 0, Width = 50, Height = 50,ReadOnly = true, Multiline = true, WordWrap = true,
+        public TextField usernameTextField = new TextField { Text = "Username....", X = 0, Y = Pos.AnchorEnd(8), Width = 15, Height = 3 };
+        public TextField passwordTextField = new TextField { Text = "Password....", X = 0, Y = Pos.AnchorEnd(6), Width = 15, Height = 3 };
+        public Button submitButton = new Button() { Text = "Submit", X = 3, Y = 8, Width = 5, Height = 5 };
+        public TextView chatHistory = new TextView
+        {
+            X = 0,
+            Y = 0,
+            Width = 50,
+            Height = 50,
+            ReadOnly = true,
+            Multiline = true,
+            WordWrap = true,
             ColorScheme = new ColorScheme
             {
-                Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black), 
-                Focus = Application.Driver.MakeAttribute(Color.Green, Color.Black), 
+                Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black),
+                Focus = Application.Driver.MakeAttribute(Color.Green, Color.Black),
             }
         };
-        public TextView debugLogHistory= new TextView
+        public TextView debugLogHistory = new TextView
         {
             X = 0,
             Y = 0,
@@ -45,19 +52,24 @@ namespace c_tier.src
                 Focus = Application.Driver.MakeAttribute(Color.Green, Color.Black),
             }
         };
-        public TextField chatInputField = new TextField {X = 0, Y = Pos.AnchorEnd(1), Width = 50, Height = 2,
+        public TextField chatInputField = new TextField
+        {
+            X = 0,
+            Y = Pos.AnchorEnd(1),
+            Width = 50,
+            Height = 2,
             ColorScheme = new ColorScheme
             {
                 Normal = Application.Driver.MakeAttribute(Color.Green, Color.DarkGray),
-                Focus = Application.Driver.MakeAttribute(Color.Green, Color.Black), 
+                Focus = Application.Driver.MakeAttribute(Color.Green, Color.Black),
             }
         };
-        public Label userNameLabel = new Label{Text = "username", X = 0, Y =0, Width = 18, Height = 2};
-        public Label profileSeparator = new Label{Text = "------------------------", X = 0, Y = 1, Width = 18, Height = 1};
-        public Label roleListLabel = new Label{Text = "Roles", X = 0, Y =2, Width = 18, Height = 1};
+        public Label userNameLabel = new Label { Text = "username", X = 0, Y = 0, Width = 18, Height = 2 };
+        public Label profileSeparator = new Label { Text = "------------------------", X = 0, Y = 1, Width = 18, Height = 1 };
+        public Label roleListLabel = new Label { Text = "Roles", X = 0, Y = 2, Width = 18, Height = 1 };
 
 
-       // public Button generalChannelButton = new Button {Text= "General"};
+        // public Button generalChannelButton = new Button {Text= "General"};
         public App()
         {
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black);
@@ -70,7 +82,7 @@ namespace c_tier.src
             chatWindow.Add(chatInputField);
             debugWindow.Add(debugLogHistory);
 
-          
+
         }
 
 
@@ -81,7 +93,7 @@ namespace c_tier.src
     /// </summary>
     public static class ClientFrontend
     {
-        
+
         public static App app = new App();
         static Client client = new Client();
         private static List<string> chatTextHistory = new List<string>();
@@ -95,7 +107,7 @@ namespace c_tier.src
             // Define the KeyPress event to trigger on Enter key press
             app.chatInputField.KeyPress += (e) =>
             {
-              
+
                 if (e.KeyEvent.Key == Key.Enter && app.chatInputField.HasFocus && !app.chatInputField.Text.IsEmpty) // focus doesnt work
                 {
                     client.Speak(app.chatInputField.Text.ToString()); // Send the message to the server
@@ -104,9 +116,9 @@ namespace c_tier.src
             };
 
             app.submitButton.Clicked += OnAccountFormSubmit;
-           
 
-           
+
+
             Application.Run(); // has to be the last line
 
         }
@@ -122,9 +134,9 @@ namespace c_tier.src
         {
             if (client.Init())
             {
-                ClientFrontend.Log("Client init successful");
+                Log("Client init successful");
                 Task.Run(() => client.Connect()); // Connect to the server
-              
+
                 app.profileWindow.Remove(app.submitButton);
                 app.profileWindow.Remove(app.passwordTextField);
                 app.profileWindow.Remove(app.usernameTextField);
@@ -133,11 +145,11 @@ namespace c_tier.src
             }
             else
             {
-                ClientFrontend.Log("Client init failed");
+                Log("Client init failed");
                 app.profileWindow.Add(app.submitButton);
                 app.profileWindow.Add(app.passwordTextField);
                 app.profileWindow.Add(app.usernameTextField);
-             
+
 
             }
             Application.Refresh();
@@ -160,7 +172,7 @@ namespace c_tier.src
                 };
                 if (Utils.WriteToFile(newUser, "src/user_config.json"))
                 {
-                    ClientFrontend.Log("user_config.json created, logging in...");
+                    Log("user_config.json created, logging in...");
                     client.Restart();
                     SetupClient();
                 }
@@ -169,7 +181,7 @@ namespace c_tier.src
 
         }
 
-        public static int Prompt(string title,string description, params NStack.ustring[] buttons)
+        public static int Prompt(string title, string description, params NStack.ustring[] buttons)
         {
             return MessageBox.Query(title, description, buttons);
         }
@@ -188,18 +200,18 @@ namespace c_tier.src
                 var button = new Button
                 {
                     Text = channelName,
-                    X = 1,          // Indent for visual appeal
-                    Y = yPosition,  // Dynamic vertical position
+                    X = 1,      
+                    Y = yPosition,  
                 };
 
                 // Add button to the channelWindow
                 app.channelWindow.Add(button);
 
                 // Increment position for the next button
-                yPosition += 2; // Adjust for spacing (e.g., 2 rows per button)
+                yPosition += 2; 
             }
 
-            ClientFrontend.Log("Frontend: Updated channels list.");
+            Log("Frontend: Updated channels list.");
             // Explicitly refresh the UI
             //Application.Refresh();
         }
@@ -212,7 +224,7 @@ namespace c_tier.src
         /// <param name="message"></param>
         public static void PushMessage(string message)
         {
-            chatTextHistory.Add(message);
+            //chatTextHistory.Add(message);
             app.chatHistory.Text += message + '\n';
             UpdateTextHistory();
 
@@ -226,14 +238,14 @@ namespace c_tier.src
         public static void Log(string message)
         {
             app.debugLogHistory.Text += "\n" + message;
-            
+
         }
 
         public static void UpdateTextHistory()
         {
             // Scroll to the last line
-            app.chatHistory.ScrollTo(chatTextHistory.Count - 1,true);
-            ClientFrontend.Log("SCROLLING TO: " + (chatTextHistory.Count - 1).ToString());
+            //app.chatHistory.ScrollTo(chatTextHistory.Count - 1, true);
+            //Log("SCROLLING TO: " + (chatTextHistory.Count - 1).ToString());
         }
 
         /// <summary>
@@ -243,7 +255,7 @@ namespace c_tier.src
         {
             app.userNameLabel.Text = client.GetUsername();
         }
-     
+
 
     }
 }

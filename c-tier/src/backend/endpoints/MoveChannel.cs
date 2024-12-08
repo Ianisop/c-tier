@@ -34,7 +34,7 @@ namespace c_tier.src.backend.endpoints
                     {
                         if (user.MoveToChannel(channel))
                         {
-                            ServerFrontend.Log(Utils.GREEN + $"SYSTEM: Moving client to channel {channelName}");
+                            ServerFrontend.Log($"SYSTEM: Moving client to channel {channelName}");
                             Server.SendResponse(clientSocket, ".clear"); // clear the chatlog
                             Server.SendResponse(clientSocket, $"{user.currentChannel.welcomeMessage}\n Hopped to {user.currentChannel.channelName}"); // success
                         }

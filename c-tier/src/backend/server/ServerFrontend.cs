@@ -8,25 +8,29 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Terminal.Gui;
-using c_tier.src.backend.server;
 using Label = Terminal.Gui.Label;
 
-namespace c_tier.src
+namespace c_tier.src.backend.server
 {
     public class BackendApp
     {
-        
-        public Window consoleWindow = new Window("Console") { X = 200, Y = 5, Width = 40, Height = Dim.Percent(30) };
-        public Window serverInfoWindow = new Window("Logs") { X = 0, Y = 0, Width = 15, Height = Dim.Percent(100) };
-        public Window errorWindow = new Window("Errors") { X = 15, Y = 0, Width = 50, Height = Dim.Percent(70) };
-        public Window performanceWindow = new Window("Performance") { X = 80, Y = 0, Width = 20, Height = Dim.Percent(50) };
 
-        public Label cpuUsageLabel = new Label {};
-        public Label memoryUsageLabel = new Label {};
-        public Label diskUsageLabel = new Label {};
-        public Label networkUsageLabel = new Label { };
+        public Window consoleWindow = new Window("Console") { X = 40, Y = 40, Width = 40, Height = Dim.Percent(30) };
+        public Window serverInfoWindow = new Window("Logs") { X = 0, Y = 0, Width = 40, Height = Dim.Percent(100) };
+        public Window errorWindow = new Window("Errors") { X = 40, Y = 0, Width = 50, Height = Dim.Percent(70),
+            ColorScheme = new ColorScheme
+            {
+                Normal = Application.Driver.MakeAttribute(Color.Red, Color.Black),
+                Focus = Application.Driver.MakeAttribute(Color.Red, Color.Black),
+            }
+        };
+        public Window performanceWindow = new Window("Performance") { X = 100, Y = 0, Width = 30, Height = Dim.Percent(100)};
+        public Label cpuUsageLabel = new Label { X = 0,Y = 1, Height=1 ,Width = 15};
+        public Label memoryUsageLabel = new Label { X = 0, Y = 2 };
+        public Label diskUsageLabel = new Label { X = 0, Y = 3 };
+        public Label networkUsageLabel = new Label { X = 0, Y = 4 };
 
-        public TextView debugLogHistory= new TextView
+        public TextView debugLogHistory = new TextView
         {
             X = 0,
             Y = 0,
@@ -55,7 +59,7 @@ namespace c_tier.src
             }
         };
 
-       // public Button generalChannelButton = new Button {Text= "General"};
+        // public Button generalChannelButton = new Button {Text= "General"};
         public BackendApp()
         {
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black);
@@ -67,8 +71,8 @@ namespace c_tier.src
             performanceWindow.Add(cpuUsageLabel, memoryUsageLabel, networkUsageLabel, diskUsageLabel);
             consoleWindow.Add(consoleInputField);
             errorWindow.Add(debugLogHistory);
+            serverInfoWindow.Add(debugLogHistory);
 
-          
         }
 
 
@@ -79,9 +83,9 @@ namespace c_tier.src
     /// </summary>
     public static class ServerFrontend
     {
-        
+
         public static BackendApp app = new BackendApp();
-        
+
 
         public static void Init()
         {
@@ -89,20 +93,19 @@ namespace c_tier.src
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black);
             Colors.Base.Focus = Application.Driver.MakeAttribute(Color.Green, Color.DarkGray);
 
-            Server server = new Server(25366, true);
-            Task.Run(()=>Server.Start()); // Start the server
+            Server server = new Server();
+            Task.Run(() => Server.Start()); // Start the server
 
             // Define the KeyPress event to trigger on Enter key press
             app.consoleInputField.KeyPress += (e) =>
             {
-              
-                if (e.KeyEvent.Key == Key.Enter && app.consoleInputField.HasFocus && !app.consoleInputField.Text.IsEmpty) 
+                if (e.KeyEvent.Key == Key.Enter && app.consoleInputField.HasFocus && !app.consoleInputField.Text.IsEmpty)
                 {
-                    Server.ProcessCommand(app.consoleInputField.Text.ToString());
+                    Server.ProcessCommand(app.consoleInputField.Text.ToString()); // process a backend command
                     app.consoleInputField.Text = "";
                 }
             };
-  
+
 
             Application.Run(); // has to be the last line
 
@@ -115,7 +118,7 @@ namespace c_tier.src
         public static void Log(string message)
         {
             app.debugLogHistory.Text += "\n" + message;
-            
+
         }
 
         public static void LogError(string message)
@@ -123,7 +126,23 @@ namespace c_tier.src
             app.errorWindow.Text += "\n" + message;
         }
 
-     
+
+        /// <summary>
+        /// Updates performance metrics
+        /// </summary>
+        public static void UpdatePerformanceMetrics()
+        {
+            while(true)
+            {
+                app.cpuUsageLabel.Text = "CPU USAGE: " + Utils.GetCpuUsage();
+                app.memoryUsageLabel.Text = "MEMORY USAGE: " + Utils.GetMemoryUsage();
+                app.diskUsageLabel.Text = "DISK USAGE: NaN";
+           
+                app.networkUsageLabel.Text = "NETWORK USAGE:\n" + Utils.GetNetworkUsage();
+            }
+
+        }
+
 
     }
 }

@@ -12,6 +12,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CSharp;
 using System.Reflection;
 using Microsoft.CodeAnalysis.CSharp;
+using c_tier.src.backend.client;
 
 
 namespace c_tier.src
@@ -177,7 +178,7 @@ namespace c_tier.src
                 cpuCounter.NextValue(); // init the counter
                 System.Threading.Thread.Sleep(1000);
                 float cpuUsage = cpuCounter.NextValue();
-                return $"Current CPU Usage: {cpuUsage}%";
+                return $"{cpuUsage}%";
             }
             catch (Exception ex)
             {
@@ -220,7 +221,7 @@ namespace c_tier.src
             {
                 Process currentProcess = Process.GetCurrentProcess();
                 long memoryUsage = currentProcess.WorkingSet64; // in bytes
-                return $"Process Memory Usage: {(memoryUsage / (1024 * 1024))} MB"; // mb convertion
+                return $"{(memoryUsage / (1024 * 1024))} MB"; // mb convertion
             }
             catch (Exception ex)
             {

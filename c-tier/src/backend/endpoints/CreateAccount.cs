@@ -20,7 +20,7 @@ namespace c_tier.src.backend.endpoints
 
         public override void Route(Socket clientSocket, string receivedText, Dictionary<Socket, User> users)
         {
-            ServerFrontend.Log(Utils.GREEN + "SERVER: Account creation request");
+            ServerFrontend.Log("SERVER: Account creation request");
 
             //validate data
             string[] aux = receivedText.Split(" ");

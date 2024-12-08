@@ -19,13 +19,13 @@ namespace c_tier.src.backend.endpoints
 
         public override void Route(Socket clientSocket, string receivedText, Dictionary<Socket, User> users)
         {
-             ServerFrontend.Log(Utils.GREEN + "SERVER: Client asked for channel list!");
+             ServerFrontend.Log("SERVER: Client asked for channel list!");
 
                 // Send the channel list
                 string channelNameList = "";
                 foreach (Channel channel in Server.channels) channelNameList += "|" + channel.channelName;
                 Server.SendResponse(clientSocket, ".CHANNELLIST" + channelNameList);
-                 ServerFrontend.Log(Utils.GREEN + "SYSTEM: Channel list sent!");
+                 ServerFrontend.Log("SYSTEM: Channel list sent!");
             
         }
     }
