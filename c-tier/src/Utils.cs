@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Text.Json;
 using System.Security.Policy;
 using System.Security.Cryptography;
+using System.Diagnostics;
+using System.Net.NetworkInformation;
+
 
 namespace c_tier.src
 {
@@ -102,6 +105,66 @@ namespace c_tier.src
             }
 
             return result.ToString();
+        }
+
+        public static string GetCpuUsage()
+        {
+            try
+            {
+                var cpuCounter = new PerformanceCounter("Process", "% Processor Time", Process.GetCurrentProcess().ProcessName);
+                cpuCounter.NextValue(); // init the counter
+                System.Threading.Thread.Sleep(1000);
+                float cpuUsage = cpuCounter.NextValue();
+                return $"Current CPU Usage: {cpuUsage}%";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching CPU usage: {ex.Message}");
+                return "Error fetching CPU usage";
+            }
+        }
+
+        public static string GetNetworkUsage()
+        {
+            try
+            {
+                NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
+                StringBuilder networkStats = new StringBuilder();
+
+                networkStats.AppendLine("---------------");
+                foreach (var ni in networkInterfaces)
+                {
+                    if (ni.OperationalStatus == OperationalStatus.Up)
+                    {
+                        IPv4InterfaceStatistics stats = ni.GetIPv4Statistics();
+                        networkStats.AppendLine($"Network Interface: {ni.Name}");
+                        networkStats.AppendLine($"Bytes Sent: {stats.BytesSent / 1024} KB");
+                        networkStats.AppendLine($"Bytes Received: {stats.BytesReceived / 1024} KB");
+                        networkStats.AppendLine("---------------");
+                    }
+                }
+                return networkStats.Length > 0 ? networkStats.ToString() : "No active network interfaces found.";
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching network usage: {ex.Message}");
+                return "Error fetching network usage";
+            }
+        }
+
+        public static string GetMemoryUsage()
+        {
+            try
+            {
+                Process currentProcess = Process.GetCurrentProcess();
+                long memoryUsage = currentProcess.WorkingSet64; // in bytes
+                return $"Process Memory Usage: {(memoryUsage / (1024 * 1024))} MB"; // mb convertion
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching memory usage: {ex.Message}");
+                return "Error fetching memory usage";
+            }
         }
 
     }
