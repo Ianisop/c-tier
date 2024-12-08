@@ -16,6 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="src\backend\server-commands\GiveOwner.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Update="src\backend\endpoints\CreateAccount.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>

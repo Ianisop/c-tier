@@ -32,6 +32,7 @@ namespace c_tier.src.backend.server
         public static readonly int badValidationRequestLimit = 4;
         public static readonly int sessionTokenValidationTimeout = 300000; // im ms (default 5 mins)
         public static List<Endpoint> endpoints = new List<Endpoint>();
+        public static List<ServerCommand> commands = new List<ServerCommand>();
         public static readonly ulong ownerUserId;
         private static ServerConfigData serverConfigData;
 
@@ -71,23 +72,26 @@ namespace c_tier.src.backend.server
             try
             {
                 serverConfigData = Utils.ReadFromFile<ServerConfigData>("src/server_config.json"); // load the server config
-
+                string[] endpointFiles = Directory.GetFiles("src/backend/endpoints", "*.cs");
+                string[] serverCommandFiles = Directory.GetFiles("src/backend/server-commands", "*.cs");
                 //If theres no config data, quit
-                if(serverConfigData == null) 
+                if (serverConfigData == null) 
                 {
                     ServerFrontend.Log("SYSTEM: NO SERVER CONFIG FOUND. PLEASE CREATE A server_config.json FILE IN THE SOURCE(SRC) DIRECTORY.");
                     return;
                 }
 
                 ServerFrontend.Log(Utils.GREEN + "SYSTEM: Loaded server config...");
-                string[] csFiles = Directory.GetFiles("src/backend/endpoints", "*.cs");
+                
 
                 ServerFrontend.Log(Utils.GREEN + "SYSTEM: Loading endpoints...");
 
-                endpoints = Utils.LoadAndCreateInstances<Endpoint>(csFiles); // try some shit
+                endpoints = Utils.LoadAndCreateInstances<Endpoint>(endpointFiles); // try some shit
                 ServerFrontend.Log(Utils.GREEN + "SYSTEM: " + endpoints.Count + " endpoints loaded!");
-             
-                SQLiteConnection tempdb = Database.InitDatabase("db.db");
+                ServerFrontend.Log(Utils.GREEN + "SYSTEM: Loading server-commands...");
+                commands = Utils.LoadAndCreateInstances<ServerCommand>(serverCommandFiles); // try some more shit
+                ServerFrontend.Log(Utils.GREEN + "SYSTEM: " + commands.Count + " server-commands loaded!");
+                SQLiteConnection tempdb = Database.InitDatabase("db.db");// try some other shit
                 ServerFrontend.Log("SYSTEM: Found " + channels.Count + " channels, " + serverRoles.Count + " roles!");
                 serverSocket.Bind(endPoint);
                 serverSocket.Listen(1); // Backlog 1 connection
@@ -141,10 +145,31 @@ namespace c_tier.src.backend.server
             }
         }
 
-        //TODO: implement this
+        /// <summary>
+        /// Processes all backend commands that match a cached ServerCommand from the src/backend/server-commands/ directory.
+        /// </summary>
+        /// <param name="command"></param>
         public static void ProcessCommand(string command)
         {
-
+            ServerFrontend.Log(command);
+            string prefix = command.Split(' ').First();
+            foreach (var cmd in commands)
+            {
+                if (cmd.prefix == prefix)
+                {
+                    try
+                    {
+                        cmd.Execute(command);
+                    }
+                    catch (Exception ex)
+                    {
+                        ServerFrontend.LogError("Failed to execute command " + command + " because " + ex.Message);
+                        break; // command found
+                    }
+                }
+                
+            }
+            
         }
 
 
@@ -272,6 +297,20 @@ namespace c_tier.src.backend.server
         {
             byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
             clientSocket.Send(responseBytes);
+        }
+
+        /// <summary>
+        /// Method to find an active user by their username
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns>an Instance of <href>User</href></returns>
+        public static User FindUserByUsername(string username)
+        {
+            foreach (var user in users.Values)
+            {
+                if (user.username == username) return user;
+            }
+            return null;
         }
 
         public static Socket GetSocket() { return serverSocket; }

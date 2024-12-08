@@ -49,7 +49,20 @@ namespace c_tier.src.backend.server
         public TextField consoleInputField = new TextField
         {
             X = 0,
-            Y = Pos.AnchorEnd(1),
+            Y = Pos.AnchorEnd(3),
+            Width = 40,
+            Height = 20,
+            ColorScheme = new ColorScheme
+            {
+                Normal = Application.Driver.MakeAttribute(Color.Green, Color.DarkGray),
+                Focus = Application.Driver.MakeAttribute(Color.Green, Color.Black),
+            }
+        };
+
+        public TextField consoleLogHistory = new TextField
+        {
+            X = 0,
+            Y = 0,
             Width = 50,
             Height = 2,
             ColorScheme = new ColorScheme
@@ -58,6 +71,7 @@ namespace c_tier.src.backend.server
                 Focus = Application.Driver.MakeAttribute(Color.Green, Color.Black),
             }
         };
+        
 
         // public Button generalChannelButton = new Button {Text= "General"};
         public BackendApp()
@@ -69,7 +83,7 @@ namespace c_tier.src.backend.server
 
             //Setup base widgets
             performanceWindow.Add(cpuUsageLabel, memoryUsageLabel, networkUsageLabel, diskUsageLabel);
-            consoleWindow.Add(consoleInputField);
+            consoleWindow.Add(consoleInputField, consoleLogHistory);
             errorWindow.Add(debugLogHistory);
             serverInfoWindow.Add(debugLogHistory);
 
@@ -101,6 +115,7 @@ namespace c_tier.src.backend.server
             {
                 if (e.KeyEvent.Key == Key.Enter && app.consoleInputField.HasFocus && !app.consoleInputField.Text.IsEmpty)
                 {
+
                     Server.ProcessCommand(app.consoleInputField.Text.ToString()); // process a backend command
                     app.consoleInputField.Text = "";
                 }
@@ -126,6 +141,10 @@ namespace c_tier.src.backend.server
             app.errorWindow.Text += "\n" + message;
         }
 
+        public static void LogToConsole(string message)
+        {
+            app.consoleLogHistory.Text += "\n" + message;
+        }
 
         /// <summary>
         /// Updates performance metrics

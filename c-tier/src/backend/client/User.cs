@@ -40,13 +40,19 @@ namespace c_tier.src.backend.client
         /// <returns></returns>
         public bool HasRole(int minPermLevel)
         {
-         
             foreach(var role in roles)
             {
                 if(role.permLevel >= minPermLevel) return true;   
             }
 
             return false;
+        }
+
+        public void AddRole(Role role)
+        {
+            if(!roles.Contains(role))
+                roles.Add(role);
+            ClientFrontend.Update(); // update roles list locally
         }
 
         /// <summary>

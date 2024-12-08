@@ -237,7 +237,8 @@ namespace c_tier.src.backend.client
 
         public string GetUsername()
         {
-            return localUser.username;  
+            if(localUser != null) return localUser.username;
+            return null;
         }
 
     }
