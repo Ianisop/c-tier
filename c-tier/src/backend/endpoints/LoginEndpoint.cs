@@ -34,7 +34,7 @@ public class LoginEndpoint : Endpoint
         ServerFrontend.Log("SYSTEM: Log in request for account: " + username);
 
             //Init validation timer
-            var timer = new System.Timers.Timer(Server.sessionTokenValidationTimeout);
+            var timer = new System.Timers.Timer(Server.config.sessionTokenValidationTimeout);
             var userTimer = new UserTimer();
 
             //Create a local user
@@ -78,7 +78,7 @@ public class LoginEndpoint : Endpoint
     /// <param name="userTimer"></param>
     private static void ValidateSessionForClient(UserTimer userTimer)
     {
-        if (userTimer.user.validationCounter >= Server.badValidationRequestLimit)
+        if (userTimer.user.validationCounter >= Server.config.badValidationRequestLimit)
         {
             ServerFrontend.Log("SYSTEM: Disconnecting client(failed to validate session)");
             Server.SendResponse(userTimer.user.socket, ".DISCONNECT");

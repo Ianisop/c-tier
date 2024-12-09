@@ -49,7 +49,7 @@ namespace c_tier.src.backend.server
         public TextField consoleInputField = new TextField
         {
             X = 0,
-            Y = Pos.AnchorEnd(3),
+            Y = Pos.AnchorEnd(5),
             Width = 40,
             Height = 20,
             ColorScheme = new ColorScheme
@@ -62,9 +62,9 @@ namespace c_tier.src.backend.server
         public TextField consoleLogHistory = new TextField
         {
             X = 0,
-            Y = 0,
-            Width = 50,
-            Height = 2,
+            Y = Pos.AnchorEnd(0),
+            Width = 40,
+            Height = 20,
             ColorScheme = new ColorScheme
             {
                 Normal = Application.Driver.MakeAttribute(Color.Green, Color.DarkGray),

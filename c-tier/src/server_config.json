@@ -1,4 +1,7 @@
 {
-    "ownerUsername": "somethingfishy"
+    "port": 25366,
+    "max_connections": 20
+    "badValidationRequestLimit": 4,
+    "sessionTokenValidationTimeout": 30000
     
 }

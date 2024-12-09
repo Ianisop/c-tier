@@ -23,18 +23,12 @@ namespace c_tier.src.backend.server
 {
     public class Server
     {
-        static bool SHOULD_DEBUG = false;
         protected static bool shouldStop = true; // Controls if the server should stop working
-        private static int port = 25366; // Port number to listen on
         private static readonly IPAddress ipAddress = IPAddress.Any; // Listen on all network interfaces;
         private static readonly Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); // Create a socket
-
-        public static readonly int badValidationRequestLimit = 4;
-        public static readonly int sessionTokenValidationTimeout = 300000; // im ms (default 5 mins)
         public static List<Endpoint> endpoints = new List<Endpoint>();
         public static List<ServerCommand> commands = new List<ServerCommand>();
-        public static readonly ulong ownerUserId;
-        private static ServerConfigData serverConfigData;
+        public static ServerConfigData config;
 
         public static readonly Role ownerRole = new Role()
         {
@@ -71,17 +65,17 @@ namespace c_tier.src.backend.server
             shouldStop = false;
             try
             {
-                serverConfigData = Utils.ReadFromFile<ServerConfigData>("src/server_config.json"); // load the server config
+                config = Utils.ReadFromFile<ServerConfigData>("src/server_config.json"); // load the server config
                 string[] endpointFiles = Directory.GetFiles("src/backend/endpoints", "*.cs");
                 string[] serverCommandFiles = Directory.GetFiles("src/backend/server-commands", "*.cs");
                 //If theres no config data, quit
-                if (serverConfigData == null) 
+                if (config == null) 
                 {
                     ServerFrontend.Log("SYSTEM: NO SERVER CONFIG FOUND. PLEASE CREATE A server_config.json FILE IN THE SOURCE(SRC) DIRECTORY.");
                     return;
                 }
 
-                IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, serverConfigData.port);
+                IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, config.port);
           
 
                 ServerFrontend.Log(Utils.GREEN + "SYSTEM: Loaded server config...");
@@ -118,7 +112,7 @@ namespace c_tier.src.backend.server
         {
             try
             {
-                ServerFrontend.Log($"SERVER: Listening on port {port}...");
+                ServerFrontend.Log($"SERVER: Listening on port {config.port}...");
 
                 // Start listening for incoming connections
                 serverSocket.Listen(10); // Backlog of 10 connections
@@ -320,7 +314,7 @@ namespace c_tier.src.backend.server
 
         public static bool IsAlive() { return !shouldStop; }
 
-        public static int GetPort() { return port; }
+        public static int GetPort() { return config.port; }
 
         public static IPAddress GetIPAddress() { return ipAddress; }
     }
