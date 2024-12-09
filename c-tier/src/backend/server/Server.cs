@@ -58,23 +58,22 @@ namespace c_tier.src.backend.server
                 //If theres no config data, quit
                 if (config == null)
                 {
-                    ServerFrontend.Log("SYSTEM: NO SERVER CONFIG FOUND. PLEASE CREATE A server_config.json FILE IN THE SOURCE (SRC) DIRECTORY.");
-                    return;
+                    ServerFrontend.LogError("SYSTEM: NO SERVER CONFIG FOUND. PLEASE CREATE A server_config.json FILE IN THE SOURCE (SRC) DIRECTORY.");
                 }
-
                 IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, config.port);
 
-
                 ServerFrontend.Log(Utils.GREEN + "SYSTEM: Loaded server config...");
-
-
                 ServerFrontend.Log(Utils.GREEN + "SYSTEM: Loading endpoints...");
 
                 endpoints = Utils.LoadAndCreateInstances<Endpoint>(endpointFiles); // try some shit
+
                 ServerFrontend.Log(Utils.GREEN + "SYSTEM: " + endpoints.Count + " endpoints loaded!");
                 ServerFrontend.Log(Utils.GREEN + "SYSTEM: Loading server-commands...");
+
                 commands = Utils.LoadAndCreateInstances<ServerCommand>(serverCommandFiles); // try some more shit
+
                 ServerFrontend.Log(Utils.GREEN + "SYSTEM: " + commands.Count + " server-commands loaded!");
+
                 SQLiteConnection tempdb = Database.InitDatabase("db.db");// try some other shit
                 ServerFrontend.Log("SYSTEM: Found " + channels.Count + " channels, " + serverRoles.Count + " roles!");
                 serverSocket.Bind(endPoint);

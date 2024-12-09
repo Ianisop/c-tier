@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
@@ -19,8 +19,8 @@ namespace c_tier.src.backend.client
         public Window chatWindow = new Window("Chat") { X = 15, Y = 0, Width = 50, Height = Dim.Percent(70) };
         public Window profileWindow = new Window("Profile") { X = 80, Y = 0, Width = 20, Height = Dim.Percent(50) };
         // public Window serverBrowserWindow = new Window("Server Browser") {X= 50, Y= 3, Width=20, Height = 40 };
-        public TextField usernameTextField = new TextField { Text = "Username....", X = 0, Y = Pos.AnchorEnd(8), Width = 15, Height = 3 };
-        public TextField passwordTextField = new TextField { Text = "Password....", X = 0, Y = Pos.AnchorEnd(6), Width = 15, Height = 3 };
+        public TextField usernameTextField = new TextField { Text = "Username....", X = 0, Y = Pos.AnchorEnd(4), Width = 15, Height = 3 };
+        public TextField passwordTextField = new TextField { Text = "Password....", X = 0, Y = Pos.AnchorEnd(3), Width = 15, Height = 3 };
         public Button submitButton = new Button() { Text = "Submit", X = 3, Y = 8, Width = 5, Height = 5 };
         public TextView chatHistory = new TextView
         {
@@ -75,17 +75,11 @@ namespace c_tier.src.backend.client
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black);
             Application.Top.Add(channelWindow, chatWindow, debugWindow, profileWindow); // add the windows
 
-
-
             //Setup base widgets
             chatWindow.Add(chatHistory);
             chatWindow.Add(chatInputField);
             debugWindow.Add(debugLogHistory);
-
-
         }
-
-
     }
 
     /// <summary>
@@ -93,7 +87,6 @@ namespace c_tier.src.backend.client
     /// </summary>
     public static class ClientFrontend
     {
-
         public static App app = new App();
         static Client client = new Client();
         private static List<string> chatTextHistory = new List<string>();
@@ -107,7 +100,6 @@ namespace c_tier.src.backend.client
             // Define the KeyPress event to trigger on Enter key press
             app.chatInputField.KeyPress += (e) =>
             {
-
                 if (e.KeyEvent.Key == Key.Enter && app.chatInputField.HasFocus && !app.chatInputField.Text.IsEmpty) // focus doesnt work
                 {
                     client.Speak(app.chatInputField.Text.ToString()); // Send the message to the server
@@ -116,15 +108,12 @@ namespace c_tier.src.backend.client
             };
 
             app.submitButton.Clicked += OnAccountFormSubmit;
-
-
-
             Application.Run(); // has to be the last line
 
         }
 
         /// <summary>
-        /// Cleans the chat history 
+        /// Cleans the chat history
         /// </summary>
         public static void CleanChat()
         {
@@ -136,7 +125,6 @@ namespace c_tier.src.backend.client
             {
                 Log("Client init successful");
                 Task.Run(() => client.Connect()); // Connect to the server
-
                 app.profileWindow.Remove(app.submitButton);
                 app.profileWindow.Remove(app.passwordTextField);
                 app.profileWindow.Remove(app.usernameTextField);
@@ -149,7 +137,6 @@ namespace c_tier.src.backend.client
                 app.profileWindow.Add(app.submitButton);
                 app.profileWindow.Add(app.passwordTextField);
                 app.profileWindow.Add(app.usernameTextField);
-
 
             }
             Application.Refresh();
@@ -200,15 +187,15 @@ namespace c_tier.src.backend.client
                 var button = new Button
                 {
                     Text = channelName,
-                    X = 1,      
-                    Y = yPosition,  
+                    X = 1,
+                    Y = yPosition,
                 };
 
                 // Add button to the channelWindow
                 app.channelWindow.Add(button);
 
                 // Increment position for the next button
-                yPosition += 2; 
+                yPosition += 2;
             }
 
             Log("Frontend: Updated channels list.");

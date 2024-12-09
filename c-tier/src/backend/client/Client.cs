@@ -1,4 +1,4 @@
-﻿using c_tier.src.backend.server;
+using c_tier.src.backend.server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,22 +14,22 @@ namespace c_tier.src.backend.client
     public class Client
     {
         // Create a TCP socket
-        private  Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        private Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         private IPEndPoint remoteEndPoint;
         private bool isSpeaking = false;
         protected User localUser;
         public bool isConnected = false;
-        
+
 
         public Client()
         {
 
             ServerInfo serverData = Utils.ReadFromFile<ServerInfo>("src/secret.json");
             remoteEndPoint = new IPEndPoint(IPAddress.Parse(serverData.ip), serverData.port);
-            
+
         }
 
-       
+
 
         public void Stop()
         {
@@ -39,25 +39,28 @@ namespace c_tier.src.backend.client
 
         public bool Init()
         {
-            var options = new JsonSerializerOptions
+            try
             {
-                PropertyNameCaseInsensitive = true,
-                IncludeFields = true,
-            };
+                User user = Utils.ReadFromFile<User>("src/user_config.json");
 
-            User user = Utils.ReadFromFile<User>("src/user_config.json", options);
-
-            if (user == null)
+                if (user == null)
+                {
+                    ClientFrontend.Log("user_config.json not found");
+                    return false;
+                }
+                else
+                {
+                    localUser = user;
+                    return true;
+                }
+            }
+            catch (Exception ex)
             {
-                
+                ClientFrontend.Log("Something went wrong! " + ex.Message);
                 return false;
             }
-            else
-            {
-                localUser = user;
-                return true;
-            }
-       
+
+
         }
 
         public bool CreateAccount(string username, string password)
@@ -85,7 +88,7 @@ namespace c_tier.src.backend.client
                         ClientFrontend.Log("Account created succsefully!");
                         isSpeaking = false;
                         return true;
-                   
+
                     }
 
                     //just a chat message
@@ -102,7 +105,7 @@ namespace c_tier.src.backend.client
                     ClientFrontend.Log($"Error receiving data: {ex.Message}");
                     isSpeaking = false;
                     return false;
-             
+
                 }
 
             }
@@ -113,7 +116,7 @@ namespace c_tier.src.backend.client
 
         public void Restart()
         {
-           clientSocket.Dispose();
+            clientSocket.Dispose();
             clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
 
@@ -139,7 +142,7 @@ namespace c_tier.src.backend.client
             Task.Run(() => ReceiveMessagesFromServer());
         }
 
-        
+
         private void Login()
         {
             ClientFrontend.Log("logging in!");
@@ -174,45 +177,45 @@ namespace c_tier.src.backend.client
                         isSpeaking = false;
                     }
 
-                    if(receivedText.StartsWith(".sessiontoken"))
+                    if (receivedText.StartsWith(".sessiontoken"))
                     {
                         string[] aux = receivedText.Split(" ");
                         localUser.sessionToken = aux[1]; // cache the new session token
                         ClientFrontend.Log("SessionToken updated: " + aux[1]);
-             
+
 
                     }
-                    if(receivedText.StartsWith(".DISCONNECT"))
+                    if (receivedText.StartsWith(".DISCONNECT"))
                     {
                         clientSocket.Disconnect(true);
                     }
-                    if(receivedText.StartsWith(".SENDTOKEN"))
+                    if (receivedText.StartsWith(".SENDTOKEN"))
                     {
                         Speak(".validate " + localUser.sessionToken);
                         //Frontend.Log("Validating session");
                         isSpeaking = false;
                     }
-                    if(receivedText.StartsWith(".clear"))
+                    if (receivedText.StartsWith(".clear"))
                     {
                         ClientFrontend.CleanChat();
                         isSpeaking = false;
                     }
 
                     //just a chat message
-                    else if(!receivedText.StartsWith('.'))
+                    else if (!receivedText.StartsWith('.'))
                     {
                         ClientFrontend.PushMessage(receivedText);
                         isSpeaking = false;
                     }
                 }
-   
+
                 catch (Exception ex)
                 {
                     ClientFrontend.Log($"Error receiving data: {ex.Message}");
                     isSpeaking = false;
                     break;
                 }
-        
+
             }
         }
 
@@ -237,7 +240,7 @@ namespace c_tier.src.backend.client
 
         public string GetUsername()
         {
-            if(localUser != null) return localUser.username;
+            if (localUser != null) return localUser.username;
             return null;
         }
 
