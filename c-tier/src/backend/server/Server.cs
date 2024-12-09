@@ -71,7 +71,7 @@ namespace c_tier.src.backend.server
                 //If theres no config data, quit
                 if (config == null) 
                 {
-                    ServerFrontend.Log("SYSTEM: NO SERVER CONFIG FOUND. PLEASE CREATE A server_config.json FILE IN THE SOURCE(SRC) DIRECTORY.");
+                    ServerFrontend.Log("SYSTEM: NO SERVER CONFIG FOUND. PLEASE CREATE A server_config.json FILE IN THE SOURCE (SRC) DIRECTORY.");
                     return;
                 }
 

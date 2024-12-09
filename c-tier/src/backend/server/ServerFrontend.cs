@@ -115,7 +115,6 @@ namespace c_tier.src.backend.server
             {
                 if (e.KeyEvent.Key == Key.Enter && app.consoleInputField.HasFocus && !app.consoleInputField.Text.IsEmpty)
                 {
-
                     Server.ProcessCommand(app.consoleInputField.Text.ToString()); // process a backend command
                     app.consoleInputField.Text = "";
                 }
