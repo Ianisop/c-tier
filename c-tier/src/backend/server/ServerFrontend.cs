@@ -1,12 +1,4 @@
-﻿using c_tier.src.backend.client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+
 using Terminal.Gui;
 using Label = Terminal.Gui.Label;
 
@@ -17,15 +9,20 @@ namespace c_tier.src.backend.server
 
         public Window consoleWindow = new Window("Console") { X = 40, Y = 40, Width = 40, Height = 4 };
         public Window serverInfoWindow = new Window("Logs") { X = 0, Y = 0, Width = 40, Height = Dim.Percent(100) };
-        public Window errorWindow = new Window("Errors") { X = 40, Y = 0, Width = 50, Height = Dim.Percent(70),
+        public Window errorWindow = new Window("Errors")
+        {
+            X = 40,
+            Y = 0,
+            Width = 50,
+            Height = Dim.Percent(70),
             ColorScheme = new ColorScheme
             {
                 Normal = Application.Driver.MakeAttribute(Color.Red, Color.Black),
                 Focus = Application.Driver.MakeAttribute(Color.Red, Color.Black),
             }
         };
-        public Window performanceWindow = new Window("Performance") { X = 100, Y = 0, Width = 30, Height = Dim.Percent(100)};
-        public Label cpuUsageLabel = new Label { X = 0,Y = 1, Height=1 ,Width = 15};
+        public Window performanceWindow = new Window("Performance") { X = 100, Y = 0, Width = 30, Height = Dim.Percent(100) };
+        public Label cpuUsageLabel = new Label { X = 0, Y = 1, Height = 1, Width = 15 };
         public Label memoryUsageLabel = new Label { X = 0, Y = 2 };
         public Label diskUsageLabel = new Label { X = 0, Y = 3 };
         public Label networkUsageLabel = new Label { X = 0, Y = 4 };
@@ -59,7 +56,7 @@ namespace c_tier.src.backend.server
             }
         };
 
-        
+
 
         public BackendApp()
         {
@@ -132,7 +129,7 @@ namespace c_tier.src.backend.server
         /// </summary>
         public static void UpdatePerformanceMetrics()
         {
-            while(true) // TODO: find a solution for this pls theres no reason to use a whole thread only for this, right?
+            while (true) // TODO: find a solution for this pls theres no reason to use a whole thread only for this, right?
             {
                 app.cpuUsageLabel.Text = "CPU USAGE: " + Utils.GetCpuUsage();
                 app.memoryUsageLabel.Text = "MEMORY USAGE: " + Utils.GetMemoryUsage();

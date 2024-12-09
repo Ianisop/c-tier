@@ -1,14 +1,8 @@
-﻿using System;
+
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Media;
-using System.Net.NetworkInformation;
+
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
-using c_tier.src.backend.client;
+
 
 namespace c_tier.src.backend.server
 {
@@ -37,7 +31,7 @@ namespace c_tier.src.backend.server
         {
             byte[] salt = new byte[SaltSize];
 
-            using (var rng = RandomNumberGenerator.Create()) 
+            using (var rng = RandomNumberGenerator.Create())
             {
                 rng.GetBytes(salt);
             }
@@ -66,7 +60,7 @@ namespace c_tier.src.backend.server
 
             bool validPassword = VerifyPassword(password, hashedPassword);
 
-            if (!validPassword) 
+            if (!validPassword)
             {
                 throw new InvalidDataException("Invalid password for: " + username);
             }

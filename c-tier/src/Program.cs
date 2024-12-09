@@ -1,6 +1,6 @@
-﻿using c_tier.src.backend.server;
+using c_tier.src.backend.server;
 using c_tier.src.backend.client;
-using System;
+
 
 namespace c_tier.src.program
 {
@@ -9,7 +9,7 @@ namespace c_tier.src.program
         static void Main(string[] args)
         {
             Console.WriteLine("Select mode: Type 'server' to run as server, or 'client' to run as client.");
-             string mode = Console.ReadLine()?.ToLower();
+            string mode = Console.ReadLine()?.ToLower();
             //string mode = "client";
 
             if (mode == "server" || mode == "s")
@@ -21,7 +21,7 @@ namespace c_tier.src.program
             {
                 Console.Clear();
                 ClientFrontend.Init();
-             
+
             }
             else
             {

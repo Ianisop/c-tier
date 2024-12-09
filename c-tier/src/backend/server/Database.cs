@@ -1,14 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data.SQLite;
-using System.Data.Common;
-using System.Data;
-using c_tier.src;
-using System.Threading.Channels;
-using System.Drawing.Printing;
+
 
 namespace c_tier.src.backend.server
 {

@@ -1,9 +1,5 @@
-﻿using c_tier.src.backend.client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using c_tier.src.backend.client;
+
 
 namespace c_tier.src.backend.server
 {
@@ -14,7 +10,7 @@ namespace c_tier.src.backend.server
 
         public UserTimer()
         {
-        
+
         }
     }
 

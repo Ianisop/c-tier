@@ -1,22 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
-using System.Diagnostics;
 using c_tier.src.backend.client;
-using System.Security.Cryptography.X509Certificates;
 using System.Data.SQLite;
-using System.Drawing.Printing;
-using System.Reflection;
-using System.Timers;
-using System.Threading;
-using System.Data;
-using System.Reflection;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
+
 
 
 namespace c_tier.src.backend.server
@@ -34,7 +21,6 @@ namespace c_tier.src.backend.server
         {
             roleName = "Owner",
             permLevel = 9,
-            
         };
 
         public static List<Channel> channels = new List<Channel>()
@@ -70,17 +56,17 @@ namespace c_tier.src.backend.server
                 string[] serverCommandFiles = Directory.GetFiles("src/backend/server-commands", "*.cs");
 
                 //If theres no config data, quit
-                if (config == null) 
+                if (config == null)
                 {
                     ServerFrontend.Log("SYSTEM: NO SERVER CONFIG FOUND. PLEASE CREATE A server_config.json FILE IN THE SOURCE (SRC) DIRECTORY.");
                     return;
                 }
 
                 IPEndPoint endPoint = new IPEndPoint(IPAddress.Any, config.port);
-          
+
 
                 ServerFrontend.Log(Utils.GREEN + "SYSTEM: Loaded server config...");
-                
+
 
                 ServerFrontend.Log(Utils.GREEN + "SYSTEM: Loading endpoints...");
 
@@ -98,11 +84,11 @@ namespace c_tier.src.backend.server
                 ServerFrontend.LogError($"Something went wrong! Stopping! {e.Message}");
             }
             ServerFrontend.Log("SERVER: Running on " + ipAddress.ToString());
-            Task.Run(() => ServerFrontend.UpdatePerformanceMetrics()); // update performance labels in the backend 
+            Task.Run(() => ServerFrontend.UpdatePerformanceMetrics()); // update performance labels in the backend
             Work();
         }
 
-      
+
         public static void Stop()
         {
             serverSocket.Close();
@@ -119,7 +105,7 @@ namespace c_tier.src.backend.server
 
                 while (true)
                 {
-                    
+
                     // Accept an incoming connection
                     Socket clientSocket = serverSocket.Accept();
 
@@ -128,7 +114,7 @@ namespace c_tier.src.backend.server
                     // Handle the client's communication asynchronously
                     Task.Run(() => HandleClientCommunication(clientSocket));
 
-                    
+
                 }
             }
             catch (Exception ex)
@@ -164,9 +150,9 @@ namespace c_tier.src.backend.server
                         break; // command found
                     }
                 }
-                
+
             }
-            
+
         }
 
 
@@ -188,15 +174,15 @@ namespace c_tier.src.backend.server
                     string[] aux = receivedText.Split(" ");
 
                     //route to the right endpoint
-                   // Console.WriteLine(aux[0]);
-            
+                    // Console.WriteLine(aux[0]);
 
-                    foreach(var endpoint in endpoints)
+
+                    foreach (var endpoint in endpoints)
                     {
                         if (endpoint.destination.Equals(aux[0]))
-                        { 
+                        {
                             endpoint.Route(clientSocket, receivedText, users);
-                            ServerFrontend.Log("SERVER: Routing to endpoint " + endpoint.destination +"! (" + receivedText + ")");
+                            ServerFrontend.Log("SERVER: Routing to endpoint " + endpoint.destination + "! (" + receivedText + ")");
                         }
                     }
 
@@ -279,7 +265,7 @@ namespace c_tier.src.backend.server
         {
             Channel aux = channels.Find(x => x.channelName == newChannelName); // Check if theres a channel with the same name already
             if (aux != null) return false; // channel already exists
-            Channel newChannel = new Channel(newChannelName, newChannelDesc, minRolePermLevel,welcomeMessage);
+            Channel newChannel = new Channel(newChannelName, newChannelDesc, minRolePermLevel, welcomeMessage);
             channels.Add(newChannel);
             ServerFrontend.Log("SYSTEM: CREATED NEW CHANNEL " + newChannelName);
             return true;
