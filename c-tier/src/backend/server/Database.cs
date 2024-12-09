@@ -241,6 +241,32 @@ namespace c_tier.src.backend.server
             return channels;
         }
 
+        public static List<(UInt64 userID, string username, int createdAt)> GetUser(UInt64 userID)
+        {
+            string sql = @"
+            SELECT 
+            users.userid,
+            users.username,
+            users.timestamp
+            FROM users WHERE userid == @userid";
+
+            using var command = new SQLiteCommand(sql, dbConnection);
+            command.Parameters.AddWithValue("@userid", userID);
+
+            var user = new List<(UInt64 userID, string username, int createdAt)>();
+            using var reader = command.ExecuteReader();
+            while (reader.Read()) { 
+                var username = reader.GetString(1);
+                var createdAt = reader.GetInt32(2);
+
+                user.Add((userID, username, createdAt));
+            }
+
+            return user;
+        }
+
+
+
         public static List<(int messageID, string content, int authorID, string authorName)> GetChannelMessages(int channelId, int limit, int offset)
         {
             string sql = @"
