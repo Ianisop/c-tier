@@ -68,6 +68,7 @@ namespace c_tier.src.backend.server
                 config = Utils.ReadFromFile<ServerConfigData>("src/server_config.json"); // load the server config
                 string[] endpointFiles = Directory.GetFiles("src/backend/endpoints", "*.cs");
                 string[] serverCommandFiles = Directory.GetFiles("src/backend/server-commands", "*.cs");
+
                 //If theres no config data, quit
                 if (config == null) 
                 {
@@ -91,7 +92,6 @@ namespace c_tier.src.backend.server
                 SQLiteConnection tempdb = Database.InitDatabase("db.db");// try some other shit
                 ServerFrontend.Log("SYSTEM: Found " + channels.Count + " channels, " + serverRoles.Count + " roles!");
                 serverSocket.Bind(endPoint);
-                serverSocket.Listen(1); // Backlog 1 connection
             }
             catch (Exception e)
             {

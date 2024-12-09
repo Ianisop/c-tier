@@ -15,7 +15,7 @@ namespace c_tier.src.backend.server
     public class BackendApp
     {
 
-        public Window consoleWindow = new Window("Console") { X = 40, Y = 40, Width = 40, Height = Dim.Percent(30) };
+        public Window consoleWindow = new Window("Console") { X = 40, Y = 40, Width = 40, Height = 4 };
         public Window serverInfoWindow = new Window("Logs") { X = 0, Y = 0, Width = 40, Height = Dim.Percent(100) };
         public Window errorWindow = new Window("Errors") { X = 40, Y = 0, Width = 50, Height = Dim.Percent(70),
             ColorScheme = new ColorScheme
@@ -49,7 +49,7 @@ namespace c_tier.src.backend.server
         public TextField consoleInputField = new TextField
         {
             X = 0,
-            Y = Pos.AnchorEnd(5),
+            Y = 1,
             Width = 40,
             Height = 20,
             ColorScheme = new ColorScheme
@@ -59,21 +59,8 @@ namespace c_tier.src.backend.server
             }
         };
 
-        public TextField consoleLogHistory = new TextField
-        {
-            X = 0,
-            Y = Pos.AnchorEnd(0),
-            Width = 40,
-            Height = 20,
-            ColorScheme = new ColorScheme
-            {
-                Normal = Application.Driver.MakeAttribute(Color.Green, Color.DarkGray),
-                Focus = Application.Driver.MakeAttribute(Color.Green, Color.Black),
-            }
-        };
         
 
-        // public Button generalChannelButton = new Button {Text= "General"};
         public BackendApp()
         {
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black);
@@ -83,7 +70,7 @@ namespace c_tier.src.backend.server
 
             //Setup base widgets
             performanceWindow.Add(cpuUsageLabel, memoryUsageLabel, networkUsageLabel, diskUsageLabel);
-            consoleWindow.Add(consoleInputField, consoleLogHistory);
+            consoleWindow.Add(consoleInputField);
             errorWindow.Add(debugLogHistory);
             serverInfoWindow.Add(debugLogHistory);
 
@@ -140,22 +127,16 @@ namespace c_tier.src.backend.server
             app.errorWindow.Text += "\n" + message;
         }
 
-        public static void LogToConsole(string message)
-        {
-            app.consoleLogHistory.Text += "\n" + message;
-        }
-
         /// <summary>
         /// Updates performance metrics
         /// </summary>
         public static void UpdatePerformanceMetrics()
         {
-            while(true)
+            while(true) // TODO: find a solution for this pls theres no reason to use a whole thread only for this, right?
             {
                 app.cpuUsageLabel.Text = "CPU USAGE: " + Utils.GetCpuUsage();
                 app.memoryUsageLabel.Text = "MEMORY USAGE: " + Utils.GetMemoryUsage();
                 app.diskUsageLabel.Text = "DISK USAGE: NaN";
-           
                 app.networkUsageLabel.Text = "NETWORK USAGE:\n" + Utils.GetNetworkUsage();
             }
 

@@ -26,7 +26,7 @@ namespace c_tier.src.backend.commands
             {
                 User targetUser = Server.FindUserByUsername(username);
                 targetUser.AddRole(Server.ownerRole);
-                ServerFrontend.LogToConsole("Command " + input + " executed!");
+                ServerFrontend.Log("Command " + input + " executed!");
             } catch(Exception ex) //in case anything goes wrong
             {
                 ServerFrontend.LogError("Failed to execute " + input + " because " + ex.Message);

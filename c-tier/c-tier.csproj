@@ -37,9 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="src\secret.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="src\server_config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
