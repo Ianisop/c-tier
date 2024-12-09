@@ -1,19 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Text.Json;
-using System.Security.Policy;
-using System.Security.Cryptography;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Net.NetworkInformation;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using System.Threading;
 using Microsoft.CodeAnalysis;
-using Microsoft.CSharp;
-using System.Reflection;
 using Microsoft.CodeAnalysis.CSharp;
-using c_tier.src.backend.client;
-
+using System.Reflection;
 
 namespace c_tier.src
 {
@@ -40,48 +37,37 @@ namespace c_tier.src
             PropertyNameCaseInsensitive = true,
         };
 
-        private static readonly char[] DefaultCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".ToCharArray(); // char set for string generation
-        /// <summary>
-        /// Serializes json into object, optionally pass JsonSerializerOptions if you dont want to use the default ones
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="filePath"></param>
-        /// <returns> :shrug: </returns>
+        private static readonly char[] DefaultCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".ToCharArray();
+
         public static T ReadFromFile<T>(string filePath, JsonSerializerOptions options = null)
         {
             try
             {
-
                 string jsonContent = File.ReadAllText(filePath);
-                if (options != null) return JsonSerializer.Deserialize<T>(jsonContent, options);
-                return JsonSerializer.Deserialize<T>(jsonContent, defaultJsonSerializerOptions);
+                return JsonSerializer.Deserialize<T>(jsonContent, options ?? defaultJsonSerializerOptions);
             }
             catch (Exception ex)
             {
-                // Console.WriteLine($"Error reading or deserializing file: {ex.Message}");
-                ClientFrontend.Log(ex.Message);
+                Console.WriteLine($"Error reading file: {ex.Message}");
                 return default;
             }
         }
-        public static bool WriteToFile(object tempObj,string fileName)
+
+        public static bool WriteToFile(object tempObj, string fileName)
         {
             try
             {
-
-                string jsonString = JsonSerializer.Serialize(tempObj);
+                string jsonString = JsonSerializer.Serialize(tempObj, defaultJsonSerializerOptions);
                 File.WriteAllText(fileName, jsonString);
                 return true;
             }
             catch (Exception ex)
             {
-                // Console.WriteLine($"Error reading or deserializing file: {ex.Message}");
-                ClientFrontend.Log(ex.Message);
+                Console.WriteLine($"Error writing to file: {ex.Message}");
                 return false;
             }
         }
 
-        //method to load instances of an abstract class
-        // Dynamic method to load instances of a specified base class or interface
         public static List<T> LoadAndCreateInstances<T>(string[] csFiles)
         {
             var syntaxTrees = csFiles.Select(file => CSharpSyntaxTree.ParseText(File.ReadAllText(file))).ToList();
@@ -112,7 +98,6 @@ namespace c_tier.src
                 ms.Seek(0, SeekOrigin.Begin);
                 var assembly = Assembly.Load(ms.ToArray());
 
-                // Find all types that inherit from or implement T
                 var baseClassType = typeof(T);
                 if (!baseClassType.IsClass && !baseClassType.IsInterface)
                 {
@@ -121,7 +106,6 @@ namespace c_tier.src
 
                 var types = assembly.GetTypes().Where(t => baseClassType.IsAssignableFrom(t) && !t.IsAbstract);
 
-                // Create instances of the found types
                 var instances = new List<T>();
                 foreach (var type in types)
                 {
@@ -132,58 +116,49 @@ namespace c_tier.src
                 return instances;
             }
         }
-        public static UInt64 GenerateID(int length)
+
+        public static ulong GenerateID(int length)
         {
-            long timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            byte[] randomBytes = new byte[8];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(randomBytes);
-            }
-            UInt64 randomPort = BitConverter.ToUInt64(randomBytes, 0);
-            string combined = timestamp.ToString() + randomPort.ToString();
-            using (var sha256 =  SHA256.Create())
-            {
-                byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(combined));
-                UInt64 id = BitConverter.ToUInt64(hash, 0);
-                string idString = id.ToString().Substring(0, Math.Min(length,id.ToString().Length));
-                return UInt64.Parse(idString);
-            }
+            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            var randomBytes = new byte[8];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
+
+            ulong randomPart = BitConverter.ToUInt64(randomBytes, 0);
+            string combined = timestamp.ToString() + randomPart;
+            using var sha256 = SHA256.Create();
+            byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(combined));
+            ulong id = BitConverter.ToUInt64(hash, 0);
+            return ulong.Parse(id.ToString().Substring(0, Math.Min(length, id.ToString().Length)));
         }
-        
+
         public static string GenerateRandomString(int length)
         {
-            if (length <= 0)
-            {
-                return "";
-            }
-
-            char[] characters = (new string(DefaultCharacters)).ToCharArray();
-            StringBuilder result = new StringBuilder(length);
-            Random random = new Random();
-
-            for (int i = 0; i < length; i++)
-            {
-                result.Append(characters[random.Next(characters.Length)]);
-            }
-
-            return result.ToString();
+            if (length <= 0) return "";
+            var random = new Random();
+            return new string(Enumerable.Repeat(DefaultCharacters, length)
+                                        .Select(chars => chars[random.Next(chars.Length)]).ToArray());
         }
 
-        public static string GetCpuUsage()
+        public static double GetCpuUsage()
         {
             try
             {
-                var cpuCounter = new PerformanceCounter("Process", "% Processor Time", Process.GetCurrentProcess().ProcessName);
-                cpuCounter.NextValue(); // init the counter
-                System.Threading.Thread.Sleep(1000);
-                float cpuUsage = cpuCounter.NextValue();
-                return $"{cpuUsage}%";
+                var stopwatch = Stopwatch.StartNew();
+                var startCpuTime = Process.GetCurrentProcess().TotalProcessorTime;
+
+                Thread.Sleep(500);
+
+                var endCpuTime = Process.GetCurrentProcess().TotalProcessorTime;
+                stopwatch.Stop();
+
+                var cpuUsage = (endCpuTime - startCpuTime).TotalMilliseconds / (Environment.ProcessorCount * stopwatch.ElapsedMilliseconds);
+                return Math.Round(cpuUsage * 100, 2);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error fetching CPU usage: {ex.Message}");
-                return "Error fetching CPU usage";
+                return -1;
             }
         }
 
@@ -191,22 +166,18 @@ namespace c_tier.src
         {
             try
             {
-                NetworkInterface[] networkInterfaces = NetworkInterface.GetAllNetworkInterfaces();
-                StringBuilder networkStats = new StringBuilder();
-
-                networkStats.AppendLine("---------------");
-                foreach (var ni in networkInterfaces)
+                var sb = new StringBuilder();
+                foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
                 {
                     if (ni.OperationalStatus == OperationalStatus.Up)
                     {
-                        IPv4InterfaceStatistics stats = ni.GetIPv4Statistics();
-                        networkStats.AppendLine($"Network Interface: {ni.Name}");
-                        networkStats.AppendLine($"Bytes Sent: {stats.BytesSent / 1024} KB");
-                        networkStats.AppendLine($"Bytes Received: {stats.BytesReceived / 1024} KB");
-                        networkStats.AppendLine("---------------");
+                        var stats = ni.GetIPv4Statistics();
+                        sb.AppendLine($"Interface: {ni.Name}");
+                        sb.AppendLine($"Bytes Sent: {stats.BytesSent / 1024} KB");
+                        sb.AppendLine($"Bytes Received: {stats.BytesReceived / 1024} KB");
                     }
                 }
-                return networkStats.Length > 0 ? networkStats.ToString() : "No active network interfaces found.";
+                return sb.ToString();
             }
             catch (Exception ex)
             {
@@ -219,9 +190,8 @@ namespace c_tier.src
         {
             try
             {
-                Process currentProcess = Process.GetCurrentProcess();
-                long memoryUsage = currentProcess.WorkingSet64; // in bytes
-                return $"{(memoryUsage / (1024 * 1024))} MB"; // mb convertion
+                using var currentProcess = Process.GetCurrentProcess();
+                return $"{(currentProcess.WorkingSet64 / 1024 / 1024)} MB";
             }
             catch (Exception ex)
             {
@@ -229,8 +199,5 @@ namespace c_tier.src
                 return "Error fetching memory usage";
             }
         }
-
     }
 }
-
-

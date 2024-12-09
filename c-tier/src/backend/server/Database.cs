@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,9 +21,9 @@ namespace c_tier.src.backend.server
             var connectionString = $"Data Source={dbPath};Version=3;";
             dbConnection = new SQLiteConnection(connectionString);
             dbConnection.Open();
-            Console.WriteLine(Utils.GREEN+"DATABASE: Up and running!");
+            ServerFrontend.Log("DATABASE: Up and running!");
             CreateTables();
-            Console.WriteLine(Utils.GREEN+"DATABASE: Tables created!");
+            ServerFrontend.Log("DATABASE: Tables created!");
             return dbConnection;
         }
 
@@ -56,7 +56,7 @@ namespace c_tier.src.backend.server
             );";
 
             ExecuteNonQuery(sql);
-            Console.WriteLine(Utils.GREEN + "DATABASE: Created users table.");
+            ServerFrontend.Log(Utils.GREEN + "DATABASE: Created users table.");
         }
 
         private static void CreateChannelsTable()
@@ -74,7 +74,7 @@ namespace c_tier.src.backend.server
             );";
 
             ExecuteNonQuery(sql);
-            Console.WriteLine(Utils.GREEN + "DATABASE: Created channels table.");
+            ServerFrontend.Log(Utils.GREEN + "DATABASE: Created channels table.");
         }
 
         private static void CreateMessageTable()
@@ -91,7 +91,7 @@ namespace c_tier.src.backend.server
             );";
 
             ExecuteNonQuery(sql);
-            Console.WriteLine(Utils.GREEN + "DATABASE: Created messages table.");
+            ServerFrontend.Log(Utils.GREEN + "DATABASE: Created messages table.");
         }
 
         private static void CreateUserChannelsTable()
@@ -106,7 +106,7 @@ namespace c_tier.src.backend.server
             );";
 
             ExecuteNonQuery(sql);
-            Console.WriteLine(Utils.GREEN + "DATABASE: Created user_channels table.");
+            ServerFrontend.Log(Utils.GREEN + "DATABASE: Created user_channels table.");
         }
 
         private static void CreateDMsTable()
@@ -121,7 +121,7 @@ namespace c_tier.src.backend.server
             );";
 
             ExecuteNonQuery(sql);
-            Console.WriteLine(Utils.GREEN + "DATABASE: Created direct_messages table.");
+            ServerFrontend.Log(Utils.GREEN + "DATABASE: Created direct_messages table.");
         }
 
         private static void CreateDirectMessagesTable()
@@ -138,7 +138,7 @@ namespace c_tier.src.backend.server
             );";
 
             ExecuteNonQuery(sql);
-            Console.WriteLine(Utils.GREEN + "DATABASE: Created messages_dms table.");
+            ServerFrontend.Log(Utils.GREEN + "DATABASE: Created messages_dms table.");
         }
 
         private static void CreateRolesTable()
@@ -150,7 +150,7 @@ namespace c_tier.src.backend.server
                 permissionlevel INTEGER
             );";
             ExecuteNonQuery(sql);
-            Console.WriteLine(Utils.GREEN + "DATABASE: Created roles table.");
+            ServerFrontend.Log(Utils.GREEN + "DATABASE: Created roles table.");
         }
 
         private static void CreateUserRolesTable()
@@ -165,7 +165,7 @@ namespace c_tier.src.backend.server
             );";
 
             ExecuteNonQuery(sql);
-            Console.WriteLine(Utils.GREEN + "DATABASE: Created user_roles table.");
+            ServerFrontend.Log(Utils.GREEN + "DATABASE: Created user_roles table.");
         }
 
 
@@ -204,13 +204,13 @@ namespace c_tier.src.backend.server
             command.Parameters.AddWithValue("@channelid", channelID);
             command.Parameters.AddWithValue("@timestamp", timestamp);
             command.Parameters.AddWithValue("@messageid", messageID);
-            
+
             command.ExecuteNonQuery();
             return messageID;
         }
 
 
-        public static List<int> GetUserChannels (UInt64 userID)
+        public static List<int> GetUserChannels(UInt64 userID)
         {
             string sql = "SELECT channelid FROM user_channels WHERE userid = @userid";
             using var command = new SQLiteCommand(sql, dbConnection);
@@ -218,7 +218,8 @@ namespace c_tier.src.backend.server
 
             var channels = new List<int>();
             using var reader = command.ExecuteReader();
-            while(reader.Read()) { 
+            while (reader.Read())
+            {
                 channels.Add(reader.GetInt32(0));
             }
 
@@ -244,7 +245,7 @@ namespace c_tier.src.backend.server
         public static List<(UInt64 userID, string username, int createdAt)> GetUser(UInt64 userID)
         {
             string sql = @"
-            SELECT 
+            SELECT
             users.userid,
             users.username,
             users.timestamp
@@ -255,7 +256,8 @@ namespace c_tier.src.backend.server
 
             var user = new List<(UInt64 userID, string username, int createdAt)>();
             using var reader = command.ExecuteReader();
-            while (reader.Read()) { 
+            while (reader.Read())
+            {
                 var username = reader.GetString(1);
                 var createdAt = reader.GetInt32(2);
 
@@ -270,10 +272,10 @@ namespace c_tier.src.backend.server
         public static List<(int messageID, string content, int authorID, string authorName)> GetChannelMessages(int channelId, int limit, int offset)
         {
             string sql = @"
-            SELECT 
-            messages.messageid, 
-            messages.content, 
-            messages.authorid, 
+            SELECT
+            messages.messageid,
+            messages.content,
+            messages.authorid,
             users.name AS authorName
             FROM messages
             INNER JOIN users ON messages.authorid = users.userid
