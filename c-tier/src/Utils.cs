@@ -52,6 +52,7 @@ namespace c_tier.src
         {
             try
             {
+                if (File.Exists(fileName)) File.Delete(fileName); // remove old entry
                 string jsonString = JsonSerializer.Serialize(tempObj, defaultJsonSerializerOptions);
                 File.WriteAllText(fileName, jsonString);
                 return true;
@@ -194,5 +195,95 @@ namespace c_tier.src
                 return "Error fetching memory usage";
             }
         }
+
+        public static string ConvertKeyToString(RSAParameters pubKey)
+        {
+            string pubKeyString;
+            {
+                //we need some buffer
+                var sw = new System.IO.StringWriter();
+                //we need a serializer
+                var xs = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+                //serialize the key into the stream
+                xs.Serialize(sw, pubKey);
+                //get the string from the stream
+                pubKeyString = sw.ToString();
+            }
+            return pubKeyString;
+        }
+
+        public static RSAParameters ConvertStringToKey(string pubKeyString)
+        {
+
+            //get a stream from the string
+            var sr = new System.IO.StringReader(pubKeyString);
+            //we need a deserializer
+            var xs = new System.Xml.Serialization.XmlSerializer(typeof(RSAParameters));
+            //get the object back from the stream
+            var pubKey = (RSAParameters)xs.Deserialize(sr);
+            return pubKey;
+
+        }
+
+
+        public static string Encrypt(string data, RSAParameters pubKey)
+        {
+            var csp = new RSACryptoServiceProvider();
+
+            csp.ImportParameters(pubKey);
+
+
+            //for encryption, always handle bytes...
+            var bytesPlainTextData = System.Text.Encoding.Unicode.GetBytes(data);
+
+            //apply pkcs#1.5 padding and encrypt our data 
+            var bytesCypherText = csp.Encrypt(bytesPlainTextData, false);
+
+            //convert to base64 string
+            var cypherText = Convert.ToBase64String(bytesCypherText);
+            csp.Dispose();
+            return cypherText;
+        }
+
+        public static string Decrypt(string data, RSAParameters privKey)
+        {
+            //first, get our bytes back from the base64 string ...
+            var bytesCypherText = Convert.FromBase64String(data);
+
+            //we want to decrypt, therefore we need a csp and load our private key
+            var csp = new RSACryptoServiceProvider();
+
+            csp.ImportParameters(privKey);
+
+            //decrypt and strip pkcs#1.5 padding
+            var bytesPlainTextData = csp.Decrypt(bytesCypherText, false);
+
+            //get our original plainText back...
+            var plainTextData = System.Text.Encoding.Unicode.GetString(bytesPlainTextData);
+            csp.Dispose();
+            return plainTextData;
+        }
+
+
+        public static RSAParameters[] GenerateKeyPair()
+        {
+            //lets take a new CSP with a new 2048 bit rsa key pair
+            var csp = new RSACryptoServiceProvider(2048);
+
+            //how to get the private key
+            var privKey = csp.ExportParameters(true);
+
+            //and the public key ...
+            var pubKey = csp.ExportParameters(false);
+
+            RSAParameters[] array = [privKey, pubKey]; // make sure private key is first always please
+
+
+
+            csp.Dispose(); // get rid of the old one
+            return array;
+            
+        }
     }
 }
+

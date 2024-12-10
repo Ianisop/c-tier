@@ -3,6 +3,7 @@ using System.Net;
 using System.Text;
 using c_tier.src.backend.client;
 using System.Data.SQLite;
+using System.Security.Cryptography;
 
 
 
@@ -16,6 +17,7 @@ namespace c_tier.src.backend.server
         public static List<Endpoint> endpoints = new List<Endpoint>();
         public static List<ServerCommand> commands = new List<ServerCommand>();
         public static ServerConfigData config;
+        protected static RSAParameters[] rsaKeys = new RSAParameters[2]; // private key at index 0, public key at index 1
 
         public static readonly Role ownerRole = new Role()
         {
@@ -76,6 +78,16 @@ namespace c_tier.src.backend.server
 
                 SQLiteConnection tempdb = Database.InitDatabase("db.db");// try some other shit
                 ServerFrontend.Log("SYSTEM: Found " + channels.Count + " channels, " + serverRoles.Count + " roles!");
+                ServerFrontend.Log("SYSTEM: Generating RSA keyPair of size 2048...");
+                rsaKeys = Utils.GenerateKeyPair();
+
+                var priv = Utils.ConvertKeyToString(rsaKeys[0]);
+                var pub = Utils.ConvertKeyToString(rsaKeys[1]);
+
+                Utils.WriteToFile(priv,"privateKey.txt");
+                Utils.WriteToFile(pub,"publicKey.txt");
+
+                ServerFrontend.Log("SYSTEM: Keys generated!");
                 serverSocket.Bind(endPoint);
             }
             catch (Exception e)
