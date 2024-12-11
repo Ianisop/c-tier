@@ -34,6 +34,10 @@ namespace c_tier.src
 
         private static readonly char[] DefaultCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".ToCharArray();
 
+        private static Dictionary<string, (long bytesSent, long bytesReceived)> previousStats = new();
+        private static Dictionary<string, (long bytesSent, long bytesReceived)> totalStats = new();
+        private static DateTime lastNetworkUpdate = DateTime.Now;
+
         public static T ReadFromFile<T>(string filePath, JsonSerializerOptions options = null)
         {
             try
@@ -162,14 +166,31 @@ namespace c_tier.src
             try
             {
                 var sb = new StringBuilder();
+                var currentTime = DateTime.Now;
+                double sinceLast = (currentTime - lastNetworkUpdate).TotalSeconds;
+
                 foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
                 {
                     if (ni.OperationalStatus == OperationalStatus.Up)
                     {
                         var stats = ni.GetIPv4Statistics();
+                        long currentBytesSent = stats.BytesSent;
+                        long currentBytesReceived = stats.BytesReceived;
+
+                        if (!previousStats.ContainsKey(ni.Name))
+                        {
+                            previousStats[ni.Name] = (currentBytesSent, currentBytesReceived);
+                            totalStats[ni.Name] = (currentBytesSent, currentBytesReceived);
+                        }
+
+                        var (prevSent, prevRecieved) = previousStats[ni.Name];
+                        var (totalSent, totalRecieved) = totalStats[ni.Name];
+
                         sb.AppendLine($"Interface: {ni.Name}");
-                        sb.AppendLine($"Bytes Sent: {stats.BytesSent / 1024} KB");
-                        sb.AppendLine($"Bytes Received: {stats.BytesReceived / 1024} KB");
+                        sb.AppendLine($"Recieved: {((currentBytesSent - prevSent) / sinceLast)/1024:F2} KB/s");
+                        sb.AppendLine($"Transferred: {((currentBytesReceived - prevRecieved) / sinceLast) / 1024:F2} KB/s");
+
+                        previousStats[ni.Name] = (currentBytesSent, currentBytesReceived);
                     }
                 }
                 return sb.ToString();
