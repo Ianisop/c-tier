@@ -58,7 +58,7 @@ Built with C#, c-tier runs natively on Windows, macOS, and Linux, so you can dep
 ### Installation  
 1. Clone the repository:  
   ```
-  git clone https://github.com/yourusername/c-tier.git
+  git clone https://github.com/Ianisop/c-tier.git
   cd c-tier
   ```
 2.Build the project using Visual Studio or the .NET CLI:
