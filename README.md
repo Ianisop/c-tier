@@ -71,13 +71,16 @@ Built with C#, c-tier runs natively on Windows, macOS, and Linux, so you can dep
   dotnet run src/Program.cs
   ```
 ## 📚 Documentation
-Comprehensive documentation is available here. You’ll find:
-
+Comprehensive documentation is available [here](
+https://docs.c-tier.com).
 Step-by-step guides for setting up endpoints.
 Tutorials on creating custom channels and managing permissions.
 Advanced configuration options for the server.
 ## 👥 Community and Support
 Issues & Feedback: Found a bug or have a feature request? Open an issue on GitHub Issues.
+
+You can read about updates and general releases on our [blog](https://blog.c-tier.com).
+
 ## 📜 License
 c-tier is released under the MIT License. Feel free to use, modify, and distribute this software.
 
