@@ -29,10 +29,10 @@ namespace c_tier.src.backend.endpoints
             string password = aux[2];
 
             var user_id = Database.CreateUser(username, password);
-            if (user_id == 0) Server.SendResponse(clientSocket, "Account request failed");
+            if (user_id == 0) Server.SendResponseEncrypted(clientSocket, "Account request failed");
             else
             {
-                Server.SendResponse(clientSocket, ".ACCOUNTOK");
+                Server.SendResponseEncrypted(clientSocket, ".ACCOUNTOK");
                 ServerFrontend.Log("SERVER: Account created for user " + username);
                 Task.Run(() => clientSocket.Disconnect(true));
                 ServerFrontend.Log("SERVER: Disconnecting client " + username);

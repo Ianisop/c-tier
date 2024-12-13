@@ -234,7 +234,7 @@ namespace c_tier.src
 
 
             //for encryption, always handle bytes...
-            var bytesPlainTextData = System.Text.Encoding.Unicode.GetBytes(data);
+            var bytesPlainTextData = Encoding.Unicode.GetBytes(data);
 
             //apply pkcs#1.5 padding and encrypt our data 
             var bytesCypherText = csp.Encrypt(bytesPlainTextData, false);
