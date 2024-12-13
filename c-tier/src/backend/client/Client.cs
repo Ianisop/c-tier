@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Terminal.Gui;
@@ -19,14 +20,15 @@ namespace c_tier.src.backend.client
         private bool isSpeaking = false;
         protected User localUser;
         public bool isConnected = false;
-
+        public RSAParameters[] rsaKeys;
+        public string serverPubKey;
 
         public Client()
         {
 
             ServerInfo serverData = Utils.ReadFromFile<ServerInfo>("src/secret.json");
             remoteEndPoint = new IPEndPoint(IPAddress.Parse(serverData.ip), serverData.port);
-
+            rsaKeys = Utils.GenerateKeyPair();
         }
 
 
@@ -123,19 +125,39 @@ namespace c_tier.src.backend.client
         }
         public void Connect()
         {
-            JsonSerializerOptions options = new()
-            {
-                IncludeFields = true,
-                PropertyNameCaseInsensitive = true
-            };
-
             localUser.socket = clientSocket;
             ClientFrontend.Log("Trying socket connection...");
             clientSocket.Connect(remoteEndPoint);
             isConnected = true;
             ClientFrontend.Log("Connection established...");
 
-            Login(); // try logging in
+            byte[] buffer = new byte[1024];
+
+            while (true)
+            {
+                int receivedBytes = clientSocket.Receive(buffer);
+                if (receivedBytes == 0) break; // Server closed the connection
+                string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+                ClientFrontend.Log($"Received from server: {receivedText}");
+                if(receivedText.StartsWith(".KEYOK"))
+                {
+                    Login();
+                    break;
+                }
+                if (receivedText.StartsWith(".key|"))
+                {
+                    string[] tokens = receivedText.Split("|");
+                    serverPubKey = tokens[1];
+                    var data = ".key|" + Utils.ConvertKeyToString(rsaKeys[1]);
+                    byte[] rawData = Encoding.UTF8.GetBytes(data);
+                    clientSocket.Send(rawData);
+                    ClientFrontend.Log($"Sending message: {data}");
+                    ClientFrontend.Log("Sent key back!");
+                    
+                }
+
+            }
+
             ClientFrontend.Update();
 
             // Start a background task to listen for incoming messages from the server
@@ -147,7 +169,7 @@ namespace c_tier.src.backend.client
         {
             ClientFrontend.Log("logging in!");
             string message = ".login " + localUser.username + " " + localUser.password.ToString();
-            Speak(message);
+            SpeakEncrypted(message);
             ClientFrontend.Update();
         }
 
@@ -164,8 +186,10 @@ namespace c_tier.src.backend.client
                 {
                     int receivedBytes = clientSocket.Receive(buffer);
                     if (receivedBytes == 0) break; // Server closed the connection
-
-                    string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+                    ClientFrontend.Log("Received data from server.");
+                    string message = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+                    ClientFrontend.Log("Received message from server: " + message);
+                    string receivedText = Utils.Decrypt(message, rsaKeys[0]); // decrypt
 
                     ClientFrontend.Log($"Received from server: {receivedText}");
 
@@ -191,7 +215,7 @@ namespace c_tier.src.backend.client
                     }
                     if (receivedText.StartsWith(".SENDTOKEN"))
                     {
-                        Speak(".validate " + localUser.sessionToken);
+                        SpeakEncrypted(".validate " + localUser.sessionToken);
                         //Frontend.Log("Validating session");
                         isSpeaking = false;
                     }
@@ -238,6 +262,23 @@ namespace c_tier.src.backend.client
         }
 
 
+        /// <summary>
+        /// Method to send an encrypted message to the server
+        /// </summary>
+        /// <param name="message"></param>
+        public void SpeakEncrypted(string message)
+        {
+            if (isSpeaking) return; // this ensures it only sends one message (not really)
+
+            isSpeaking = true;
+            var encrypted = Utils.Encrypt(message, Utils.ConvertStringToKey(serverPubKey));
+            byte[] rawData = Convert.FromBase64String(encrypted);
+            clientSocket.Send(rawData);
+            ClientFrontend.Log($"Sending encrypted message: {message}");
+            isSpeaking = false;
+
+
+        }
         public string GetUsername()
         {
             if (localUser != null) return localUser.username;

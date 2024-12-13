@@ -3,6 +3,7 @@ using System.Net;
 using System.Text;
 using c_tier.src.backend.client;
 using System.Data.SQLite;
+using System.Security.Cryptography;
 
 
 
@@ -16,6 +17,8 @@ namespace c_tier.src.backend.server
         public static List<Endpoint> endpoints = new List<Endpoint>();
         public static List<ServerCommand> commands = new List<ServerCommand>();
         public static ServerConfigData config;
+        protected static RSAParameters[] rsaKeys = new RSAParameters[2]; // private key at index 0, public key at index 1
+        protected static Dictionary<Socket,RSAParameters> socketKeyPairs = new Dictionary<Socket,RSAParameters>();
 
         public static readonly Role ownerRole = new Role()
         {
@@ -76,6 +79,9 @@ namespace c_tier.src.backend.server
 
                 SQLiteConnection tempdb = Database.InitDatabase("db.db");// try some other shit
                 ServerFrontend.Log("SYSTEM: Found " + channels.Count + " channels, " + serverRoles.Count + " roles!");
+                ServerFrontend.Log("SYSTEM: Generating RSA keyPair of size 2048...");
+                rsaKeys = Utils.GenerateKeyPair();
+                ServerFrontend.Log("SYSTEM: Keys generated!");
                 serverSocket.Bind(endPoint);
             }
             catch (Exception e)
@@ -99,6 +105,9 @@ namespace c_tier.src.backend.server
             {
                 ServerFrontend.Log($"SERVER: Listening on port {config.port}...");
 
+                // Receive key from client
+                byte[] buffer = new byte[2048];
+
                 // Start listening for incoming connections
                 serverSocket.Listen(10); // Backlog of 10 connections
 
@@ -110,11 +119,23 @@ namespace c_tier.src.backend.server
 
                     ServerFrontend.Log($"SERVER: Client connected.");
 
+                    SendResponse(clientSocket, ".key|" + Utils.ConvertKeyToString(rsaKeys[1]));
+
+                    int receivedBytes = clientSocket.Receive(buffer);
+
+                    string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+                    ServerFrontend.Log("DATA: " + receivedText);
+                    string[] aux = receivedText.Split("|");
+                    socketKeyPairs[clientSocket] = Utils.ConvertStringToKey(aux[1]); // cache the key
+                    SendResponse(clientSocket, ".KEYOK");
                     // Handle the client's communication asynchronously
                     Task.Run(() => HandleClientCommunication(clientSocket));
+                    
+                    
 
 
                 }
+  
             }
             catch (Exception ex)
             {
@@ -169,7 +190,11 @@ namespace c_tier.src.backend.server
                 {
                     int receivedBytes = clientSocket.Receive(buffer);
                     if (receivedBytes == 0) break; // Client disconnected
-                    string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+                    string message = Convert.ToBase64String(buffer, 0, receivedBytes);
+                    ServerFrontend.Log("Decrypting data");
+                    string receivedText = Utils.Decrypt(message, rsaKeys[0]);
+                    
+                    ServerFrontend.Log("DATA: " + receivedText);
                     string[] aux = receivedText.Split(" ");
 
                     //route to the right endpoint
@@ -245,13 +270,11 @@ namespace c_tier.src.backend.server
         private static void UpdateClientsAndHost(string message, Socket host)
         {
 
-            byte[] msgBytes = Encoding.UTF8.GetBytes(message);
-
             users.TryGetValue(host, out var user);
 
             foreach (var socket in user.currentChannel.users.Keys)
             {
-                socket.Send(msgBytes); // bye bye
+                SendResponseEncrypted(socket,message);
             }
         }
 
@@ -278,6 +301,14 @@ namespace c_tier.src.backend.server
         public static void SendResponse(Socket clientSocket, string responseText)
         {
             byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
+            clientSocket.Send(responseBytes);
+        }
+
+        public static void SendResponseEncrypted(Socket clientSocket, string responseText)
+        {
+            string encrypted = Utils.Encrypt(responseText, socketKeyPairs[clientSocket]);
+            byte[] plainBytes = Encoding.UTF8.GetBytes(encrypted);
+            byte[] responseBytes = Convert.FromBase64String(Convert.ToBase64String(plainBytes));
             clientSocket.Send(responseBytes);
         }
 

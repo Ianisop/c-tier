@@ -102,7 +102,7 @@ namespace c_tier.src.backend.client
             {
                 if (e.KeyEvent.Key == Key.Enter && app.chatInputField.HasFocus && !app.chatInputField.Text.IsEmpty) // focus doesnt work
                 {
-                    client.Speak(app.chatInputField.Text.ToString()); // Send the message to the server
+                    client.SpeakEncrypted(app.chatInputField.Text.ToString()); // Send the message to the server
                     app.chatInputField.Text = "";
                 }
             };

@@ -31,7 +31,7 @@ namespace c_tier.src.backend.endpoints
             else
             {
                 ServerFrontend.Log("SYSTEM: Invalid token. Disconnecting client.");
-                Server.SendResponse(clientSocket, "Error: Invalid session token.");
+                Server.SendResponseEncrypted(clientSocket, "Error: Invalid session token.");
                 clientSocket.Disconnect(true);
 
             }
