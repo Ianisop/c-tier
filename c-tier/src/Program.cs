@@ -8,7 +8,7 @@ namespace c_tier.src.program
     {
         static void Main(string[] args)
         {
-            // Updater.CheckForUpdate(); // TODO: uncomment when we're actually using this
+            Updater.CheckForUpdate(); // TODO: make settings for disabling/automating this
             Console.WriteLine("Select mode: Type 'server' to run as server, or 'client' to run as client.");
             string mode = Console.ReadLine()?.ToLower();
             //string mode = "client";

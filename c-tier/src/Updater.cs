@@ -12,19 +12,23 @@ namespace c_tier.src
 {
     public static class Updater
     {
-        public static readonly string VERSION = "0.1.0";
+        public static readonly string VERSION = "0.1.1";
 
-        // TODO: currently on test domains as the official CDN isnt running
-        private static readonly string VERSIONURL = "https://cdn.rasmus.zip/latest_overlay.txt"; // "https://cdn.c-tier.com/latest_version";
-        private static readonly string DOWNLOADURL = "https://cdn.rasmus.zip/c-tier.exe"; //Environment.OSVersion.Platform == PlatformID.Win32NT
-           // ? "https://cdn.c-tier.com/latest_windows"
-           // : "https://cdn.c-tier.con/latest_linux";
+        private static readonly string VERSIONURL = "https://cdn.c-tier.com/latest_version.txt";
+        private static readonly string DOWNLOADURL = Environment.OSVersion.Platform switch
+        {
+            PlatformID.Win32NT => "https://cdn.c-tier.com/win-x64.exe",
+            PlatformID.Unix when IsMacOS() => "https://cdn.c-tier.com/osx-x64",
+            PlatformID.Unix when IsLinuxArm64() => "https://cdn.c-tier.com/linux-aarch64",
+            PlatformID.Unix => "https://cdn.c-tier.com/linux-x64"
+        }; // this is a weird looking switch statement but its required to assign a static readonly var. "when" is basically a && case
+        // TODO: make this throw some error if we're on an unknown platform 
 
 
         public static void CheckForUpdate()
         {
             Console.WriteLine("Checking for updates");
-            string currentExe = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, AppDomain.CurrentDomain.FriendlyName);
+            string currentExe = Process.GetCurrentProcess().MainModule.FileName;
             if (currentExe.EndsWith(".dll")) // ignore update check when developing
             {
                 Console.WriteLine("Running as a .dll. Skipping update check"); // this needs fixing later
@@ -126,6 +130,17 @@ namespace c_tier.src
                 Console.WriteLine($"Error updating: {ex.Message}");
                 if (File.Exists(newExePath)) File.Delete(newExePath);
             }
+        }
+
+        private static bool IsMacOS()
+        {
+            return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.OSX);
+        }
+
+        private static bool IsLinuxArm64()
+        {
+            return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux) &&
+                   System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture == System.Runtime.InteropServices.Architecture.Arm64;
         }
     }
 }
