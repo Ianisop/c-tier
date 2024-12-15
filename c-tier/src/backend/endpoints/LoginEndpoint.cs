@@ -63,10 +63,10 @@ public class LoginEndpoint : Endpoint
 
             c_tier.src.backend.server.Channel channel = Server.channels.FirstOrDefault(); // get the default channel to send the client to
 
-            Server.SendResponseEncrypted(clientSocket, ".sessiontoken " + newUser.sessionToken); // send token
+            Server.SpeakEncrypted(clientSocket, ".sessiontoken " + newUser.sessionToken); // send token
             if (newUser.MoveToChannel(channel))
             {
-                Server.SendResponseEncrypted(clientSocket, channel.welcomeMessage + "\n" + "You're in " + newUser.currentChannel.channelName);
+                Server.SpeakEncrypted(clientSocket, channel.welcomeMessage + "\n" + "You're in " + newUser.currentChannel.channelName);
             }
         
        
@@ -81,13 +81,13 @@ public class LoginEndpoint : Endpoint
         if (userTimer.user.validationCounter >= Server.config.badValidationRequestLimit)
         {
             ServerFrontend.Log("SYSTEM: Disconnecting client(failed to validate session)");
-            Server.SendResponseEncrypted(userTimer.user.socket, ".DISCONNECT");
+            Server.SpeakEncrypted(userTimer.user.socket, ".DISCONNECT");
             userTimer.timer.Stop();
             return;
         }
         else
         {
-            Server.SendResponseEncrypted(userTimer.user.socket, ".SENDTOKEN");
+            Server.SpeakEncrypted(userTimer.user.socket, ".SENDTOKEN");
             ServerFrontend.Log("SYSTEM: asked for validation for client " + userTimer.user.username);
             userTimer.user.validationCounter++;
         }

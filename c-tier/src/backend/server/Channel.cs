@@ -5,16 +5,15 @@ using System.Net.Sockets;
 
 namespace c_tier.src.backend.server
 {
-    public class Channel
+    public abstract class Channel 
     {
-        public string channelName;
-        public int channelID;
-        public string channelDescription;
-        public int minRolePermLevel = 1;
-        public int activeMembers;
-        public Dictionary<Socket, User> users = new Dictionary<Socket, User>();
-        public string welcomeMessage;
-
+        abstract public required string channelName { get; set; }
+        abstract public required int channelID { get; set; }
+        abstract public required string channelDescription { get; set; }
+        abstract public required int minRolePermLevel { get; set; }
+        abstract public required int activeMembers { get; set; }
+        abstract public required Dictionary<Socket, User> users { get; set; }
+        abstract public required string welcomeMessage { get; set; }
 
         public Channel(string channelName, string channelDescription, int minRolePermLevel, string welcomeMessage)
         {
@@ -22,11 +21,13 @@ namespace c_tier.src.backend.server
             this.channelDescription = channelDescription;
             this.minRolePermLevel = minRolePermLevel;
             this.welcomeMessage = welcomeMessage;
-
-
+            users = new Dictionary<Socket, User>();
         }
 
-
+        /// <summary>
+        /// Initializes the channel with its values
+        /// </summary>
+        public abstract void Init();
 
     }
 }

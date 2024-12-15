@@ -11,26 +11,25 @@ namespace c_tier.src.backend.server
 {
     public class Server
     {
-        protected static bool shouldStop = true; // Controls if the server should stop working
+        protected static bool shouldStop = true; 
         private static readonly IPAddress ipAddress = IPAddress.Any; // Listen on all network interfaces;
-        private static readonly Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp); // Create a socket
-        public static List<Endpoint> endpoints = new List<Endpoint>();
-        public static List<ServerCommand> commands = new List<ServerCommand>();
-        public static ServerConfigData config;
+        private static readonly Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        public static List<Endpoint> endpoints = new List<Endpoint>(); // List to cache custom endpoints into
+        public static List<ServerCommand> commands = new List<ServerCommand>(); // List to cache serverCommands into
+        public static ServerConfigData config; // fetched from server_config.json
         protected static RSAParameters[] rsaKeys = new RSAParameters[2]; // private key at index 0, public key at index 1
+
+        // Pair rsa public keys with socekts to be able to encrypt for each individual client
         protected static Dictionary<Socket,RSAParameters> socketKeyPairs = new Dictionary<Socket,RSAParameters>();
 
-        public static readonly Role ownerRole = new Role()
+        public static readonly Role ownerRole = new Role() // Role to give to the owner of the server (TODO: Find a better way to do this)
         {
             roleName = "Owner",
             permLevel = 9,
         };
 
-        public static List<Channel> channels = new List<Channel>()
-        { new Channel("General", "The Place to be!",1, "Welcome to General!"),
-         new Channel("General 2", "The Place to be again!",1, "Welcome to General 2!"),
-          new Channel("Staff", "Staff Only!",5, "Welcome to Staff only!")
-        };
+        public static List<Channel> channels = new List<Channel>(); // List to cache channels into
+
 
         public static List<Role> serverRoles = new List<Role>()
         {
@@ -48,7 +47,9 @@ namespace c_tier.src.backend.server
 
         }
 
-
+        /// <summary>
+        /// Starts up and initializes the server and its systems.
+        /// </summary>
         public static void Start()
         {
             shouldStop = false;
@@ -99,6 +100,10 @@ namespace c_tier.src.backend.server
             serverSocket.Close();
         }
 
+
+        /// <summary>
+        /// makes the server work indefinetly 
+        /// </summary>
         private static void Work()
         {
             try
@@ -113,13 +118,12 @@ namespace c_tier.src.backend.server
 
                 while (true)
                 {
-
                     // Accept an incoming connection
                     Socket clientSocket = serverSocket.Accept();
 
                     ServerFrontend.Log($"SERVER: Client connected.");
 
-                    SendResponse(clientSocket, ".key|" + Utils.ConvertKeyToString(rsaKeys[1]));
+                    Speak(clientSocket, ".key|" + Utils.ConvertKeyToString(rsaKeys[1]));
 
                     int receivedBytes = clientSocket.Receive(buffer);
 
@@ -127,15 +131,10 @@ namespace c_tier.src.backend.server
                     ServerFrontend.Log("DATA: " + receivedText);
                     string[] aux = receivedText.Split("|");
                     socketKeyPairs[clientSocket] = Utils.ConvertStringToKey(aux[1]); // cache the key
-                    SendResponse(clientSocket, ".KEYOK");
+                    Speak(clientSocket, ".KEYOK");
                     // Handle the client's communication asynchronously
                     Task.Run(() => HandleClientCommunication(clientSocket));
-                    
-                    
-
-
                 }
-  
             }
             catch (Exception ex)
             {
@@ -163,11 +162,12 @@ namespace c_tier.src.backend.server
                     try
                     {
                         cmd.Execute(command);
+                        break; // command found
                     }
                     catch (Exception ex)
                     {
                         ServerFrontend.LogError("Failed to execute command " + command + " because " + ex.Message);
-                        break; // command found
+                        break; 
                     }
                 }
 
@@ -198,9 +198,6 @@ namespace c_tier.src.backend.server
                     string[] aux = receivedText.Split(" ");
 
                     //route to the right endpoint
-                    // Console.WriteLine(aux[0]);
-
-
                     foreach (var endpoint in endpoints)
                     {
                         if (endpoint.destination.Equals(aux[0]))
@@ -210,12 +207,12 @@ namespace c_tier.src.backend.server
                         }
                     }
 
-                    // If it's just a message ( program shouldnt reach this if a valid command has been entered and processed)
+                    // If it's just a message (program shouldnt reach this if a valid command has been entered and processed)
                     if (!receivedText.StartsWith('.'))
                     {
                         ServerFrontend.Log($"SERVER: Received from client: {receivedText}");
                         if (users.TryGetValue(clientSocket, out var user)) // Find the user
-                            UpdateClientsAndHost($"{user.username}: {receivedText}", clientSocket); // Send the message}
+                            UpdateClientsAndAuthor($"{user.username}: {receivedText}", clientSocket); // Send the message
                     }
                 }
             }
@@ -250,36 +247,36 @@ namespace c_tier.src.backend.server
         /// </summary>
         /// <param name="message"></param>
         /// <param name="clientToIgnore"></param>
-        private static void UpdateClientsNoHost(string message, Socket clientToIgnore)
+        private static void UpdateClientsNoAuthor(string message, Socket author)
         {
             byte[] msgBytes = Encoding.UTF8.GetBytes(message);
 
             foreach (Socket socket in users.Keys)
             {
-                if (socket == clientToIgnore) continue; // ignore the og client when spreading the word
+                if (socket == author) continue; // ignore the og client when spreading the word
                 socket.Send(msgBytes); // bye bye
             }
         }
 
 
         /// <summary>
-        /// Sends a message in the same channel as the host
+        /// Sends a message in the same channel as the author
         /// </summary>
         /// <param name="message"></param>
         /// <param name="host"></param>
-        private static void UpdateClientsAndHost(string message, Socket host)
+        private static void UpdateClientsAndAuthor(string message, Socket author)
         {
 
-            users.TryGetValue(host, out var user);
+            users.TryGetValue(author, out var user);
 
             foreach (var socket in user.currentChannel.users.Keys)
             {
-                SendResponseEncrypted(socket,message);
+                SpeakEncrypted(socket,message);
             }
         }
 
         /// <summary>
-        /// Method to create a new channel
+        /// Creates a new channel and caches it, returns true if succsesfull
         /// </summary>
         /// <param name="channelName"></param>
         /// <param name="rolesWithAccess"></param>
@@ -294,17 +291,23 @@ namespace c_tier.src.backend.server
         }
 
         /// <summary>
-        /// method to talk to a client at a time
+        /// Sends a message through the server socket
         /// </summary>
         /// <param name="clientSocket"></param>
         /// <param name="responseText"></param>
-        public static void SendResponse(Socket clientSocket, string responseText)
+        public static void Speak(Socket clientSocket, string responseText)
         {
             byte[] responseBytes = Encoding.UTF8.GetBytes(responseText);
             clientSocket.Send(responseBytes);
         }
 
-        public static void SendResponseEncrypted(Socket clientSocket, string responseText)
+
+        /// <summary>
+        /// Sends an encrypted message through the server socket
+        /// </summary>
+        /// <param name="clientSocket"></param>
+        /// <param name="responseText"></param>
+        public static void SpeakEncrypted(Socket clientSocket, string responseText)
         {
             string encrypted = Utils.Encrypt(responseText, socketKeyPairs[clientSocket]);
             byte[] plainBytes = Encoding.UTF8.GetBytes(encrypted);
@@ -313,7 +316,7 @@ namespace c_tier.src.backend.server
         }
 
         /// <summary>
-        /// Method to find an active user by their username
+        /// Returns the first occurance of a cached user by their username
         /// </summary>
         /// <param name="username"></param>
         /// <returns>an Instance of <href>User</href></returns>
@@ -326,12 +329,5 @@ namespace c_tier.src.backend.server
             return null;
         }
 
-        public static Socket GetSocket() { return serverSocket; }
-
-        public static bool IsAlive() { return !shouldStop; }
-
-        public static int GetPort() { return config.port; }
-
-        public static IPAddress GetIPAddress() { return ipAddress; }
     }
 }

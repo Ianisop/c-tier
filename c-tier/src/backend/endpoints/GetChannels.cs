@@ -24,9 +24,8 @@ namespace c_tier.src.backend.endpoints
                 // Send the channel list
                 string channelNameList = "";
                 foreach (Channel channel in Server.channels) channelNameList += "|" + channel.channelName;
-                Server.SendResponseEncrypted(clientSocket, ".CHANNELLIST" + channelNameList);
-                 ServerFrontend.Log("SYSTEM: Channel list sent!");
-            
+                Server.SpeakEncrypted(clientSocket, ".CHANNELLIST" + channelNameList);
+                ServerFrontend.Log("SYSTEM: Channel list sent!");
         }
     }
 }

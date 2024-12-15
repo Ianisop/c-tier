@@ -35,22 +35,22 @@ namespace c_tier.src.backend.endpoints
                         if (user.MoveToChannel(channel))
                         {
                             ServerFrontend.Log($"SYSTEM: Moving client to channel {channelName}");
-                            Server.SendResponseEncrypted(clientSocket, ".clear"); // clear the chatlog
-                            Server.SendResponseEncrypted(clientSocket, $"{user.currentChannel.welcomeMessage}\n Hopped to {user.currentChannel.channelName}"); // success
+                            Server.SpeakEncrypted(clientSocket, ".clear"); // clear the chatlog
+                            Server.SpeakEncrypted(clientSocket, $"{user.currentChannel.welcomeMessage}\n Hopped to {user.currentChannel.channelName}"); // success
                         }
                         else
                         {
-                            Server.SendResponseEncrypted(clientSocket, "Error: Failed to join channel.");
+                            Server.SpeakEncrypted(clientSocket, "Error: Failed to join channel.");
                         }
                     }
                     else
                     {
-                        Server.SendResponseEncrypted(clientSocket, $"Error: Channel '{channelName}' not found.");
+                        Server.SpeakEncrypted(clientSocket, $"Error: Channel '{channelName}' not found.");
                     }
                 }
                 else
                 {
-                    Server.SendResponseEncrypted(clientSocket, "Error: User not found.");
+                    Server.SpeakEncrypted(clientSocket, "Error: User not found.");
                 }
         }
     }
