@@ -10,6 +10,7 @@ namespace c_tier.src.backend.server
 {
     public class Channel
     {
+<<<<<<< Updated upstream
         public string channelName;
         public int channelID;
         public string channelDescription;
@@ -26,6 +27,16 @@ namespace c_tier.src.backend.server
            
           
         }
+=======
+        abstract public string channelName { get; set; }
+        abstract public int channelID { get; set; }
+        abstract public string channelDescription { get; set; }
+        abstract public int minRolePermLevel { get; set; }
+        abstract public int activeMembers { get; set; }
+        abstract public Dictionary<Socket, User> users { get; set; }
+        abstract public string welcomeMessage { get; set; }
+
+>>>>>>> Stashed changes
 
         
 
