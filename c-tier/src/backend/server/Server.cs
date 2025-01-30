@@ -58,6 +58,7 @@ namespace c_tier.src.backend.server
                 config = Utils.ReadFromFile<ServerConfigData>("src/server_config.json"); // load the server config
                 string[] endpointFiles = Directory.GetFiles("src/backend/endpoints", "*.cs");
                 string[] serverCommandFiles = Directory.GetFiles("src/backend/server-commands", "*.cs");
+                string[] channelFiles = Directory.GetFiles("src/backend/channels", "*.cs");
 
                 //If theres no config data, quit
                 if (config == null)
@@ -79,6 +80,9 @@ namespace c_tier.src.backend.server
                 ServerFrontend.Log(Utils.GREEN + "SYSTEM: " + commands.Count + " server-commands loaded!");
 
                 SQLiteConnection tempdb = Database.InitDatabase("db.db");// try some other shit
+
+                channels = Utils.LoadAndCreateInstances<Channel>(channelFiles); // try some more other shit
+
                 ServerFrontend.Log("SYSTEM: Found " + channels.Count + " channels, " + serverRoles.Count + " roles!");
                 ServerFrontend.Log("SYSTEM: Generating RSA keyPair of size 2048...");
                 rsaKeys = Utils.GenerateKeyPair();
@@ -284,8 +288,7 @@ namespace c_tier.src.backend.server
         {
             Channel aux = channels.Find(x => x.channelName == newChannelName); // Check if theres a channel with the same name already
             if (aux != null) return false; // channel already exists
-            Channel newChannel = new Channel(newChannelName, newChannelDesc, minRolePermLevel, welcomeMessage);
-            channels.Add(newChannel);
+
             ServerFrontend.Log("SYSTEM: CREATED NEW CHANNEL " + newChannelName);
             return true;
         }

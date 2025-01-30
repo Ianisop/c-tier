@@ -3,6 +3,10 @@
   "WorkspaceRootPath": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\backend\\server\\server.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\server\\server.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\backend\\channels\\channelgeneral.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\channels\\channelgeneral.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -19,6 +23,14 @@
       "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\endpoints\\getchannels.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\backend\\client\\clientfrontend.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\client\\clientfrontend.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\backend\\client\\client.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\client\\client.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\backend\\server\\channel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\server\\channel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -27,24 +39,28 @@
       "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\server\\endpoint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\backend\\server\\server.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\server\\server.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\backend\\client\\client.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\client\\client.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\backend\\server\\serverfrontend.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\server\\serverfrontend.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\secret.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\secret.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\utils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\utils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\backend\\client\\clientfrontend.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\client\\clientfrontend.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\updater.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\updater.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\user_config.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\user_config.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\server_config.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\server_config.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\backend\\server\\serverfrontend.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\server\\serverfrontend.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\bocia\\documents\\github\\c-tier\\c-tier\\src\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -62,17 +78,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 7,
+          "SelectedChildIndex": 0,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 0,
               "Title": "Server.cs",
               "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\server\\Server.cs",
               "RelativeDocumentMoniker": "src\\backend\\server\\Server.cs",
               "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\server\\Server.cs",
               "RelativeToolTip": "src\\backend\\server\\Server.cs",
-              "ViewState": "AgIAAEQAAAAAAAAAAAAYwHoAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAADsAAAAAAAAAAAAowFMAAABIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-07T08:31:38.232Z",
               "IsPinned": true,
@@ -80,7 +96,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 5,
               "Title": "ClientFrontend.cs",
               "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\client\\ClientFrontend.cs",
               "RelativeDocumentMoniker": "src\\backend\\client\\ClientFrontend.cs",
@@ -89,38 +105,54 @@
               "ViewState": "AgIAAHYAAAAAAAAAAAAQwHoAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-08T18:58:21.094Z",
-              "IsPinned": true
+              "IsPinned": true,
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 6,
               "Title": "Client.cs",
               "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\client\\Client.cs",
               "RelativeDocumentMoniker": "src\\backend\\client\\Client.cs",
               "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\client\\Client.cs",
               "RelativeToolTip": "src\\backend\\client\\Client.cs",
-              "ViewState": "AgIAAP0AAAAAAAAAAAAowBMBAAAnAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAYwBwAAABWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-13T08:15:45.048Z",
               "IsPinned": true,
               "EditorCaption": ""
             },
             {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "CreateAccount.cs",
-              "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\endpoints\\CreateAccount.cs",
-              "RelativeDocumentMoniker": "src\\backend\\endpoints\\CreateAccount.cs",
-              "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\endpoints\\CreateAccount.cs",
-              "RelativeToolTip": "src\\backend\\endpoints\\CreateAccount.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-15T13:28:56.172Z",
-              "EditorCaption": ""
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 11,
+              "Title": "Updater.cs",
+              "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\Updater.cs",
+              "RelativeDocumentMoniker": "src\\Updater.cs",
+              "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\Updater.cs",
+              "RelativeToolTip": "src\\Updater.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-01-21T11:41:24.946Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "user_config.json",
+              "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\user_config.json",
+              "RelativeDocumentMoniker": "src\\user_config.json",
+              "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\user_config.json",
+              "RelativeToolTip": "src\\user_config.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-01-21T11:41:19.791Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
               "Title": "LoginEndpoint.cs",
               "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\endpoints\\LoginEndpoint.cs",
               "RelativeDocumentMoniker": "src\\backend\\endpoints\\LoginEndpoint.cs",
@@ -133,88 +165,96 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 8,
               "Title": "Endpoint.cs",
               "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\server\\Endpoint.cs",
               "RelativeDocumentMoniker": "src\\backend\\server\\Endpoint.cs",
               "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\server\\Endpoint.cs",
               "RelativeToolTip": "src\\backend\\server\\Endpoint.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-15T13:28:34.842Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "GetChannels.cs",
               "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\endpoints\\GetChannels.cs",
               "RelativeDocumentMoniker": "src\\backend\\endpoints\\GetChannels.cs",
               "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\endpoints\\GetChannels.cs",
               "RelativeToolTip": "src\\backend\\endpoints\\GetChannels.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAnAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-15T10:26:41.973Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "ChannelGeneral.cs",
               "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\channels\\ChannelGeneral.cs",
               "RelativeDocumentMoniker": "src\\backend\\channels\\ChannelGeneral.cs",
               "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\channels\\ChannelGeneral.cs",
               "RelativeToolTip": "src\\backend\\channels\\ChannelGeneral.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAAAA8AAAA/AAAAAAAAAA==",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAABAAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-15T09:54:22.73Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 13,
+              "Title": "server_config.json",
+              "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\server_config.json",
+              "RelativeDocumentMoniker": "src\\server_config.json",
+              "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\server_config.json",
+              "RelativeToolTip": "src\\server_config.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-01-21T11:41:25.368Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "Channel.cs",
               "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\server\\Channel.cs",
               "RelativeDocumentMoniker": "src\\backend\\server\\Channel.cs",
               "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\server\\Channel.cs",
               "RelativeToolTip": "src\\backend\\server\\Channel.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAAAqwBEAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAqwBAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-15T09:49:21.894Z",
               "EditorCaption": ""
             },
             {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
-            },
-            {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "ServerFrontend.cs",
-              "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\server\\ServerFrontend.cs",
-              "RelativeDocumentMoniker": "src\\backend\\server\\ServerFrontend.cs",
-              "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\server\\ServerFrontend.cs",
-              "RelativeToolTip": "src\\backend\\server\\ServerFrontend.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAAawBkAAABDAAAAAAAAAA==",
+              "DocumentIndex": 2,
+              "Title": "CreateAccount.cs",
+              "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\endpoints\\CreateAccount.cs",
+              "RelativeDocumentMoniker": "src\\backend\\endpoints\\CreateAccount.cs",
+              "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\endpoints\\CreateAccount.cs",
+              "RelativeToolTip": "src\\backend\\endpoints\\CreateAccount.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-08T18:02:58.147Z",
+              "WhenOpened": "2024-12-15T13:28:56.172Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\Program.cs",
-              "RelativeDocumentMoniker": "src\\Program.cs",
-              "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\Program.cs",
-              "RelativeToolTip": "src\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAATAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-08T08:10:20.941Z"
+              "DocumentIndex": 9,
+              "Title": "secret.json",
+              "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\secret.json",
+              "RelativeDocumentMoniker": "src\\secret.json",
+              "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\secret.json",
+              "RelativeToolTip": "src\\secret.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-01-21T11:41:18.846Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "Utils.cs",
               "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\Utils.cs",
               "RelativeDocumentMoniker": "src\\Utils.cs",
@@ -226,7 +266,31 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 14,
+              "Title": "ServerFrontend.cs",
+              "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\server\\ServerFrontend.cs",
+              "RelativeDocumentMoniker": "src\\backend\\server\\ServerFrontend.cs",
+              "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\server\\ServerFrontend.cs",
+              "RelativeToolTip": "src\\backend\\server\\ServerFrontend.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAawBkAAABDAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-08T18:02:58.147Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\Program.cs",
+              "RelativeDocumentMoniker": "src\\Program.cs",
+              "ToolTip": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\Program.cs",
+              "RelativeToolTip": "src\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-08T08:10:20.941Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
               "Title": "ServerInfo.cs",
               "DocumentMoniker": "C:\\Users\\bocia\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\server\\ServerInfo.cs",
               "RelativeDocumentMoniker": "src\\backend\\server\\ServerInfo.cs",
