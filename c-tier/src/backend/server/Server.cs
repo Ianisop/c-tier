@@ -130,13 +130,18 @@ namespace c_tier.src.backend.server
                     Speak(clientSocket, ".key|" + Utils.ConvertKeyToString(rsaKeys[1]));
 
                     int receivedBytes = clientSocket.Receive(buffer);
-
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
                     ServerFrontend.Log("DATA: " + receivedText);
                     string[] aux = receivedText.Split("|");
-                    socketKeyPairs[clientSocket] = Utils.ConvertStringToKey(aux[1]); // cache the key
-                    Speak(clientSocket, ".KEYOK");
-                    // Handle the client's communication asynchronously
+                    if(receivedText.StartsWith(".key|"))
+                    {
+                        ServerFrontend.Log("Cacheing key for client");
+                        socketKeyPairs[clientSocket] = Utils.ConvertStringToKey(aux[1]); // cache the key
+                        Speak(clientSocket, ".KEYOK");
+                        ServerFrontend.Log("SERVER: Key exchange complete!");
+                        // Handle the client's communication asynchronously
+                        
+                    }
                     Task.Run(() => HandleClientCommunication(clientSocket));
                 }
             }
@@ -202,8 +207,10 @@ namespace c_tier.src.backend.server
                     string[] aux = receivedText.Split(" ");
 
                     //route to the right endpoint
+                    ServerFrontend.Log(endpoints.Count.ToString()); 
                     foreach (var endpoint in endpoints)
                     {
+                        //ServerFrontend.Log("Endpoint: " + endpoint.destination);
                         if (endpoint.destination.Equals(aux[0]))
                         {
                             endpoint.Route(clientSocket, receivedText, users);

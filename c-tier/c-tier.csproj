@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
+    <PackageReference Include="PvRecorder" Version="1.2.9" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.119" />
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="9.0.0" />
     <PackageReference Include="Terminal.Gui" Version="1.17.1" />
@@ -17,6 +18,9 @@
 
   <ItemGroup>
     <Compile Update="src\backend\channels\ChannelGeneral.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Update="src\backend\endpoints\Audio.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
     <Compile Update="src\backend\server-commands\GiveOwner.cs">
@@ -37,11 +41,20 @@
     <Compile Update="src\backend\endpoints\Validate.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Update="src\backend\server-commands\SendMessage.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="src\secret.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="src\server_config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="src\user_config.json">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 

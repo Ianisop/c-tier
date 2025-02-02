@@ -24,10 +24,10 @@ namespace c_tier.src.backend.endpoints
 
             //validate data
             string[] aux = receivedText.Split(" ");
-
+           
             string username = aux[1];
             string password = aux[2];
-
+            ServerFrontend.Log("SERVER: Account creation in progress");
             var user_id = Database.CreateUser(username, password);
             if (user_id == 0) Server.SpeakEncrypted(clientSocket, "Account request failed");
             else

@@ -1,4 +1,5 @@
 using c_tier.src.backend.server;
+using Pv;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +26,6 @@ namespace c_tier.src.backend.client
 
         public Client()
         {
-
             ServerInfo serverData = Utils.ReadFromFile<ServerInfo>("src/secret.json");
             remoteEndPoint = new IPEndPoint(IPAddress.Parse(serverData.ip), serverData.port);
             rsaKeys = Utils.GenerateKeyPair();
@@ -53,6 +53,8 @@ namespace c_tier.src.backend.client
                 else
                 {
                     localUser = user;
+                    AudioManager.Init(); // initialize the audio shit
+                    ClientFrontend.Log("AudioManager: good!");
                     return true;
                 }
             }
@@ -70,7 +72,7 @@ namespace c_tier.src.backend.client
 
             clientSocket.Connect(remoteEndPoint);
             isConnected = true;
-            Speak(".createaccount " + username + " " + password);
+       
 
             byte[] buffer = new byte[1024];
 
@@ -79,26 +81,34 @@ namespace c_tier.src.backend.client
                 try
                 {
                     int receivedBytes = clientSocket.Receive(buffer);
-                    if (receivedBytes == 0) break; // Server closed the connection
+                    //if (receivedBytes == 0) break; // Server closed the connection
 
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
 
                     ClientFrontend.Log($"Received from server: {receivedText}");
+                
+
+                    if (receivedText.StartsWith(".KEYOK"))
+                    {
+                        SpeakEncrypted(".createaccount " + username + " " + password);
+                        break;
+                    }
+                    if (receivedText.StartsWith(".key"))
+                    {
+                        string[] tokens = receivedText.Split("|");
+                        serverPubKey = tokens[1];
+                        var data = ".key|" + Utils.ConvertKeyToString(rsaKeys[1]);
+                        byte[] rawData = Encoding.UTF8.GetBytes(data);
+                        clientSocket.Send(rawData);
+                        ClientFrontend.Log("Sent key back!");
+
+                    }
 
                     if (receivedText.StartsWith(".ACCOUNTOK"))
                     {
                         ClientFrontend.Log("Account created succsefully!");
-                        isSpeaking = false;
                         return true;
 
-                    }
-
-                    //just a chat message
-                    else
-                    {
-                        ClientFrontend.Log("Error: " + receivedText);
-                        isSpeaking = false;
-                        return false;
                     }
                 }
 
@@ -114,6 +124,18 @@ namespace c_tier.src.backend.client
             return false;
 
         }
+
+
+        public void StreamAudio()
+        {
+            AudioManager.recorder.Start();
+            while (AudioManager.recorder.IsRecording)
+            {
+                SpeakEncrypted(".audio|" + AudioManager.recorder.Read());
+            }
+            AudioManager.recorder.Stop();
+        }
+
 
 
         public void Restart()
@@ -219,6 +241,11 @@ namespace c_tier.src.backend.client
                         //Frontend.Log("Validating session");
                         isSpeaking = false;
                     }
+                    if (receivedText.StartsWith(".startaudio"))
+                    {
+                        StreamAudio();
+                    }
+                    
                     if (receivedText.StartsWith(".clear"))
                     {
                         ClientFrontend.CleanChat();
