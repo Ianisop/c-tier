@@ -18,10 +18,13 @@ namespace c_tier.src.backend.client
         public Window channelWindow = new Window("Channels") { X = 0, Y = 0, Width = 15, Height = Dim.Percent(100) };
         public Window chatWindow = new Window("Chat") { X = 15, Y = 0, Width = 50, Height = Dim.Percent(70) };
         public Window profileWindow = new Window("Profile") { X = 80, Y = 0, Width = 20, Height = Dim.Percent(50) };
+        public Window voiceChatWindow = new Window("VoiceChat") { X = 50, Y = 0, Width = 40, Height = Dim.Percent(25) };
         // public Window serverBrowserWindow = new Window("Server Browser") {X= 50, Y= 3, Width=20, Height = 40 };
         public TextField usernameTextField = new TextField { Text = "Username....", X = 0, Y = Pos.AnchorEnd(4), Width = 15, Height = 3 };
         public TextField passwordTextField = new TextField { Text = "Password....", X = 0, Y = Pos.AnchorEnd(3), Width = 15, Height = 3 };
         public Button submitButton = new Button() { Text = "Submit", X = 3, Y = 8, Width = 5, Height = 5 };
+        public Button muteMicButton = new Button() { Text = "Mute", X = 1, Y = 1, Width = 2, Height = 4 };
+        public Button deafenButton = new Button() { Text = "Deafen", X = 10, Y = 1, Width = 2, Height = 4 };
         public TextView chatHistory = new TextView
         {
             X = 0,
@@ -67,18 +70,23 @@ namespace c_tier.src.backend.client
         public Label userNameLabel = new Label { Text = "username", X = 0, Y = 0, Width = 18, Height = 2 };
         public Label profileSeparator = new Label { Text = "------------------------", X = 0, Y = 1, Width = 18, Height = 1 };
         public Label roleListLabel = new Label { Text = "Roles", X = 0, Y = 2, Width = 18, Height = 1 };
+        public Label activeUsersInVoiceChatLabel = new Label{ Text = "users in voicechat: 0/0" ,X=1, Y = 0, Width = 18, Height = 1 };
 
 
         // public Button generalChannelButton = new Button {Text= "General"};
         public App()
         {
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black);
-            Application.Top.Add(channelWindow, chatWindow, debugWindow, profileWindow); // add the windows
+            Application.Top.Add(voiceChatWindow, chatWindow, debugWindow, profileWindow); // add the windows
 
             //Setup base widgets
             chatWindow.Add(chatHistory);
             chatWindow.Add(chatInputField);
             debugWindow.Add(debugLogHistory);
+            voiceChatWindow.Add((muteMicButton));
+            voiceChatWindow.Add((deafenButton));
+            voiceChatWindow.Add((activeUsersInVoiceChatLabel));
+
         }
     }
 
