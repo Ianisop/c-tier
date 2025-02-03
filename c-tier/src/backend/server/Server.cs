@@ -82,6 +82,10 @@ namespace c_tier.src.backend.server
                 SQLiteConnection tempdb = Database.InitDatabase("db.db");// try some other shit
 
                 channels = Utils.LoadAndCreateInstances<Channel>(channelFiles); // try some more other shit
+                foreach(Channel channel in channels)
+                {
+                    channel.Init();
+                }
 
                 ServerFrontend.Log("SYSTEM: Found " + channels.Count + " channels, " + serverRoles.Count + " roles!");
                 ServerFrontend.Log("SYSTEM: Generating RSA keyPair of size 2048...");

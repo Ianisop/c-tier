@@ -69,10 +69,8 @@ namespace c_tier.src.backend.client
 
         public bool CreateAccount(string username, string password)
         {
-
             clientSocket.Connect(remoteEndPoint);
             isConnected = true;
-       
 
             byte[] buffer = new byte[1024];
 
@@ -91,7 +89,7 @@ namespace c_tier.src.backend.client
                     if (receivedText.StartsWith(".KEYOK"))
                     {
                         SpeakEncrypted(".createaccount " + username + " " + password);
-                        break;
+                        return true;
                     }
                     if (receivedText.StartsWith(".key"))
                     {
@@ -121,7 +119,6 @@ namespace c_tier.src.backend.client
                 }
 
             }
-            return false;
 
         }
 
@@ -142,8 +139,6 @@ namespace c_tier.src.backend.client
         {
             clientSocket.Dispose();
             clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
-
         }
         public void Connect()
         {

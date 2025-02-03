@@ -63,14 +63,16 @@ namespace c_tier.src.backend.client
         /// <returns></returns>
         public bool MoveToChannel(Channel channel)
         {
+            if (channel == null) return false;
             if (currentChannel != channel && HasRole(channel.minRolePermLevel))
             { 
                 oldChannel = currentChannel;
                 currentChannel = channel;
 
                 if (oldChannel !=null) oldChannel.users.Remove(socket); // remove from the old channel
+                    
                 channel.users.Add(socket,this); // cache the new user
-         
+                  
                 channel.activeMembers++;
                 if (oldChannel != null) oldChannel.activeMembers--;
 

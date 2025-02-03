@@ -19,13 +19,13 @@ namespace c_tier.src.backend.channels
         public override Dictionary<Socket, User> users { get; set; }
         public override string welcomeMessage { get; set; }
 
-
         public override void Init()
         {
-            this.channelName = channelName;
+            this.channelName = "General";
             this.channelDescription = channelDescription;
-            this.minRolePermLevel = minRolePermLevel;
-            this.welcomeMessage = welcomeMessage;
+            this.minRolePermLevel = 1;
+            this.users = new Dictionary<Socket, User>();
+            this.welcomeMessage = "Welcome to general!";
         }
 
 
