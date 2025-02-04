@@ -116,6 +116,32 @@ namespace c_tier.src
                 return instances;
             }
         }
+        public static byte[] ShortArrayToByteArray(short[] shortArray)
+        {
+            byte[] byteArray = new byte[shortArray.Length * 2]; // Each short takes 2 bytes
+
+            for (int i = 0; i < shortArray.Length; i++)
+            {
+                byteArray[i * 2] = (byte)(shortArray[i] & 0xFF); // Lower byte
+                byteArray[i * 2 + 1] = (byte)((shortArray[i] >> 8) & 0xFF); // Upper byte
+            }
+
+            return byteArray;
+        }
+        public static short[] ByteArrayToShortArray(byte[] byteArray)
+        {
+            if (byteArray.Length % 2 != 0)
+                throw new ArgumentException("Byte array length must be even to convert to short array.");
+
+            short[] shortArray = new short[byteArray.Length / 2];
+
+            for (int i = 0; i < shortArray.Length; i++)
+            {
+                shortArray[i] = (short)(byteArray[i * 2] | (byteArray[i * 2 + 1] << 8)); // Little-endian
+            }
+
+            return shortArray;
+        }
 
         public static ulong GenerateID(int length)
         {

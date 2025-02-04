@@ -18,13 +18,12 @@ namespace c_tier.src.backend.endpoints
         }
         public override void Route(Socket clientSocket, string receivedText, Dictionary<Socket, User> users)
         {
-            ServerFrontend.Log("SERVER: Audio Packet");
-            string[] aux = receivedText.Split("|");
-            short[] frames;
+            ServerFrontend.Log("SERVER:" + receivedText);
             try
             {
-                frames = aux[1].Split(",").Select(short.Parse).ToArray();
-                ServerFrontend.Log("SERVER: Audio packet parsed, sampleCount: " + frames.Length);
+                // Server.UpdateClientsNoAuthor(receivedText,clientSocket); // route the packets to everyone besides the author, we dont want them listening to their own voice
+
+                Server.UpdateClientsAndAuthor(receivedText,clientSocket);
             }
             catch (Exception e)
             {
