@@ -3,24 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\ianis\\onedrive\\documents\\github\\c-tier\\c-tier\\src\\backend\\client\\client.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\client\\client.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\ianis\\onedrive\\documents\\github\\c-tier\\c-tier\\src\\backend\\channels\\channelgeneral.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\channels\\channelgeneral.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\ianis\\onedrive\\documents\\github\\c-tier\\c-tier\\src\\backend\\server\\server.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\server\\server.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\ianis\\onedrive\\documents\\github\\c-tier\\c-tier\\src\\backend\\client\\audiomanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\client\\audiomanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\ianis\\onedrive\\documents\\github\\c-tier\\c-tier\\src\\backend\\channels\\channelgeneral.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\channels\\channelgeneral.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\ianis\\onedrive\\documents\\github\\c-tier\\c-tier\\src\\backend\\server\\channel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\server\\channel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\ianis\\onedrive\\documents\\github\\c-tier\\c-tier\\src\\backend\\client\\audiomanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\client\\audiomanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\ianis\\onedrive\\documents\\github\\c-tier\\c-tier\\src\\backend\\client\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -33,6 +29,10 @@
     {
       "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\ianis\\onedrive\\documents\\github\\c-tier\\c-tier\\src\\backend\\client\\clientfrontend.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\client\\clientfrontend.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\ianis\\onedrive\\documents\\github\\c-tier\\c-tier\\src\\backend\\client\\client.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|solutionrelative:src\\backend\\client\\client.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{1F9A3EB1-3D8E-4AA8-A4EE-7ADFDE3ED687}|c-tier.csproj|c:\\users\\ianis\\onedrive\\documents\\github\\c-tier\\c-tier\\src\\utils.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -106,7 +106,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Document",
@@ -116,7 +116,7 @@
               "RelativeDocumentMoniker": "src\\backend\\server\\Server.cs",
               "ToolTip": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\server\\Server.cs",
               "RelativeToolTip": "src\\backend\\server\\Server.cs",
-              "ViewState": "AgIAAB0AAAAAAAAAAAAAwEEAAABVAAAAAAAAAA==",
+              "ViewState": "AgIAAD0AAAAAAAAAAAArwEEAAABVAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-07T08:31:38.232Z",
               "IsPinned": true,
@@ -124,7 +124,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 6,
               "Title": "ClientFrontend.cs",
               "DocumentMoniker": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\client\\ClientFrontend.cs",
               "RelativeDocumentMoniker": "src\\backend\\client\\ClientFrontend.cs",
@@ -138,13 +138,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 7,
               "Title": "Client.cs",
               "DocumentMoniker": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\client\\Client.cs",
               "RelativeDocumentMoniker": "src\\backend\\client\\Client.cs",
               "ToolTip": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\client\\Client.cs",
               "RelativeToolTip": "src\\backend\\client\\Client.cs",
-              "ViewState": "AgIAAG0AAAAAAAAAAAASwIMAAAANAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAHYAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-13T08:15:45.048Z",
               "IsPinned": true,
@@ -156,20 +156,32 @@
             },
             {
               "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\client\\User.cs",
+              "RelativeDocumentMoniker": "src\\backend\\client\\User.cs",
+              "ToolTip": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\client\\User.cs",
+              "RelativeToolTip": "src\\backend\\client\\User.cs",
+              "ViewState": "AgIAADEAAAAAAAAAAADgvz8AAAAqAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-02-03T07:42:43.421Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 12,
               "Title": "CreateAccount.cs",
               "DocumentMoniker": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\endpoints\\CreateAccount.cs",
               "RelativeDocumentMoniker": "src\\backend\\endpoints\\CreateAccount.cs",
               "ToolTip": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\endpoints\\CreateAccount.cs",
               "RelativeToolTip": "src\\backend\\endpoints\\CreateAccount.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAIBJwBMAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-15T13:28:56.172Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-15T13:28:56.172Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 5,
               "Title": "LoginEndpoint.cs",
               "DocumentMoniker": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\endpoints\\LoginEndpoint.cs",
               "RelativeDocumentMoniker": "src\\backend\\endpoints\\LoginEndpoint.cs",
@@ -182,20 +194,20 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 0,
               "Title": "ChannelGeneral.cs",
               "DocumentMoniker": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\channels\\ChannelGeneral.cs",
               "RelativeDocumentMoniker": "src\\backend\\channels\\ChannelGeneral.cs",
               "ToolTip": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\channels\\ChannelGeneral.cs",
               "RelativeToolTip": "src\\backend\\channels\\ChannelGeneral.cs",
-              "ViewState": "AgIAAAsAAAAAAAAAAAAxwBkAAAAQAAAAAAAAAA==",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAxwBgAAAA4AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-15T09:54:22.73Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 2,
               "Title": "Channel.cs",
               "DocumentMoniker": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\server\\Channel.cs",
               "RelativeDocumentMoniker": "src\\backend\\server\\Channel.cs",
@@ -221,28 +233,15 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "AudioManager.cs",
               "DocumentMoniker": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\client\\AudioManager.cs",
               "RelativeDocumentMoniker": "src\\backend\\client\\AudioManager.cs",
               "ToolTip": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\client\\AudioManager.cs",
               "RelativeToolTip": "src\\backend\\client\\AudioManager.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAuwA0AAAAqAAAAAAAAAA==",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAYAAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-02-01T11:15:25.059Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "User.cs",
-              "DocumentMoniker": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\client\\User.cs",
-              "RelativeDocumentMoniker": "src\\backend\\client\\User.cs",
-              "ToolTip": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\client\\User.cs",
-              "RelativeToolTip": "src\\backend\\client\\User.cs",
-              "ViewState": "AgIAADEAAAAAAAAAAADgvz8AAAAqAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-03T07:42:43.421Z",
               "EditorCaption": ""
             },
             {
@@ -255,8 +254,7 @@
               "RelativeToolTip": "src\\backend\\server\\ServerFrontend.cs",
               "ViewState": "AgIAAEMAAAAAAAAAAAAcwFQAAAAhAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-08T18:02:58.147Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-08T18:02:58.147Z"
             },
             {
               "$type": "Document",
@@ -281,8 +279,7 @@
               "RelativeToolTip": "src\\server_config.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-01-21T11:41:25.368Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-01-21T11:41:25.368Z"
             },
             {
               "$type": "Document",
@@ -294,8 +291,7 @@
               "RelativeToolTip": "src\\backend\\server\\ServerCommand.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-01T12:34:56.547Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-02-01T12:34:56.547Z"
             },
             {
               "$type": "Document",
@@ -307,8 +303,7 @@
               "RelativeToolTip": "src\\backend\\server\\ServerConfigData.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-01T12:34:59.584Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-02-01T12:34:59.584Z"
             },
             {
               "$type": "Document",
@@ -320,8 +315,7 @@
               "RelativeToolTip": "src\\secret.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-01-21T11:41:18.846Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-01-21T11:41:18.846Z"
             },
             {
               "$type": "Document",
@@ -333,8 +327,7 @@
               "RelativeToolTip": "src\\backend\\server\\Endpoint.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-15T13:28:34.842Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-15T13:28:34.842Z"
             },
             {
               "$type": "Document",
@@ -346,8 +339,7 @@
               "RelativeToolTip": "src\\backend\\endpoints\\GetChannels.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAnAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-15T10:26:41.973Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-15T10:26:41.973Z"
             },
             {
               "$type": "Document",
@@ -357,10 +349,9 @@
               "RelativeDocumentMoniker": "src\\backend\\server-commands\\SendMessage.cs",
               "ToolTip": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\server-commands\\SendMessage.cs",
               "RelativeToolTip": "src\\backend\\server-commands\\SendMessage.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAIBJwAwAAAATAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAwAAAATAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-01T11:45:44.588Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-02-01T11:45:44.588Z"
             },
             {
               "$type": "Document",
@@ -370,10 +361,9 @@
               "RelativeDocumentMoniker": "src\\backend\\server-commands\\GiveOwner.cs",
               "ToolTip": "C:\\Users\\ianis\\OneDrive\\Documents\\GitHub\\c-tier\\c-tier\\src\\backend\\server-commands\\GiveOwner.cs",
               "RelativeToolTip": "src\\backend\\server-commands\\GiveOwner.cs",
-              "ViewState": "AgIAAAYAAAAAAAAAAIBJwBIAAAASAAAAAAAAAA==",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAABIAAAASAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-01T11:45:31.312Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-02-01T11:45:31.312Z"
             },
             {
               "$type": "Document",
@@ -385,8 +375,7 @@
               "RelativeToolTip": "src\\Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-08T08:10:20.941Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-08T08:10:20.941Z"
             },
             {
               "$type": "Document",
@@ -398,8 +387,7 @@
               "RelativeToolTip": "src\\backend\\endpoints\\Audio.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA8AAAAkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-02-01T11:36:57.402Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-02-01T11:36:57.402Z"
             },
             {
               "$type": "Document",
@@ -411,8 +399,7 @@
               "RelativeToolTip": "src\\Updater.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-01-21T11:41:24.946Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-01-21T11:41:24.946Z"
             },
             {
               "$type": "Document",
@@ -424,8 +411,7 @@
               "RelativeToolTip": "src\\backend\\server\\ServerInfo.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-12-07T09:51:25.64Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-12-07T09:51:25.64Z"
             }
           ]
         }
