@@ -18,14 +18,7 @@ namespace c_tier.src.backend.client
         public Window channelWindow = new Window("Channels") { X = 0, Y = 0, Width = 15, Height = Dim.Percent(100) };
         public Window chatWindow = new Window("Chat") { X = 15, Y = 0, Width = 50, Height = Dim.Percent(70) };
         public Window profileWindow = new Window("Profile") { X = 80, Y = 0, Width = 20, Height = Dim.Percent(50) };
-        public Window settingsWindow = new Window("Settings") { X = 120, Y = 0, Width = 60, Height = Dim.Percent(25) };
-        public Window voiceChatWindow = new Window("VoiceChat") { X = 50, Y = 0, Width = 40, Height = Dim.Percent(25),
-                     ColorScheme = new ColorScheme
-                     {
-                         Normal = Application.Driver.MakeAttribute(Color.Red, Color.Black),
-                         Focus = Application.Driver.MakeAttribute(Color.Red, Color.Black),
-                     }
-        };
+        public Window voiceChatWindow = new Window("VoiceChat") { X = 50, Y = 0, Width = 40, Height = Dim.Percent(25) };
         // public Window serverBrowserWindow = new Window("Server Browser") {X= 50, Y= 3, Width=20, Height = 40 };
         public TextField usernameTextField = new TextField { Text = "Username....", X = 0, Y = Pos.AnchorEnd(4), Width = 15, Height = 3 };
         public TextField passwordTextField = new TextField { Text = "Password....", X = 0, Y = Pos.AnchorEnd(3), Width = 15, Height = 3 };
@@ -78,16 +71,13 @@ namespace c_tier.src.backend.client
         public Label profileSeparator = new Label { Text = "------------------------", X = 0, Y = 1, Width = 18, Height = 1 };
         public Label roleListLabel = new Label { Text = "Roles", X = 0, Y = 2, Width = 18, Height = 1 };
         public Label activeUsersInVoiceChatLabel = new Label{ Text = "users in voicechat: 0/0" ,X=1, Y = 0, Width = 18, Height = 1 };
-        public Label outputDeviceLabel = new Label{ Text = "" ,X=1, Y = 3, Width = 5, Height = 1, AutoSize = true };
-        public Label inputDeviceLabel = new Label{ Text = "" ,X=1, Y = 0, Width = 5, Height = 1, AutoSize = true  };
-        public Label inputLevelLabel = new Label{ Text = "|||||||||||" ,X=4, Y = 0, Width = 5, Height = 1 };
 
 
         // public Button generalChannelButton = new Button {Text= "General"};
         public App()
         {
             Colors.Base.Normal = Application.Driver.MakeAttribute(Color.Green, Color.Black);
-            Application.Top.Add(voiceChatWindow, chatWindow, debugWindow, profileWindow,settingsWindow); // add the windows
+            Application.Top.Add(voiceChatWindow, chatWindow, debugWindow, profileWindow); // add the windows
 
             //Setup base widgets
             chatWindow.Add(chatHistory);
@@ -95,8 +85,7 @@ namespace c_tier.src.backend.client
             debugWindow.Add(debugLogHistory);
             voiceChatWindow.Add((muteMicButton));
             voiceChatWindow.Add((deafenButton));
-            voiceChatWindow.Add(activeUsersInVoiceChatLabel,inputLevelLabel);
-            settingsWindow.Add(inputDeviceLabel, outputDeviceLabel);
+            voiceChatWindow.Add((activeUsersInVoiceChatLabel));
 
         }
     }
@@ -262,20 +251,6 @@ namespace c_tier.src.backend.client
             app.userNameLabel.Text = client.GetUsername();
         }
 
-        public static void ChangeColorOfVoiceChatWindow(Color color)
-        {
-            app.voiceChatWindow.ColorScheme = new ColorScheme
-            {
-                Normal = Application.Driver.MakeAttribute(color, Color.Black),
-                Focus = Application.Driver.MakeAttribute(color, Color.Black),
-            };
-        }
-        public static void UpdateInputLevel(short[] audioFrames)
-        {
-            int maxAmplitude = audioFrames.Max(Math.Abs);
-            int level = (int)(maxAmplitude / 32767.0 * 5); // Scale from 0-5
-            ClientFrontend.app.inputLevelLabel.Text = new string('|', level);
-        }
 
     }
 }

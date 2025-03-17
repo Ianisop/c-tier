@@ -262,7 +262,7 @@ namespace c_tier.src.backend.server
         /// </summary>
         /// <param name="message"></param>
         /// <param name="clientToIgnore"></param>
-        public static void UpdateClientsNoAuthor(string message, Socket author)
+        private static void UpdateClientsNoAuthor(string message, Socket author)
         {
             byte[] msgBytes = Encoding.UTF8.GetBytes(message);
 
@@ -279,9 +279,9 @@ namespace c_tier.src.backend.server
         /// </summary>
         /// <param name="message"></param>
         /// <param name="host"></param>
-        public static void UpdateClientsAndAuthor(string message, Socket author)
+        private static void UpdateClientsAndAuthor(string message, Socket author)
         {
-            //TODO: make it check if people are in vc and only send to them
+
             users.TryGetValue(author, out var user);
 
             foreach (var socket in user.currentChannel.users.Keys)

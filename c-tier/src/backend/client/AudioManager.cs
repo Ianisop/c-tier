@@ -19,7 +19,7 @@ namespace c_tier.src.backend.client
         public static short[] inputAudioFrames;
         public static Dictionary<int, string> inputDevices = new Dictionary<int, string>();
         public static Dictionary<int, string> outputDevices = new Dictionary<int, string>();
-        private static Queue<short[]> audioQueue = new Queue<short[]>();
+
 
         /// <summary>
         /// Initializes the audio manager devices and creates a recording devices
@@ -27,13 +27,10 @@ namespace c_tier.src.backend.client
         public static void Init()
         {
             FindDevices();
-            ClientFrontend.app.inputDeviceLabel.Text = "Input Device: " + inputDevices[1];
-            ClientFrontend.app.outputDeviceLabel.Text = "Output Device: " + outputDevices[1];
-            recorder = PvRecorder.Create(frameLength, 1);
+            recorder = PvRecorder.Create(frameLength, 0);
             speaker = new PvSpeaker(
                 sampleRate:sampleRate,
-                bitsPerSample:bitsPerSample,
-                deviceIndex:1
+                bitsPerSample:bitsPerSample
                 );
           
         }
@@ -50,41 +47,15 @@ namespace c_tier.src.backend.client
             }
         }
 
-
-        public static void Play(short[] samples)
+        public static void Play(byte[] samples)
         {
-            lock (audioQueue)
+            speaker.Start();
+            while(speaker.IsStarted)
             {
-                audioQueue.Enqueue(samples);
+                int writtenSamples = speaker.Write(samples); // write to the audio buffer
+                int flushedLength = speaker.Flush(); // this is what plays the audio
             }
-
-            if (!speaker.IsStarted)
-            {
-                speaker.Start();
-                Task.Run(() => ProcessAudioQueue());
-            }
-        }
-        private static void ProcessAudioQueue()
-        {
-            while (speaker.IsStarted)
-            {
-                short[] nextSamples = null;
-
-                lock (audioQueue)
-                {
-                    if (audioQueue.Count > 0)
-                        nextSamples = audioQueue.Dequeue();
-                }
-
-                if (nextSamples != null)
-                {
-                    speaker.Write(Utils.ShortArrayToByteArray(nextSamples));
-                }
-                else
-                {
-                    Task.Delay(1).Wait(); // Prevents CPU overuse if queue is empty
-                }
-            }
+            speaker.Stop();
         }
 
         /// <summary>
