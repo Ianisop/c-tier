@@ -11,7 +11,7 @@ namespace c_tier.src.backend.server
 {
     public class Server
     {
-        protected static bool shouldStop = true;
+        protected static bool shouldStop = true; 
         private static readonly IPAddress ipAddress = IPAddress.Any; // Listen on all network interfaces;
         private static readonly Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         public static List<Endpoint> endpoints = new List<Endpoint>(); // List to cache custom endpoints into
@@ -20,7 +20,7 @@ namespace c_tier.src.backend.server
         protected static RSAParameters[] rsaKeys = new RSAParameters[2]; // private key at index 0, public key at index 1
 
         // Pair rsa public keys with socekts to be able to encrypt for each individual client
-        protected static Dictionary<Socket, RSAParameters> socketKeyPairs = new Dictionary<Socket, RSAParameters>();
+        protected static Dictionary<Socket,RSAParameters> socketKeyPairs = new Dictionary<Socket,RSAParameters>();
 
         public static readonly Role ownerRole = new Role() // Role to give to the owner of the server (TODO: Find a better way to do this)
         {
@@ -82,7 +82,7 @@ namespace c_tier.src.backend.server
                 SQLiteConnection tempdb = Database.InitDatabase("db.db");// try some other shit
 
                 channels = Utils.LoadAndCreateInstances<Channel>(channelFiles); // try some more other shit
-                foreach (Channel channel in channels)
+                foreach(Channel channel in channels)
                 {
                     channel.Init();
                 }
@@ -110,7 +110,7 @@ namespace c_tier.src.backend.server
 
 
         /// <summary>
-        /// makes the server work indefinetly
+        /// makes the server work indefinetly 
         /// </summary>
         private static void Work()
         {
@@ -137,14 +137,14 @@ namespace c_tier.src.backend.server
                     string receivedText = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
                     ServerFrontend.Log("DATA: " + receivedText);
                     string[] aux = receivedText.Split("|");
-                    if (receivedText.StartsWith(".key|"))
+                    if(receivedText.StartsWith(".key|"))
                     {
                         ServerFrontend.Log("Cacheing key for client");
                         socketKeyPairs[clientSocket] = Utils.ConvertStringToKey(aux[1]); // cache the key
                         Speak(clientSocket, ".KEYOK");
                         ServerFrontend.Log("SERVER: Key exchange complete!");
                         // Handle the client's communication asynchronously
-
+                        
                     }
                     Task.Run(() => HandleClientCommunication(clientSocket));
                 }
@@ -180,7 +180,7 @@ namespace c_tier.src.backend.server
                     catch (Exception ex)
                     {
                         ServerFrontend.LogError("Failed to execute command " + command + " because " + ex.Message);
-                        break;
+                        break; 
                     }
                 }
 
@@ -202,30 +202,30 @@ namespace c_tier.src.backend.server
                 while (true)
                 {
                     int receivedBytes = clientSocket.Receive(buffer);
-                    if (receivedBytes == 0) break; // Client disconnectedHandleClientCommunication
+                    if (receivedBytes == 0) break; // Client disconnected
                     string message = Convert.ToBase64String(buffer, 0, receivedBytes);
-                    //ServerFrontend.Log("Decrypting data");
+                    ServerFrontend.Log("Decrypting data");
                     string receivedText = Utils.Decrypt(message, rsaKeys[0]);
-
-                    //ServerFrontend.Log("DATA: " + receivedText);
+                    
+                    ServerFrontend.Log("DATA: " + receivedText);
                     string[] aux = receivedText.Split(" ");
 
                     //route to the right endpoint
-                    //ServerFrontend.Log(endpoints.Count.ToString());
+                    ServerFrontend.Log(endpoints.Count.ToString()); 
                     foreach (var endpoint in endpoints)
                     {
                         //ServerFrontend.Log("Endpoint: " + endpoint.destination);
                         if (endpoint.destination.Equals(aux[0]))
                         {
                             endpoint.Route(clientSocket, receivedText, users);
-                            // ServerFrontend.Log("SERVER: Routing to endpoint " + endpoint.destination + "! (" + receivedText + ")");
+                            ServerFrontend.Log("SERVER: Routing to endpoint " + endpoint.destination + "! (" + receivedText + ")");
                         }
                     }
 
                     // If it's just a message (program shouldnt reach this if a valid command has been entered and processed)
                     if (!receivedText.StartsWith('.'))
                     {
-                        //ServerFrontend.Log($"SERVER: Received from client: {receivedText}");
+                        ServerFrontend.Log($"SERVER: Received from client: {receivedText}");
                         if (users.TryGetValue(clientSocket, out var user)) // Find the user
                             UpdateClientsAndAuthor($"{user.username}: {receivedText}", clientSocket); // Send the message
                     }
@@ -286,7 +286,7 @@ namespace c_tier.src.backend.server
 
             foreach (var socket in user.currentChannel.users.Keys)
             {
-                SpeakEncrypted(socket, message);
+                SpeakEncrypted(socket,message);
             }
         }
 
